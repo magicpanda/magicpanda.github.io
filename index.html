@@ -1,443 +1,351 @@
 <!DOCTYPE html>
-<html lang="zh-CN" class="light">
+<html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Culper Research | AppLovin 调查报告</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.2/css/all.min.css">
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            primary: {
-              50: '#f0f9ff',
-              100: '#e0f2fe',
-              200: '#bae6fd',
-              300: '#7dd3fc',
-              400: '#38bdf8',
-              500: '#0ea5e9',
-              600: '#0284c7',
-              700: '#0369a1',
-              800: '#075985',
-              900: '#0c4a6e',
-            },
-            dark: {
-              100: '#1E293B',
-              200: '#0F172A',
-              300: '#020617',
-            },
-          },
-          fontFamily: {
-            sans: ['Inter', 'sans-serif'],
-          },
-        }
-      }
-    }
-  </script>
-  <style>
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    
-    .fade-in {
-      animation: fadeIn 0.6s ease-out forwards;
-    }
-    
-    .content-card {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    
-    .content-card.visible {
-      animation: fadeIn 0.6s ease-out forwards;
-    }
-    
-    .smooth-scroll {
-      scroll-behavior: smooth;
-    }
-
-    blockquote {
-      position: relative;
-    }
-    
-    blockquote::before {
-      content: "\201C"; /* Unicode for left double quotation mark */
-      position: absolute;
-      top: -10px;
-      left: -20px;
-      font-size: 3rem;
-      opacity: 0.2;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>健身天地 - 专业健身指导</title>
+    <meta name="description" content="提供专业的健身方法和课程，帮助您达到健康的体魄和理想的身材">
+    <link rel="stylesheet" href="css/style.css">
+    <!-- 引入字体图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
-<body class="font-sans bg-gray-50 text-gray-900 dark:bg-dark-200 dark:text-gray-100 transition-colors duration-300">
-  
-  <!-- 页面头部 -->
-  <header class="sticky top-0 z-50 bg-white/80 dark:bg-dark-200/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800">
-    <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-      <div class="flex items-center space-x-4">
-        <div class="w-10 h-10 bg-primary-600 rounded-lg flex items-center justify-center text-white font-bold text-lg">
-          CR
+<body>
+    <!-- 导航栏 -->
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>健身<span>天地</span></h1>
+            </div>
+            <div class="menu-toggle">
+                <i class="fas fa-bars"></i>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#" class="active">首页</a></li>
+                    <li><a href="#features">特色服务</a></li>
+                    <li><a href="#courses">课程</a></li>
+                    <li><a href="methods.html">健身方法</a></li>
+                    <li><a href="calculator.html">健身计算器</a></li>
+                    <li><a href="#contact">联系我们</a></li>
+                </ul>
+            </nav>
         </div>
-        <h1 class="text-xl sm:text-2xl font-bold">Culper Research | AppLovin 调查报告</h1>
-      </div>
-      <button id="theme-toggle" class="p-2 rounded-lg bg-gray-100 dark:bg-dark-100 hover:bg-gray-200 dark:hover:bg-dark-300 transition-colors">
-        <i class="fas fa-moon dark:hidden"></i>
-        <i class="fas fa-sun hidden dark:block"></i>
-      </button>
-    </div>
-  </header>
+    </header>
 
-  <!-- 主要内容 -->
-  <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-5xl">
-    
-    <!-- 摘要部分 -->
-    <section class="mb-12 content-card fade-in">
-      <div class="bg-white dark:bg-dark-100 rounded-xl shadow-sm dark:shadow-gray-800/20 p-6 sm:p-8 border border-gray-100 dark:border-gray-800">
-        <div class="flex items-center mb-6">
-          <div class="h-10 w-1 bg-primary-500 rounded-full mr-4"></div>
-          <h2 class="text-2xl sm:text-3xl font-bold">调查摘要</h2>
+    <!-- 英雄区 -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h2>科学健身，塑造完美身材</h2>
+            <p>我们提供专业的健身方案和个性化指导，帮助你实现健康生活和理想体态</p>
+            <div class="hero-buttons">
+                <a href="#courses" class="btn">查看课程</a>
+                <a href="#contact" class="btn btn-outline">联系我们</a>
+            </div>
         </div>
-        
-        <div class="prose dark:prose-invert max-w-none">
-          <p class="text-lg mb-4">Culper Research 发布的这份关于 AppLovin Corporation (NASDAQ:APP) 的调查报告指出，尽管该公司市值已达到 1730 亿美元，但其可能成为自金融危机以来美国最大的股票欺诈案之一。</p>
-          
-          <div class="my-8 bg-gray-50 dark:bg-dark-300 p-4 sm:p-6 rounded-lg border-l-4 border-primary-500">
-            <p class="font-medium mb-2">Culper Research 做空 AppLovin 的两个主要原因：</p>
-            <ol class="list-decimal ml-5 space-y-2">
-              <li>AppLovin 近期在移动游戏领域的成功源于系统性地利用应用权限，通过广告强制静默安装应用程序到用户手机中，只需一次点击 — 而这往往是因为该公司臭名昭著的用户体验陷阱导致的无意点击。由于 AppLovin 主要按安装量获得收入，每次非法安装直接转化为利润。</li>
-              <li>AppLovin 在电子商务领域的新计划是一场烟雾弹，该公司从一开始就操纵了游戏规则。AppLovin 必须严格控制允许哪些广告主进入平台，以防止叙事失控。为此，该公司要求广告主首先在 Meta 上证明每月花费 60 万美元，这样 AppLovin 就可以通过其 MAX 中介平台"看到"展示给 Meta 用户的广告，插入自己的流程并获得销售功劳。</li>
-            </ol>
-          </div>
-        </div>
-      </div>
     </section>
 
-    <!-- AppLovin 隐秘安装机制 -->
-    <section class="mb-12 content-card">
-      <div class="bg-white dark:bg-dark-100 rounded-xl shadow-sm dark:shadow-gray-800/20 p-6 sm:p-8 border border-gray-100 dark:border-gray-800">
-        <div class="flex items-center mb-6">
-          <div class="h-10 w-1 bg-red-500 rounded-full mr-4"></div>
-          <h2 class="text-2xl sm:text-3xl font-bold">AppLovin 的后门安装机制</h2>
+    <!-- 特色服务 -->
+    <section class="features" id="features">
+        <div class="container">
+            <h2 class="section-title animate">我们的特色服务</h2>
+            <div class="feature-grid">
+                <div class="feature-item animate">
+                    <div class="feature-icon">
+                        <i class="fas fa-dumbbell"></i>
+                    </div>
+                    <h3>个性化训练计划</h3>
+                    <p>根据您的身体状况、健身目标和时间安排，定制专属的训练计划，确保高效达成目标。</p>
+                </div>
+                <div class="feature-item animate">
+                    <div class="feature-icon">
+                        <i class="fas fa-heartbeat"></i>
+                    </div>
+                    <h3>科学健身指导</h3>
+                    <p>基于运动科学和人体工程学原理，提供科学的健身方法，避免运动伤害，提高训练效率。</p>
+                </div>
+                <div class="feature-item animate">
+                    <div class="feature-icon">
+                        <i class="fas fa-apple-alt"></i>
+                    </div>
+                    <h3>营养饮食建议</h3>
+                    <p>专业营养师为您提供全面的饮食指导，搭配训练效果，帮助您更快达到理想体态。</p>
+                </div>
+            </div>
         </div>
-        
-        <div class="prose dark:prose-invert max-w-none">
-          <p class="mb-4">在 2022 年末，AppLovin 推出了 Array，与 OEM 和运营商合作，在用户拆箱时在手机上安装新应用程序。因此，Array 的"AppHub"——一个系统级应用程序——被授予强大的"直接下载"权限，允许 AppHub 在 Google Play 商店之外安装应用程序。</p>
-          
-          <div class="my-6 flex flex-col md:flex-row gap-6">
-            <div class="bg-gray-50 dark:bg-dark-300 p-4 rounded-lg flex-1">
-              <h3 class="font-bold mb-2 text-lg flex items-center">
-                <i class="fas fa-shield-alt text-red-500 mr-2"></i>
-                第一步：获取系统权限
-              </h3>
-              <p>AppLovin 通过与手机制造商和运营商的合作，将 AppHub 预装到设备上，获得了强大的系统级权限。</p>
-            </div>
-            <div class="bg-gray-50 dark:bg-dark-300 p-4 rounded-lg flex-1">
-              <h3 class="font-bold mb-2 text-lg flex items-center">
-                <i class="fas fa-code text-red-500 mr-2"></i>
-                第二步：权限嵌入应用
-              </h3>
-              <p>AppLovin 将"AppHub 绑定"权限偷偷植入到数千个自有和合作伙伴的应用中，使这些应用可以继承 AppHub 的权限。</p>
-            </div>
-            <div class="bg-gray-50 dark:bg-dark-300 p-4 rounded-lg flex-1">
-              <h3 class="font-bold mb-2 text-lg flex items-center">
-                <i class="fas fa-download text-red-500 mr-2"></i>
-                第三步：强制安装应用
-              </h3>
-              <p>通过这些权限，应用内广告可以在用户点击后，在未经明确同意的情况下，直接安装第三方应用。</p>
-            </div>
-          </div>
-          
-          <p class="mb-4">根据报告，AppLovin 已将这种机制整合到世界上一些最受欢迎的免费游戏中，包括 Subway Surfers、8 Ball Pool、Wordscapes 和 Angry Birds 2。这些应用的代码中都含有"com.applovin.array.apphub.permission.BIND_APPHUB_SERVICE"权限。</p>
-          
-          <div class="my-6 bg-gray-50 dark:bg-dark-300 p-4 rounded-lg code-block">
-            <pre class="text-xs sm:text-sm overflow-x-auto"><code class="language-xml"><!-- 应用清单文件中的危险权限 -->
-&lt;permission
-    android:name="com.applovin.array.apphub.permission.BIND_APPHUB_SERVICE"
-    android:protectionLevel="signature" /&gt;
-
-&lt;uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" /&gt;
-&lt;uses-permission android:name="android.permission.INSTALL_PACKAGES" /&gt;</code></pre>
-          </div>
-          
-          <blockquote class="p-4 border-l-4 border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-dark-300 my-6">
-            <p class="italic">"我几乎可以肯定他们在做的是一个庞氏骗局...这是垃圾库存，垃圾应用...他们最近改变了...它把你踢出了应用程序，通过广告强制你下载其他应用程序。然后当你重新登录时，它再次计算你，所以它显示你是一个重复用户，但实际上这是一个非常糟糕的体验。这是肮脏的指标。"</p>
-            <footer class="mt-2 font-medium">— AdTech 行业高管</footer>
-          </blockquote>
-        </div>
-      </div>
     </section>
 
-    <!-- 案例研究 -->
-    <section class="mb-12 content-card">
-      <div class="bg-white dark:bg-dark-100 rounded-xl shadow-sm dark:shadow-gray-800/20 p-6 sm:p-8 border border-gray-100 dark:border-gray-800">
-        <div class="flex items-center mb-6">
-          <div class="h-10 w-1 bg-yellow-500 rounded-full mr-4"></div>
-          <h2 class="text-2xl sm:text-3xl font-bold">用户投诉与案例研究</h2>
+    <!-- 关于我们 -->
+    <section class="about" id="about">
+        <div class="container">
+            <h2 class="section-title animate">关于我们</h2>
+            <div class="about-content">
+                <div class="about-image animate">
+                    <img src="images/about.jpg" alt="健身房环境">
+                </div>
+                <div class="about-text animate">
+                    <h3>专业的健身服务提供者</h3>
+                    <p>健身天地成立于2010年，致力于为客户提供高质量的健身服务和专业指导。我们拥有一支经验丰富的教练团队，配备现代化的健身设备和舒适的训练环境。</p>
+                    <p>我们相信健康的生活方式应该是可持续的，因此我们注重将健身融入到日常生活中，帮助客户养成长期健身的好习惯。</p>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-number" data-target="15">0</div>
+                            <div class="stat-text">专业教练</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" data-target="1200">0</div>
+                            <div class="stat-text">活跃会员</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" data-target="20">0</div>
+                            <div class="stat-text">特色课程</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        
-        <div class="prose dark:prose-invert max-w-none">
-          <p class="mb-4">调查发现，用户对 AppHub 强制安装应用的投诉在 Reddit、T-Mobile 用户论坛和 Android Central 等平台上广泛存在。</p>
-          
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-6">
-            <div class="bg-gray-50 dark:bg-dark-300 p-4 rounded-lg">
-              <h3 class="font-bold mb-2">用户投诉示例 1</h3>
-              <p class="italic">"我的手机刚开始在我的安全文件夹中安装随机应用程序"</p>
-            </div>
-            <div class="bg-gray-50 dark:bg-dark-300 p-4 rounded-lg">
-              <h3 class="font-bold mb-2">用户投诉示例 2</h3>
-              <p class="italic">"当广告被点击时，游戏会自动下载到设备上...未经您的同意！"</p>
-            </div>
-            <div class="bg-gray-50 dark:bg-dark-300 p-4 rounded-lg">
-              <h3 class="font-bold mb-2">用户投诉示例 3</h3>
-              <p class="italic">"现在已经三次了，我看到 Tower War 的广告，广告结束后约 30 秒，我收到推送通知说 Tower War 已完成安装..."</p>
-            </div>
-            <div class="bg-gray-50 dark:bg-dark-300 p-4 rounded-lg">
-              <h3 class="font-bold mb-2">用户投诉示例 4</h3>
-              <p class="italic">"有些人简单地称 AppHub 为'纯癌症'"</p>
-            </div>
-          </div>
-          
-          <h3 class="text-xl font-bold mt-8 mb-4">案例研究：Animal Restaurant 和 Bricks n Balls</h3>
-          
-          <div class="my-6 bg-gray-50 dark:bg-dark-300 p-4 rounded-lg">
-            <ol class="list-decimal ml-5 space-y-3">
-              <li>有用户投诉称 Animal Restaurant（下载量超过 1000 万）应用"自动安装了一个名为 Bricks n Balls 的应用"（下载量超过 1000 万）。用户表示"只是因为收到了一个通知说'点击启动'才意识到这一点。"</li>
-              <li>对 Animal Restaurant APK 的审查确认该应用包含"绑定到 AppHub"权限，允许该游戏中的广告启动直接安装。</li>
-              <li>被指控非法安装的 Bricks n Balls 应用当时由 AppLovin 自己的工作室 PeopleFun 拥有。Bricks n Balls 的评论还指出，该应用也会"在未经您同意的情况下自动安装[其他应用]"。</li>
-              <li>Bricks n Balls 的第三方安装数据显示了异常模式，在 2023 年 5 月巴西的 Android 用户和 2023 年 9 月印度的用户中出现了两次大规模安装高峰 — 几乎紧随这些地区的新 Array 合作伙伴关系（分别是三星和 OPPO）之后。</li>
-            </ol>
-          </div>
-        </div>
-      </div>
     </section>
 
-    <!-- 电子商务计划 -->
-    <section class="mb-12 content-card">
-      <div class="bg-white dark:bg-dark-100 rounded-xl shadow-sm dark:shadow-gray-800/20 p-6 sm:p-8 border border-gray-100 dark:border-gray-800">
-        <div class="flex items-center mb-6">
-          <div class="h-10 w-1 bg-blue-500 rounded-full mr-4"></div>
-          <h2 class="text-2xl sm:text-3xl font-bold">AppLovin 的电子商务战略</h2>
-        </div>
-        
-        <div class="prose dark:prose-invert max-w-none">
-          <p class="mb-4">Culper 的报告指出，AppLovin 现在试图将其移动游戏营销策略扩展到电子商务领域。然而，调查显示，AppLovin 在电子商务领域声称的出色表现也是通过操纵系统获得的。</p>
-          
-          <div class="my-6 bg-gray-50 dark:bg-dark-300 p-4 rounded-lg">
-            <h3 class="font-bold mb-2">Meta 支出要求</h3>
-            <p>多个消息来源确认，AppLovin 要求广告主在 Meta 平台上每月至少消费 60 万美元才能使用其电子商务广告服务。</p>
-            <div class="border-l-4 border-blue-500 pl-4 mt-2">
-              <p class="italic">"他们目前只允许每月在 Meta 上花费 60 万美元或更多的广告商进入该计划。"</p>
+    <!-- 推荐 -->
+    <section class="testimonials" id="testimonials">
+        <div class="container">
+            <h2 class="section-title animate">会员心得</h2>
+            <div class="testimonial-container">
+                <div class="testimonial active">
+                    <div class="testimonial-text">
+                        "加入健身天地是我做过的最好的决定之一。教练们非常专业，他们设计的训练计划帮我在3个月内减掉了15公斤，同时增加了肌肉量。现在我的身体状况和自信心都得到了极大的提升！"
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-image">
+                            <img src="images/testimonial-1.jpg" alt="李明">
+                        </div>
+                        <div class="author-info">
+                            <h4>李明</h4>
+                            <p>会员 - 2年</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial">
+                    <div class="testimonial-text">
+                        "作为一个上班族，我一直没有时间健身。健身天地提供的短时高效训练让我能够在繁忙的工作中找到锻炼的时间。教练王教的形体塑造课程太棒了，我现在的身材比20岁时还要好！"
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-image">
+                            <img src="images/testimonial-2.jpg" alt="张丽">
+                        </div>
+                        <div class="author-info">
+                            <h4>张丽</h4>
+                            <p>会员 - 1年</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial">
+                    <div class="testimonial-text">
+                        "我以前尝试过很多健身方法，但都无法坚持。健身天地的课程有趣多样，教练们也很有耐心，让我找到了享受运动的乐趣。现在健身已经成为我生活中不可或缺的一部分了！"
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-image">
+                            <img src="images/testimonial-3.jpg" alt="王强">
+                        </div>
+                        <div class="author-info">
+                            <h4>王强</h4>
+                            <p>会员 - 3年</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-nav">
+                    <span class="nav-dot active"></span>
+                    <span class="nav-dot"></span>
+                    <span class="nav-dot"></span>
+                </div>
             </div>
-          </div>
-          
-          <p class="mb-4">Culper 的分析指出，这一要求的真正目的可能与 AppLovin 通过其 MAX 中介层"查看"Meta 现有广告的能力有关，从而允许 AppLovin 复制 Meta 的成功。</p>
-          
-          <blockquote class="p-4 border-l-4 border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-dark-300 my-6">
-            <p class="italic">"预算是巨大的，这意味着它在 Meta 上广泛支出。这样一来，他们[AppLovin]就能够收集那些意图信号，可能是通过正在被跟踪的 Adjust 应用，然后获得功劳。我一点也不相信它。这不可能。"</p>
-            <footer class="mt-2 font-medium">— 前 Adjust 员工</footer>
-          </blockquote>
-          
-          <div class="my-6 bg-gray-50 dark:bg-dark-300 p-4 rounded-lg">
-            <h3 class="font-bold mb-2">归因操控</h3>
-            <p>报告进一步指出，AppLovin 鼓励广告商使用其在 2021 年收购的归因平台 Adjust，从而有效地"给自己的考试打分"并向广告商报告"A+"的结果。同时，AppLovin 从其候补名单中挑选客户，优先考虑 SKU 数量少且没有自己的数据科学团队的客户 — 也就是说，缺乏资源独立验证公司声明的群体。</p>
-            <div class="border-l-4 border-blue-500 pl-4 mt-2">
-              <p class="italic">"收购 Adjust 让他们能够看到所有数据并进行操作。" — 前 AppLovin 员工</p>
-              <p class="italic mt-2">"[客户]没有数据科学家来自行验证...他们信任 AppLovin 给他们的内容。" — 前 AppLovin 高管</p>
-            </div>
-          </div>
         </div>
-      </div>
     </section>
 
-    <!-- CEO 背景 -->
-    <section class="mb-12 content-card">
-      <div class="bg-white dark:bg-dark-100 rounded-xl shadow-sm dark:shadow-gray-800/20 p-6 sm:p-8 border border-gray-100 dark:border-gray-800">
-        <div class="flex items-center mb-6">
-          <div class="h-10 w-1 bg-purple-500 rounded-full mr-4"></div>
-          <h2 class="text-2xl sm:text-3xl font-bold">AppLovin CEO 的问题历史</h2>
-        </div>
-        
-        <div class="prose dark:prose-invert max-w-none">
-          <p class="mb-4">报告调查了 AppLovin CEO Adam Foroughi 的背景，揭示了一些令人担忧的历史：</p>
-          
-          <div class="my-6">
-            <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
-              <table class="w-full text-sm text-left">
-                <thead class="text-xs uppercase bg-gray-100 dark:bg-dark-300">
-                  <tr>
-                    <th scope="col" class="px-6 py-3">时间段</th>
-                    <th scope="col" class="px-6 py-3">公司</th>
-                    <th scope="col" class="px-6 py-3">问题</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr class="bg-white dark:bg-dark-100 border-b dark:border-gray-800">
-                    <td class="px-6 py-4">2004 年 3 月至 7 月</td>
-                    <td class="px-6 py-4">Claria Corporation（前身为 Gator Corporation）</td>
-                    <td class="px-6 py-4">该公司因创建"最早的广泛使用的间谍软件应用程序之一"而臭名昭著。</td>
-                  </tr>
-                  <tr class="bg-white dark:bg-dark-100 border-b dark:border-gray-800">
-                    <td class="px-6 py-4">2004 年后</td>
-                    <td class="px-6 py-4">LifeStreet Media</td>
-                    <td class="px-6 py-4">与被赶出 Gator 的 CEO Jeff McFadden 和他在 Gator 的老板 Mitchell Weisman 共同创立。</td>
-                  </tr>
-                  <tr class="bg-white dark:bg-dark-100 border-b dark:border-gray-800">
-                    <td class="px-6 py-4">2008 年 8 月至 2010 年 7 月</td>
-                    <td class="px-6 py-4">Social Hour</td>
-                    <td class="px-6 py-4">2009 年 6 月，Facebook 因"欺骗性内容"和"对用户体验构成潜在威胁"而完全禁止 Social Hour 在其平台上投放广告。</td>
-                  </tr>
-                </tbody>
-              </table>
+    <!-- 课程 -->
+    <section class="courses" id="courses">
+        <div class="container">
+            <h2 class="section-title animate">我们的课程</h2>
+            <div class="course-grid">
+                <div class="course-card animate">
+                    <div class="course-image">
+                        <img src="images/course-1.jpg" alt="增肌训练">
+                    </div>
+                    <div class="course-body">
+                        <h3 class="course-title">增肌训练</h3>
+                        <p class="course-description">专注于增加肌肉质量和力量的系统性训练课程，适合希望塑造肌肉线条和提高力量的学员。</p>
+                        <a href="courses.html#muscle" class="btn">了解详情</a>
+                    </div>
+                    <div class="course-footer">
+                        <div class="course-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                        </div>
+                        <div class="course-duration">8周课程</div>
+                    </div>
+                </div>
+                <div class="course-card animate">
+                    <div class="course-image">
+                        <img src="images/course-2.jpg" alt="减脂塑形">
+                    </div>
+                    <div class="course-body">
+                        <h3 class="course-title">减脂塑形</h3>
+                        <p class="course-description">结合有氧运动和力量训练，帮助学员燃烧脂肪，提高代谢水平，塑造紧致体态。</p>
+                        <a href="courses.html#fat-loss" class="btn">了解详情</a>
+                    </div>
+                    <div class="course-footer">
+                        <div class="course-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="course-duration">12周课程</div>
+                    </div>
+                </div>
+                <div class="course-card animate">
+                    <div class="course-image">
+                        <img src="images/course-3.jpg" alt="功能性训练">
+                    </div>
+                    <div class="course-body">
+                        <h3 class="course-title">功能性训练</h3>
+                        <p class="course-description">注重提高身体整体机能和日常活动能力的训练课程，提升核心稳定性、平衡能力和灵活度。</p>
+                        <a href="courses.html#functional" class="btn">了解详情</a>
+                    </div>
+                    <div class="course-footer">
+                        <div class="course-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="far fa-star"></i>
+                        </div>
+                        <div class="course-duration">6周课程</div>
+                    </div>
+                </div>
             </div>
-          </div>
-          
-          <p class="mb-4">在 AppLovin，Foroughi 已经聚集了许多前同事：</p>
-          <ul class="list-disc ml-5 space-y-1">
-            <li>AppLovin 联合创始人兼产品副总裁 Andrew Karam 曾在 Foroughi 创立的 Lifestreet、Style Page 和 Social Hour 工作。</li>
-            <li>现任 AppLovin 董事 Eduardo Vivas 共同创立了 Social Hour。</li>
-            <li>AppLovin 新计划总经理 Rafael Vivas 是 Social Hour 的业务发展总监，他也是 Eduardo Vivas 的兄弟。</li>
-            <li>现任 Applovin 财务和会计主管 Patrick McNenny 曾在 Lifestreet 担任财务副总裁超过 10 年。</li>
-          </ul>
-          
-          <div class="my-6 bg-gray-50 dark:bg-dark-300 p-4 rounded-lg">
-            <h3 class="font-bold mb-2">内部人士套现</h3>
-            <p>报告指出，在过去十二个月中，AppLovin 内部人士已经出售了近 20 亿美元的股票，而 KKR 则抛售了其剩余的 73 亿美元股份。</p>
-          </div>
+            <div class="view-all animate">
+                <a href="courses.html" class="btn btn-outline">查看全部课程</a>
+            </div>
         </div>
-      </div>
     </section>
 
-    <!-- 结论 -->
-    <section class="mb-12 content-card">
-      <div class="bg-white dark:bg-dark-100 rounded-xl shadow-sm dark:shadow-gray-800/20 p-6 sm:p-8 border border-gray-100 dark:border-gray-800">
-        <div class="flex items-center mb-6">
-          <div class="h-10 w-1 bg-green-500 rounded-full mr-4"></div>
-          <h2 class="text-2xl sm:text-3xl font-bold">结论</h2>
+    <!-- 行动召唤 -->
+    <section class="cta">
+        <div class="container">
+            <div class="cta-content animate">
+                <h3>准备好开始你的健身之旅了吗？</h3>
+                <p>立即联系我们，获取一次免费的健身评估和个性化建议。我们的专业团队将帮助你实现健康目标。</p>
+                <a href="#contact" class="btn">立即联系</a>
+            </div>
         </div>
-        
-        <div class="prose dark:prose-invert max-w-none">
-          <p class="mb-4">Culper Research 的调查报告质疑 AppLovin 声称其业务增长归功于 AI 技术（AXON 2.0）的说法。该报告提出，AppLovin 的成功实际上源于：</p>
-          
-          <ol class="list-decimal ml-5 space-y-2 mb-6">
-            <li>利用危险的应用程序权限在未经明确同意的情况下在用户设备上强制安装应用程序。</li>
-            <li>在电子商务领域创建一个有利于自己的系统，通过要求广告主首先在 Meta 上证明大量支出，然后让他们使用 AppLovin 自己的归因平台 Adjust 来"评估"结果。</li>
-          </ol>
-          
-          <p class="mb-4">基于这些发现，Culper Research 做空 AppLovin 并认为其股价将下跌。报告还提到，Culper Research 计划向 Google Play 和 Meta 发出公开信，就 AppLovin 据称违反政策和可能影响用户的风险表达关切。</p>
-          
-          <div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg border border-red-200 dark:border-red-800/30 my-6">
-            <p class="text-red-800 dark:text-red-200 font-medium">免责声明：本网页内容仅作信息分享之用，不构成投资建议。所有信息均源自原始报告，请读者自行判断信息的准确性和可靠性。</p>
-          </div>
-        </div>
-      </div>
     </section>
-  </main>
 
-  <!-- 页脚 -->
-  <footer class="bg-white dark:bg-dark-100 border-t border-gray-200 dark:border-gray-800 py-8">
-    <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div>
-          <h3 class="font-bold text-lg mb-4">作者信息</h3>
-          <p class="mb-2">作者姓名: [作者姓名]</p>
-          <p class="text-gray-600 dark:text-gray-400">金融研究分析师</p>
+    <!-- 博客 -->
+    <section class="blog" id="blog">
+        <div class="container">
+            <h2 class="section-title animate">健身知识</h2>
+            <div class="blog-grid">
+                <div class="blog-card animate">
+                    <div class="blog-image">
+                        <img src="images/blog-1.jpg" alt="如何科学增肌">
+                    </div>
+                    <div class="blog-body">
+                        <div class="blog-meta">
+                            <span><i class="far fa-calendar"></i> 2025-02-15</span>
+                            <span><i class="far fa-user"></i> 李教练</span>
+                        </div>
+                        <h3 class="blog-title">如何科学增肌：避开这些常见误区</h3>
+                        <p class="blog-excerpt">很多人在增肌过程中走了弯路，本文介绍科学增肌的方法和常见误区，帮助你更有效地增长肌肉...</p>
+                        <a href="#" class="btn btn-outline">阅读更多</a>
+                    </div>
+                </div>
+                <div class="blog-card animate">
+                    <div class="blog-image">
+                        <img src="images/blog-2.jpg" alt="饮食与健身">
+                    </div>
+                    <div class="blog-body">
+                        <div class="blog-meta">
+                            <span><i class="far fa-calendar"></i> 2025-02-28</span>
+                            <span><i class="far fa-user"></i> 王营养师</span>
+                        </div>
+                        <h3 class="blog-title">健身饮食指南：如何合理安排一日三餐</h3>
+                        <p class="blog-excerpt">合理的饮食计划是健身成功的关键因素之一，本文将指导你如何安排每日饮食，搭配训练效果...</p>
+                        <a href="#" class="btn btn-outline">阅读更多</a>
+                    </div>
+                </div>
+                <div class="blog-card animate">
+                    <div class="blog-image">
+                        <img src="images/blog-3.jpg" alt="恢复训练">
+                    </div>
+                    <div class="blog-body">
+                        <div class="blog-meta">
+                            <span><i class="far fa-calendar"></i> 2025-03-05</span>
+                            <span><i class="far fa-user"></i> 张教练</span>
+                        </div>
+                        <h3 class="blog-title">训练后恢复的重要性及方法</h3>
+                        <p class="blog-excerpt">训练后的恢复对肌肉生长和减少运动伤害至关重要，本文介绍多种有效的恢复方法和技巧...</p>
+                        <a href="#" class="btn btn-outline">阅读更多</a>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div>
-          <h3 class="font-bold text-lg mb-4">社交媒体</h3>
-          <div class="flex flex-col space-y-2">
-            <a href="#" class="flex items-center text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
-              <i class="fab fa-github w-6"></i>
-              <span>GitHub</span>
-            </a>
-            <a href="#" class="flex items-center text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
-              <i class="fab fa-twitter w-6"></i>
-              <span>Twitter</span>
-            </a>
-            <a href="#" class="flex items-center text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
-              <i class="fab fa-linkedin w-6"></i>
-              <span>LinkedIn</span>
-            </a>
-          </div>
-        </div>
-        <div>
-          <h3 class="font-bold text-lg mb-4">版权信息</h3>
-          <p class="mb-2">© 2025 [作者姓名]</p>
-          <p class="text-gray-600 dark:text-gray-400">保留所有权利</p>
-        </div>
-      </div>
-      
-      <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-800 text-center text-gray-600 dark:text-gray-400 text-sm">
-        <p>本网页基于 Culper Research 公开发布的报告内容创建，仅供参考。原始报告版权归 Culper Research 所有。</p>
-      </div>
-    </div>
-  </footer>
+    </section>
 
-  <script>
-    // 主题切换功能
-    const html = document.documentElement;
-    const themeToggle = document.getElementById('theme-toggle');
-    
-    // 检查系统偏好
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
-    // 检查本地存储
-    const savedTheme = localStorage.getItem('theme');
-    
-    // 设置初始主题
-    if (savedTheme) {
-      html.classList.remove('light', 'dark');
-      html.classList.add(savedTheme);
-    } else if (prefersDark) {
-      html.classList.remove('light');
-      html.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-    }
-    
-    // 主题切换监听
-    themeToggle.addEventListener('click', () => {
-      if (html.classList.contains('dark')) {
-        html.classList.replace('dark', 'light');
-        localStorage.setItem('theme', 'light');
-      } else {
-        html.classList.replace('light', 'dark');
-        localStorage.setItem('theme', 'dark');
-      }
-    });
-    
-    // 内容区块进入视图时触发动画
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.1 });
-    
-    document.querySelectorAll('.content-card:not(.fade-in)').forEach(card => {
-      observer.observe(card);
-    });
-    
-    // 按钮悬停效果
-    const buttons = document.querySelectorAll('button, a');
-    buttons.forEach(button => {
-      button.addEventListener('mouseover', () => {
-        button.style.transform = 'scale(1.05)';
-        button.style.transition = 'transform 0.3s ease';
-      });
-      button.addEventListener('mouseout', () => {
-        button.style.transform = 'scale(1)';
-      });
-    });
-    
-    // 平滑滚动
-    document.body.classList.add('smooth-scroll');
-  </script>
+    <!-- 页脚 -->
+    <footer id="contact">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-about">
+                    <h3>关于健身天地</h3>
+                    <p>我们致力于提供专业的健身服务和个性化指导，帮助每一位会员实现健康生活和理想体态。</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-weixin"></i></a>
+                        <a href="#"><i class="fab fa-weibo"></i></a>
+                        <a href="#"><i class="fab fa-qq"></i></a>
+                        <a href="#"><i class="fab fa-tiktok"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h3>快速链接</h3>
+                    <ul>
+                        <li><a href="#">首页</a></li>
+                        <li><a href="#features">特色服务</a></li>
+                        <li><a href="#courses">课程</a></li>
+                        <li><a href="methods.html">健身方法</a></li>
+                        <li><a href="calculator.html">健身计算器</a></li>
+                        <li><a href="#blog">健身知识</a></li>
+                    </ul>
+                </div>
+                <div class="footer-contact">
+                    <h3>联系我们</h3>
+                    <ul>
+                        <li><i class="fas fa-map-marker-alt"></i> 北京市海淀区中关村大街1号</li>
+                        <li><i class="fas fa-phone"></i> 400-123-4567</li>
+                        <li><i class="fas fa-envelope"></i> info@jianshen.com</li>
+                        <li><i class="fas fa-clock"></i> 周一至周日 08:00 - 22:00</li>
+                    </ul>
+                </div>
+                <div class="footer-newsletter">
+                    <h3>订阅我们</h3>
+                    <p>订阅我们的电子报，获取最新的健身资讯和优惠活动。</p>
+                    <form class="newsletter-form">
+                        <input type="email" placeholder="您的邮箱地址">
+                        <button type="submit"><i class="fas fa-paper-plane"></i></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="container">
+                <p>&copy; 2025 健身天地. 保留所有权利.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/script.js"></script>
 </body>
 </html>

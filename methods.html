@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>健身方法 - 健身天地</title>
+    <meta name="description" content="了解科学有效的健身方法，包括力量训练、有氧训练、功能性训练等多种健身技术和原理">
+    <link rel="stylesheet" href="css/style.css">
+    <!-- 引入字体图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* 健身方法页面特定样式 */
+        .methods-hero {
+            height: 60vh;
+            min-height: 400px;
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('images/methods-hero.jpg') no-repeat center center/cover;
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: var(--light-text);
+        }
+
+        .methods-hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        .methods-hero p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto 30px;
+            opacity: 0.9;
+        }
+
+        .methods-tabs {
+            background-color: var(--secondary-color);
+            padding: 15px 0;
+            position: sticky;
+            top: 70px;
+            z-index: 90;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .methods-tabs ul {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .methods-tabs ul li a {
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 30px;
+            background-color: rgba(255, 255, 255, 0.1);
+            transition: var(--transition);
+        }
+
+        .methods-tabs ul li a:hover,
+        .methods-tabs ul li a.active {
+            background-color: var(--primary-color);
+        }
+
+        .method-section {
+            padding: 80px 0;
+        }
+
+        .method-section:nth-child(even) {
+            background-color: var(--background-color);
+        }
+
+        .method-intro {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto 50px;
+        }
+
+        .method-intro p {
+            color: #666;
+            line-height: 1.8;
+        }
+
+        .method-container {
+            display: flex;
+            align-items: center;
+            gap: 50px;
+            margin-bottom: 70px;
+        }
+
+        .method-container:last-child {
+            margin-bottom: 0;
+        }
+
+        .method-content {
+            flex: 1;
+        }
+
+        .method-image {
+            flex: 1;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+        }
+
+        .method-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .method-container:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+
+        .method-title {
+            color: var(--secondary-color);
+            font-size: 2.2rem;
+            margin-bottom: 20px;
+        }
+
+        .method-description {
+            margin-bottom: 25px;
+            color: #666;
+            line-height: 1.8;
+        }
+
+        .method-benefits {
+            margin-bottom: 25px;
+        }
+
+        .method-benefits h3 {
+            margin-bottom: 15px;
+            color: var(--secondary-color);
+        }
+
+        .benefits-list {
+            list-style: none;
+        }
+
+        .benefits-list li {
+            margin-bottom: 10px;
+            position: relative;
+            padding-left: 28px;
+        }
+
+        .benefits-list li::before {
+            content: "\f00c";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            color: var(--primary-color);
+            position: absolute;
+            left: 0;
+            top: 2px;
+        }
+
+        .method-tips {
+            margin-bottom: 25px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: var(--box-shadow);
+        }
+
+        .method-tips h3 {
+            margin-bottom: 15px;
+            color: var(--secondary-color);
+            display: flex;
+            align-items: center;
+        }
+
+        .method-tips h3 i {
+            margin-right: 10px;
+            color: var(--primary-color);
+        }
+
+        .tips-list {
+            list-style: none;
+        }
+
+        .tips-list li {
+            margin-bottom: 10px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .tips-list li::before {
+            content: "\f138";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            color: var(--primary-color);
+            position: absolute;
+            left: 0;
+            top: 2px;
+        }
+
+        .method-cta {
+            margin-top: 30px;
+        }
+
+        /* 比较表格样式 */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 40px 0;
+            box-shadow: var(--box-shadow);
+            background-color: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 15px;
+            text-align: left;
+        }
+
+        .comparison-table th {
+            background-color: var(--secondary-color);
+            color: #fff;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .comparison-table td:first-child {
+            font-weight: bold;
+            color: var(--secondary-color);
+        }
+
+        .comparison-table .check {
+            color: #00C851;
+        }
+
+        .comparison-table .times {
+            color: #ff4444;
+        }
+
+        /* 常见问题样式 */
+        .faq-section {
+            margin-top: 70px;
+        }
+
+        .faq-item {
+            margin-bottom: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+        }
+
+        .faq-question {
+            padding: 20px;
+            background-color: var(--background-color);
+            font-weight: bold;
+            cursor: pointer;
+            position: relative;
+            color: var(--secondary-color);
+        }
+
+        .faq-question::after {
+            content: '\f078';
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            right: 20px;
+            transition: var(--transition);
+        }
+
+        .faq-item.active .faq-question::after {
+            transform: rotate(180deg);
+        }
+
+        .faq-answer {
+            padding: 0 20px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+        }
+
+        .faq-item.active .faq-answer {
+            padding: 20px;
+            max-height: 500px;
+        }
+
+        /* 健身工具和装备部分 */
+        .equipment-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .equipment-card {
+            background-color: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+            text-align: center;
+        }
+
+        .equipment-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .equipment-image {
+            height: 200px;
+            overflow: hidden;
+        }
+
+        .equipment-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .equipment-body {
+            padding: 20px;
+        }
+
+        .equipment-title {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: var(--secondary-color);
+        }
+
+        .equipment-text {
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        /* 响应式布局 */
+        @media (max-width: 992px) {
+            .method-container {
+                flex-direction: column;
+            }
+
+            .method-container:nth-child(even) {
+                flex-direction: column;
+            }
+
+            .method-content, .method-image {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .methods-hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .method-title {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>健身<span>天地</span></h1>
+            </div>
+            <div class="menu-toggle">
+                <i class="fas fa-bars"></i>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">首页</a></li>
+                    <li><a href="index.html#features">特色服务</a></li>
+                    <li><a href="courses.html">课程</a></li>
+                    <li><a href="#" class="active">健身方法</a></li>
+                    <li><a href="calculator.html">健身计算器</a></li>
+                    <li><a href="index.html#contact">联系我们</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- 健身方法页面英雄区 -->
+    <section class="methods-hero">
+        <div class="container">
+            <h1>科学健身方法指南</h1>
+            <p>了解各种专业健身方法的原理和技巧，帮助您选择最适合自己的训练方式，高效达成健身目标</p>
+        </div>
+    </section>
+
+    <!-- 健身方法标签页导航 -->
+    <section class="methods-tabs">
+        <div class="container">
+            <ul>
+                <li><a href="#strength-training" class="active">力量训练</a></li>
+                <li><a href="#cardio-training">有氧训练</a></li>
+                <li><a href="#hiit-training">HIIT训练</a></li>
+                <li><a href="#flexibility">灵活性训练</a></li>
+                <li><a href="#equipment">健身装备</a></li>
+                <li><a href="#faq">常见问题</a></li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- 力量训练部分 -->
+    <section class="method-section" id="strength-training">
+        <div class="container">
+            <h2 class="section-title animate">力量训练</h2>
+            <div class="method-intro animate">
+                <p>力量训练是通过负重练习来增强肌肉力量、耐力和体积的训练方法。合理的力量训练不仅可以塑造理想的身材，还能提高基础代谢率，增强骨密度，改善身体姿势和日常活动能力。</p>
+            </div>
+
+            <div class="method-container animate">
+                <div class="method-content">
+                    <h3 class="method-title">重量训练</h3>
+                    <div class="method-description">
+                        <p>重量训练是使用自由重量（如杠铃、哑铃）或器械进行的力量训练形式。通过控制重量、次数和组数来刺激肌肉生长，提高力量水平。根据目标不同，可以选择不同的训练参数。</p>
+                        <p>例如，增肌训练通常使用中等重量（8-12次/组），而增强最大力量则需要使用较大重量（1-6次/组）。初学者应该先掌握正确的动作技术，然后再逐渐增加训练强度。</p>
+                    </div>
+                    <div class="method-benefits">
+                        <h3>主要好处</h3>
+                        <ul class="benefits-list">
+                            <li>增加肌肉质量和力量</li>
+                            <li>提高基础代谢率，有利于控制体重</li>
+                            <li>增强骨密度，预防骨质疏松</li>
+                            <li>改善姿势和身体稳定性</li>
+                            <li>提高日常活动能力和运动表现</li>
+                        </ul>
+                    </div>
+                    <div class="method-tips">
+                        <h3><i class="fas fa-lightbulb"></i> 训练小贴士</h3>
+                        <ul class="tips-list">
+                            <li>始终注重动作技术，宁可减轻重量也要保持正确姿势</li>
+                            <li>遵循渐进式负荷原则，逐渐增加训练难度</li>
+                            <li>给予肌肉充分的恢复时间，避免过度训练</li>
+                            <li>合理搭配饮食，确保摄入足够的蛋白质和营养物质</li>
+                            <li>定期调整训练计划，避免适应性停滞</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="method-image">
+                    <img src="images/strength-training.jpg" alt="重量训练">
+                </div>
+            </div>
+
+            <div class="method-container animate">
+                <div class="method-content">
+                    <h3 class="method-title">自重训练</h3>
+                    <div class="method-description">
+                        <p>自重训练是利用自身体重作为阻力的力量训练形式，无需特殊器械也能有效锻炼全身肌肉。常见的自重训练动作包括俯卧撑、深蹲、引体向上、平板支撑等。</p>
+                        <p>自重训练的优势在于灵活方便，可以随时随地进行，同时也能通过改变动作难度和姿势来持续挑战自己。对于初学者或无法前往健身房的人群来说，自重训练是一个极佳的选择。</p>
+                    </div>
+                    <div class="method-benefits">
+                        <h3>主要好处</h3>
+                        <ul class="benefits-list">
+                            <li>无需特殊器械，随时随地可训练</li>
+                            <li>锻炼核心稳定性和全身协调能力</li>
+                            <li>降低受伤风险，适合各年龄段人群</li>
+                            <li>可根据个人情况调整难度</li>
+                            <li>提高功能性力量，更适应日常活动需求</li>
+                        </ul>
+                    </div>
+                    <div class="method-tips">
+                        <h3><i class="fas fa-lightbulb"></i> 训练小贴士</h3>
+                        <ul class="tips-list">
+                            <li>从基础动作开始，逐步过渡到更高难度的变式</li>
+                            <li>通过改变杠杆原理（如改变手脚位置）来调整训练难度</li>
+                            <li>重视动作质量而非数量，保持控制力和稳定性</li>
+                            <li>结合间歇训练或循环训练提高训练效率</li>
+                            <li>可使用辅助工具（如TRX、弹力带）丰富训练内容</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="method-image">
+                    <img src="images/bodyweight-training.jpg" alt="自重训练">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 有氧训练部分 -->
+    <section class="method-section" id="cardio-training">
+        <div class="container">
+            <h2 class="section-title animate">有氧训练</h2>
+            <div class="method-intro animate">
+                <p>有氧训练是以提高心肺功能为主的运动方式，通过持续性的中低强度运动，促进心血管健康，增强耐力，同时燃烧热量，帮助控制体重。适合所有健身水平的人群，是全面健身计划中不可或缺的部分。</p>
+            </div>
+
+            <div class="method-container animate">
+                <div class="method-content">
+                    <h3 class="method-title">稳态有氧训练</h3>
+                    <div class="method-description">
+                        <p>稳态有氧训练是指在一段时间内保持相对稳定的中等强度运动，如慢跑、快走、骑行或游泳等。这种训练方式通常保持在最大心率的65%-75%范围内，时间从20分钟到60分钟不等。</p>
+                        <p>稳态有氧是最传统和基础的有氧训练方式，特别适合初学者和希望持续燃脂的人群。长时间的中强度运动可以有效提高心肺功能，增强耐力，并且对于减脂效果显著。</p>
+                    </div>
+                    <div class="method-benefits">
+                        <h3>主要好处</h3>
+                        <ul class="benefits-list">
+                            <li>提高心肺功能，增强心血管健康</li>
+                            <li>有效燃烧脂肪，帮助减重</li>
+                            <li>降低血压和胆固醇水平</li>
+                            <li>增强整体耐力和精力水平</li>
+                            <li>降低压力，改善心理健康</li>
+                        </ul>
+                    </div>
+                    <div class="method-tips">
+                        <h3><i class="fas fa-lightbulb"></i> 训练小贴士</h3>
+                        <ul class="tips-list">
+                            <li>选择自己感兴趣的有氧活动，提高长期坚持的可能性</li>
+                            <li>使用心率监测器确保运动强度在目标区间</li>
+                            <li>遵循循序渐进原则，逐渐增加训练时间和强度</li>
+                            <li>穿着合适的运动鞋，保护关节</li>
+                            <li>尝试不同的有氧活动，避免单调</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="method-image">
+                    <img src="images/steady-state-cardio.jpg" alt="稳态有氧训练">
+                </div>
+            </div>
+
+            <div class="method-container animate">
+                <div class="method-content">
+                    <h3 class="method-title">间歇有氧训练</h3>
+                    <div class="method-description">
+                        <p>间歇有氧训练是指高强度和低强度（或休息）阶段交替进行的训练方法。例如，30秒冲刺跑后休息90秒，或者1分钟高强度骑行后1分钟低强度恢复。</p>
+                        <p>这种训练方法更加高效，能在较短的时间内获得显著的有氧能力提升。间歇训练不仅能提高最大摄氧量，还能增强身体处理乳酸的能力，同时由于训练后氧耗增加，有利于持续燃烧脂肪。</p>
+                    </div>
+                    <div class="method-benefits">
+                        <h3>主要好处</h3>
+                        <ul class="benefits-list">
+                            <li>在较短时间内获得高效锻炼</li>
+                            <li>提高最大摄氧量和无氧阈值</li>
+                            <li>增强脂肪燃烧效率，提高代谢率</li>
+                            <li>刺激人体生长激素分泌</li>
+                            <li>提高运动表现和爆发力</li>
+                        </ul>
+                    </div>
+                    <div class="method-tips">
+                        <h3><i class="fas fa-lightbulb"></i> 训练小贴士</h3>
+                        <ul class="tips-list">
+                            <li>始终进行充分的热身和缓和活动</li>
+                            <li>根据个人体能水平调整高强度和休息的比例</li>
+                            <li>初学者可从1:3或1:2的工作休息比开始</li>
+                            <li>随着适应能力提高，逐渐增加强度或缩短休息时间</li>
+                            <li>每周进行2-3次间歇训练，确保有足够恢复时间</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="method-image">
+                    <img src="images/interval-cardio.jpg" alt="间歇有氧训练">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- HIIT训练部分 -->
+    <section class="method-section" id="hiit-training">
+        <div class="container">
+            <h2 class="section-title animate">高强度间歇训练 (HIIT)</h2>
+            <div class="method-intro animate">
+                <p>高强度间歇训练（HIIT）是一种将高强度运动与短暂休息或低强度运动交替进行的训练方法。这种训练形式能在较短时间内提供显著的健身效果，非常适合时间有限的现代人。</p>
+            </div>
+
+            <div class="method-container animate">
+                <div class="method-content">
+                    <h3 class="method-title">HIIT训练原理与方法</h3>
+                    <div class="method-description">
+                        <p>HIIT训练的核心原理是通过短时间的极高强度运动（通常在最大心率的85%-95%），迅速消耗肌糖原，刺激心肺系统，然后通过短暂休息或低强度活动让身体部分恢复，接着再次进入高强度阶段。</p>
+                        <p>常见的HIIT协议包括Tabata（20秒全力，10秒休息，8轮），30-30（30秒高强度，30秒低强度）或4×4（4分钟高强度，3分钟恢复，4轮）等。HIIT可以应用于各种运动形式，如跑步、骑行、跳绳，也可以结合力量训练动作创建全身HIIT训练。</p>
+                    </div>
+                    <div class="method-benefits">
+                        <h3>主要好处</h3>
+                        <ul class="benefits-list">
+                            <li>在短时间内获得高效训练效果（通常15-30分钟）</li>
+                            <li>显著提高心肺功能和最大摄氧量</li>
+                            <li>增强训练后氧耗（EPOC），持续燃烧热量</li>
+                            <li>保留肌肉量的同时减少脂肪</li>
+                            <li>改善胰岛素敏感性，帮助调节血糖</li>
+                        </ul>
+                    </div>
+                    <div class="method-tips">
+                        <h3><i class="fas fa-lightbulb"></i> 训练小贴士</h3>
+                        <ul class="tips-list">
+                            <li>务必进行充分的热身，避免由于高强度运动导致的伤害</li>
+                            <li>真正的全力运动强度对初学者来说可能过高，应循序渐进</li>
+                            <li>尊重自己的身体极限，适当调整强度</li>
+                            <li>每周进行2-3次HIIT训练，留出足够恢复时间</li>
+                            <li>结合不同的动作和训练模式，保持训练新鲜感</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="method-image">
+                    <img src="images/hiit-training.jpg" alt="HIIT训练">
+                </div>
+            </div>
+
+            <div class="method-container animate">
+                <div class="method-content">
+                    <h3 class="method-title">HIIT训练计划示例</h3>
+                    <div class="method-description">
+                        <p>以下是一个基础的全身HIIT训练计划示例，适合在家或健身房进行，无需特殊器械：</p>
+                        <p><strong>热身（5分钟）</strong>：轻度有氧活动（原地慢跑、高抬腿）+动态拉伸</p>
+                        <p><strong>主要训练（20分钟）</strong>：进行4轮循环，每轮包含以下动作，每个动作40秒全力，休息20秒，动作间不额外休息</p>
+                        <ol style="margin-left: 20px; margin-bottom: 20px;">
+                            <li>跳跃深蹲</li>
+                            <li>俯卧撑（可根据能力调整难度）</li>
+                            <li>弓步跳</li>
+                            <li>俄罗斯转体</li>
+                            <li>登山者</li>
+                        </ol>
+                        <p>每轮之间休息60秒</p>
+                        <p><strong>缓和（5分钟）</strong>：轻度有氧活动+静态拉伸</p>
+                    </div>
+                </div>
+                <div class="method-image">
+                    <img src="images/hiit-example.jpg" alt="HIIT训练计划示例">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 灵活性训练部分 -->
+    <section class="method-section" id="flexibility">
+        <div class="container">
+            <h2 class="section-title animate">灵活性与恢复训练</h2>
+            <div class="method-intro animate">
+                <p>灵活性训练和恢复技术是全面健身计划中不可或缺的组成部分，可以提高关节活动范围，预防伤害，加快恢复，并改善整体健康状态。这些方法适合所有健身水平的人群，特别是力量和有氧训练的补充。</p>
+            </div>
+
+            <div class="method-container animate">
+                <div class="method-content">
+                    <h3 class="method-title">静态拉伸</h3>
+                    <div class="method-description">
+                        <p>静态拉伸是指将肌肉延展到舒适的极限位置并保持一段时间的技术，通常每个拉伸保持15-60秒。这种方法可以有效增加肌肉长度，提高关节活动范围。</p>
+                        <p>研究表明，静态拉伸最适合在训练后或单独的灵活性训练中进行，而不是在高强度训练前（可能会暂时降低力量和爆发力）。对于改善整体灵活性和放松紧张肌肉特别有效。</p>
+                    </div>
+                    <div class="method-benefits">
+                        <h3>主要好处</h3>
+                        <ul class="benefits-list">
+                            <li>增加肌肉长度和关节活动范围</li>
+                            <li>减轻肌肉紧张和训练后酸痛</li>
+                            <li>改善姿势和身体线条</li>
+                            <li>降低运动伤害风险</li>
+                            <li>促进身心放松</li>
+                        </ul>
+                    </div>
+                    <div class="method-tips">
+                        <h3><i class="fas fa-lightbulb"></i> 训练小贴士</h3>
+                        <ul class="tips-list">
+                            <li>拉伸时呼吸保持平稳，不要屏息</li>
+                            <li>将拉伸强度保持在轻微不适感，避免疼痛</li>
+                            <li>每侧至少保持30秒，重复1-3次</li>
+                            <li>全身主要肌群均需关注</li>
+                            <li>拉伸前最好先进行轻度热身</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="method-image">
+                    <img src="images/static-stretching.jpg" alt="静态拉伸">
+                </div>
+            </div>
+
+            <div class="method-container animate">
+                <div class="method-content">
+                    <h3 class="method-title">动态拉伸与活动性训练</h3>
+                    <div class="method-description">
+                        <p>动态拉伸是指通过控制的动作模式，将肌肉和关节在活动范围内移动的技术。不同于静态拉伸的保持，动态拉伸是在运动中进行的，如腿部摆动、手臂画圈、深蹲等。</p>
+                        <p>动态拉伸特别适合作为训练前的热身，可以提高体温，增加肌肉活性，为即将进行的运动做准备。它结合了灵活性和功能性，更符合实际运动需求。</p>
+                    </div>
+                    <div class="method-benefits">
+                        <h3>主要好处</h3>
+                        <ul class="benefits-list">
+                            <li>提高肌肉温度和血流量</li>
+                            <li>改善神经肌肉协调性</li>
+                            <li>为特定运动提供专项准备</li>
+                            <li>提升运动表现和反应能力</li>
+                            <li>在维持灵活性的同时保持肌肉激活状态</li>
+                        </ul>
+                    </div>
+                    <div class="method-tips">
+                        <h3><i class="fas fa-lightbulb"></i> 训练小贴士</h3>
+                        <ul class="tips-list">
+                            <li>动作控制是关键，避免借助惯性或过度摆动</li>
+                            <li>从小范围开始，逐渐增加活动幅度</li>
+                            <li>每个动作重复10-15次</li>
+                            <li>动态拉伸应模仿即将进行的运动模式</li>
+                            <li>保持流畅的呼吸节奏</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="method-image">
+                    <img src="images/dynamic-stretching.jpg" alt="动态拉伸">
+                </div>
+            </div>
+
+            <div class="method-container animate">
+                <div class="method-content">
+                    <h3 class="method-title">放松恢复技术</h3>
+                    <div class="method-description">
+                        <p>恢复技术是促进身体从训练压力中恢复的各种方法，包括泡沫轴放松、肌筋膜释放、按摩、对比浴等。这些技术可以减轻肌肉酸痛，促进血液循环，加速代谢废物清除。</p>
+                        <p>有效的恢复策略可以缩短训练后恢复时间，减少过度训练风险，并提高长期训练效果。恢复应被视为训练计划的重要组成部分，而不是可有可无的附加环节。</p>
+                    </div>
+                    <div class="method-benefits">
+                        <h3>主要好处</h3>
+                        <ul class="benefits-list">
+                            <li>加速肌肉组织修复和恢复</li>
+                            <li>减轻延迟性肌肉酸痛(DOMS)</li>
+                            <li>改善血液循环和淋巴引流</li>
+                            <li>减轻肌筋膜粘连和触发点</li>
+                            <li>促进整体放松和压力释放</li>
+                        </ul>
+                    </div>
+                    <div class="method-tips">
+                        <h3><i class="fas fa-lightbulb"></i> 恢复小贴士</h3>
+                        <ul class="tips-list">
+                            <li>每周安排1-2天完全休息日</li>
+                            <li>使用泡沫轴时，在敏感区域停留30-60秒</li>
+                            <li>交替使用热敷和冷敷可促进血液循环</li>
+                            <li>保证充足的睡眠，这是最重要的恢复手段</li>
+                            <li>关注营养摄入和水分补充，支持恢复过程</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="method-image">
+                    <img src="images/recovery-techniques.jpg" alt="放松恢复技术">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 训练方法比较 -->
+    <section class="method-section">
+        <div class="container">
+            <h2 class="section-title animate">训练方法比较</h2>
+            <div class="method-intro animate">
+                <p>不同的训练方法各有特点和适用场景，根据个人目标和条件选择合适的训练方式至关重要。以下表格对主要训练方法进行了比较，帮助您做出明智的选择。</p>
+            </div>
+
+            <div class="animate">
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>训练类型</th>
+                            <th>增肌效果</th>
+                            <th>减脂效果</th>
+                            <th>耐力提升</th>
+                            <th>时间效率</th>
+                            <th>适合人群</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>重量训练</td>
+                            <td><i class="fas fa-check check"></i> 优秀</td>
+                            <td><i class="fas fa-check check"></i> 中等</td>
+                            <td><i class="fas fa-check check"></i> 低</td>
+                            <td><i class="fas fa-check check"></i> 中等</td>
+                            <td>希望增肌增强、塑形的人群</td>
+                        </tr>
+                        <tr>
+                            <td>自重训练</td>
+                            <td><i class="fas fa-check check"></i> 中等</td>
+                            <td><i class="fas fa-check check"></i> 中等</td>
+                            <td><i class="fas fa-check check"></i> 中等</td>
+                            <td><i class="fas fa-check check"></i> 高</td>
+                            <td>初学者、家庭训练者</td>
+                        </tr>
+                        <tr>
+                            <td>稳态有氧</td>
+                            <td><i class="fas fa-times times"></i> 低</td>
+                            <td><i class="fas fa-check check"></i> 高</td>
+                            <td><i class="fas fa-check check"></i> 优秀</td>
+                            <td><i class="fas fa-times times"></i> 低</td>
+                            <td>减脂、提高心肺耐力的人群</td>
+                        </tr>
+                        <tr>
+                            <td>HIIT训练</td>
+                            <td><i class="fas fa-check check"></i> 低-中等</td>
+                            <td><i class="fas fa-check check"></i> 优秀</td>
+                            <td><i class="fas fa-check check"></i> 高</td>
+                            <td><i class="fas fa-check check"></i> 优秀</td>
+                            <td>时间有限、追求高效训练的人群</td>
+                        </tr>
+                        <tr>
+                            <td>功能性训练</td>
+                            <td><i class="fas fa-check check"></i> 中等</td>
+                            <td><i class="fas fa-check check"></i> 中等</td>
+                            <td><i class="fas fa-check check"></i> 中等</td>
+                            <td><i class="fas fa-check check"></i> 高</td>
+                            <td>追求全面体适能、日常表现提升的人群</td>
+                        </tr>
+                        <tr>
+                            <td>灵活性训练</td>
+                            <td><i class="fas fa-times times"></i> 低</td>
+                            <td><i class="fas fa-times times"></i> 低</td>
+                            <td><i class="fas fa-check check"></i> 低</td>
+                            <td><i class="fas fa-check check"></i> 中等</td>
+                            <td>需要改善活动范围、预防伤害的人群</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="method-intro animate">
+                <p>理想的训练计划应该结合多种训练方法，以全面发展身体素质。例如，一周进行2-3次力量训练，2次有氧训练，1-2次灵活性训练，同时确保足够的恢复时间。</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 健身装备部分 -->
+    <section class="method-section" id="equipment">
+        <div class="container">
+            <h2 class="section-title animate">健身装备与工具</h2>
+            <div class="method-intro animate">
+                <p>合适的健身装备能提高训练效果和体验。从初学者到高级健身爱好者，了解不同装备的功能和选择方法非常重要。以下是常见的健身装备及其用途。</p>
+            </div>
+
+            <div class="equipment-grid animate">
+                <div class="equipment-card">
+                    <div class="equipment-image">
+                        <img src="images/equipment-dumbbells.jpg" alt="哑铃">
+                    </div>
+                    <div class="equipment-body">
+                        <h4 class="equipment-title">哑铃</h4>
+                        <p class="equipment-text">多功能训练工具，适合全身各肌群训练，特别适合家庭健身。选择可调节重量的哑铃可节省空间。</p>
+                    </div>
+                </div>
+                <div class="equipment-card">
+                    <div class="equipment-image">
+                        <img src="images/equipment-resistance-bands.jpg" alt="阻力带">
+                    </div>
+                    <div class="equipment-body">
+                        <h4 class="equipment-title">阻力带</h4>
+                        <p class="equipment-text">便携、多功能的训练工具，提供可变阻力。适合家庭训练、旅行健身，也可作为力量训练的辅助工具。</p>
+                    </div>
+                </div>
+                <div class="equipment-card">
+                    <div class="equipment-image">
+                        <img src="images/equipment-kettlebell.jpg" alt="壶铃">
+                    </div>
+                    <div class="equipment-body">
+                        <h4 class="equipment-title">壶铃</h4>
+                        <p class="equipment-text">传统力量训练工具，特别适合爆发力、核心和全身协调性训练，如摆动、高翻等动作。</p>
+                    </div>
+                </div>
+                <div class="equipment-card">
+                    <div class="equipment-image">
+                        <img src="images/equipment-foam-roller.jpg" alt="泡沫轴">
+                    </div>
+                    <div class="equipment-body">
+                        <h4 class="equipment-title">泡沫轴</h4>
+                        <p class="equipment-text">肌筋膜放松工具，用于缓解肌肉紧张和酸痛，促进血液循环。训练前后均可使用。</p>
+                    </div>
+                </div>
+                <div class="equipment-card">
+                    <div class="equipment-image">
+                        <img src="images/equipment-yoga-mat.jpg" alt="瑜伽垫">
+                    </div>
+                    <div class="equipment-body">
+                        <h4 class="equipment-title">瑜伽垫</h4>
+                        <p class="equipment-text">为各种地面训练提供舒适支撑和防滑表面。选择厚度适中、质地环保、止滑性好的瑜伽垫。</p>
+                    </div>
+                </div>
+                <div class="equipment-card">
+                    <div class="equipment-image">
+                        <img src="images/equipment-fitness-tracker.jpg" alt="健身追踪器">
+                    </div>
+                    <div class="equipment-body">
+                        <h4 class="equipment-title">健身追踪器</h4>
+                        <p class="equipment-text">记录活动量、心率和睡眠质量等数据，帮助监测训练进度和调整计划。</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="method-intro animate" style="margin-top: 50px;">
+                <p>选择健身装备时，应考虑个人健身目标、可用空间、预算和训练经验。对于初学者，建议从基础装备开始，随着训练进展再逐步增加专业器材。</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 常见问题 -->
+    <section class="method-section" id="faq">
+        <div class="container">
+            <h2 class="section-title animate">健身常见问题</h2>
+            <div class="method-intro animate">
+                <p>健身过程中难免会遇到各种问题和困惑。以下是一些常见问题及解答，希望能帮助您更好地理解健身过程并避免常见误区。</p>
+            </div>
+
+            <div class="faq-section animate">
+                <div class="faq-item">
+                    <div class="faq-question">力量训练会让女性变得过于壮硕吗？</div>
+                    <div class="faq-answer">
+                        <p>这是一个常见的误解。女性体内睾酮水平远低于男性，使得她们即使进行强度较高的力量训练，也很难发展出男性那样的肌肉体积。实际上，力量训练对女性的好处非常多，包括提高基础代谢率、增强骨密度、塑造紧致有线条的体态等。</p>
+                        <p>女性通过合理的力量训练，更可能获得匀称、紧致的肌肉线条，而非庞大的肌肉体积。专业女性健美运动员的体型是通过严格的训练、饮食和有时候还包括特殊补充剂才能达到的，普通健身环境下几乎不可能达到这种效果。</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">有氧训练和力量训练应该如何安排？</div>
+                    <div class="faq-answer">
+                        <p>有氧训练和力量训练的安排取决于您的主要健身目标：</p>
+                        <p><strong>如果以增肌为主要目标</strong>：建议在单独的训练日进行有氧训练，或在力量训练后进行短时间（20-30分钟）低强度有氧训练。这样可以避免有氧运动消耗过多能量影响肌肉生长。</p>
+                        <p><strong>如果以减脂为主要目标</strong>：可以在力量训练后立即进行有氧训练，利用已经消耗的糖原储备，让身体更快进入脂肪燃烧状态。也可以在清晨空腹状态下进行中低强度有氧训练。</p>
+                        <p><strong>如果以提高整体体能为目标</strong>：可以尝试分隔式训练，即上午进行一种训练，下午或晚上进行另一种训练，给身体足够恢复时间。</p>
+                        <p>无论如何安排，确保两种训练都不缺失，并根据个人恢复能力调整训练频率和强度。</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">训练后肌肉酸痛是好事吗？</div>
+                    <div class="faq-answer">
+                        <p>训练后肌肉酸痛，专业术语称为延迟性肌肉酸痛(DOMS)，通常在高强度训练或尝试新动作后的24-72小时内出现。这是肌肉微损伤和修复过程的正常现象，但它既不是衡量训练效果的必要指标，也不是唯一标准。</p>
+                        <p>轻度到中度的肌肉酸痛表明肌肉受到了一定刺激，但严重的酸痛可能意味着训练过度。同样，即使没有明显的肌肉酸痛，训练也可能是有效的，特别是当身体已经适应了特定的训练模式。</p>
+                        <p>最重要的是关注长期的进步指标，如力量增加、耐力提升或身体成分改善，而不是仅仅依靠肌肉酸痛来判断训练效果。</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">我应该先减脂还是先增肌？</div>
+                    <div class="faq-answer">
+                        <p>这取决于您的起点和个人目标：</p>
+                        <p><strong>如果体脂率较高（男性>20%，女性>30%）</strong>：优先考虑减脂。高体脂状态下增肌效率较低，并且肌肉线条不明显。先减脂能提高胰岛素敏感性，为后续增肌创造更好的生理环境。</p>
+                        <p><strong>如果体脂率适中且肌肉量较少</strong>：可以考虑同时进行（称为体重重组或"recomposition"），通过适当的热量摄入和高蛋白饮食，配合力量训练，同时减脂增肌。这对初学者特别有效。</p>
+                        <p><strong>如果体脂率已经较低</strong>：可以专注于增肌，适度增加热量摄入（热量盈余），配合高强度力量训练。</p>
+                        <p>无论选择哪种策略，力量训练都是必不可少的，它能帮助保留减脂过程中的肌肉，也是增肌的主要刺激。</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">年龄较大还能开始健身吗？</div>
+                    <div class="faq-answer">
+                        <p>绝对可以！事实上，研究表明任何年龄段开始健身都能获得显著益处。对于年长者，规律的体育锻炼尤为重要，可以预防肌肉流失、维持骨密度、改善平衡能力和心血管健康，提高生活质量。</p>
+                        <p>年龄较大的初学者应注意以下几点：</p>
+                        <ul style="margin-left: 20px; margin-top: 10px; margin-bottom: 10px;">
+                            <li>开始前咨询医生，特别是有慢性病的情况</li>
+                            <li>从低强度开始，逐渐增加训练量和强度</li>
+                            <li>重视热身和恢复，可能需要更多恢复时间</li>
+                            <li>关注技术和控制，避免冲量和快速动作</li>
+                            <li>考虑在专业教练指导下开始训练</li>
+                        </ul>
+                        <p>许多研究表明，即使80岁以上的人进行力量训练，也能显著增加肌肉质量和力量，提高功能能力。健身无年龄限制，关键是选择适合自己状况的训练方式和强度。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer id="contact">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-about">
+                    <h3>关于健身天地</h3>
+                    <p>我们致力于提供专业的健身服务和个性化指导，帮助每一位会员实现健康生活和理想体态。</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-weixin"></i></a>
+                        <a href="#"><i class="fab fa-weibo"></i></a>
+                        <a href="#"><i class="fab fa-qq"></i></a>
+                        <a href="#"><i class="fab fa-tiktok"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h3>快速链接</h3>
+                    <ul>
+                        <li><a href="index.html">首页</a></li>
+                        <li><a href="index.html#features">特色服务</a></li>
+                        <li><a href="courses.html">课程</a></li>
+                        <li><a href="#">健身方法</a></li>
+                        <li><a href="calculator.html">健身计算器</a></li>
+                        <li><a href="index.html#blog">健身知识</a></li>
+                    </ul>
+                </div>
+                <div class="footer-contact">
+                    <h3>联系我们</h3>
+                    <ul>
+                        <li><i class="fas fa-map-marker-alt"></i> 北京市海淀区中关村大街1号</li>
+                        <li><i class="fas fa-phone"></i> 400-123-4567</li>
+                        <li><i class="fas fa-envelope"></i> info@jianshen.com</li>
+                        <li><i class="fas fa-clock"></i> 周一至周日 08:00 - 22:00</li>
+                    </ul>
+                </div>
+                <div class="footer-newsletter">
+                    <h3>订阅我们</h3>
+                    <p>订阅我们的电子报，获取最新的健身资讯和优惠活动。</p>
+                    <form class="newsletter-form">
+                        <input type="email" placeholder="您的邮箱地址">
+                        <button type="submit"><i class="fas fa-paper-plane"></i></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="container">
+                <p>&copy; 2025 健身天地. 保留所有权利.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/script.js"></script>
+    <script>
+        // 切换FAQ显示
+        document.addEventListener('DOMContentLoaded', function() {
+            const faqQuestions = document.querySelectorAll('.faq-question');
+            
+            faqQuestions.forEach(question => {
+                question.addEventListener('click', function() {
+                    const faqItem = this.parentNode;
+                    faqItem.classList.toggle('active');
+                });
+            });
+            
+            // 导航标签页激活状态
+            const tabLinks = document.querySelectorAll('.methods-tabs ul li a');
+            
+            function setActiveTab() {
+                const scrollPosition = window.scrollY;
+                
+                document.querySelectorAll('.method-section').forEach(section => {
+                    if (section.id) {
+                        const sectionTop = section.offsetTop - 150;
+                        const sectionBottom = sectionTop + section.offsetHeight;
+                        
+                        if (scrollPosition >= sectionTop && scrollPosition < sectionBottom) {
+                            tabLinks.forEach(link => {
+                                link.classList.remove('active');
+                                if (link.getAttribute('href') === `#${section.id}`) {
+                                    link.classList.add('active');
+                                }
+                            });
+                        }
+                    }
+                });
+            }
+            
+            window.addEventListener('scroll', setActiveTab);
+            setActiveTab(); // 初始设置
+        });
+    </script>
+</body>
+</html>
