@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2025年政府工作报告</title>
+    <!-- TailwindCSS 3.0+ via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 字体 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        // 配置Tailwind主题
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Noto Sans SC', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        secondary: {
+                            50: '#fdf2f8',
+                            100: '#fce7f3',
+                            200: '#fbcfe8',
+                            300: '#f9a8d4',
+                            400: '#f472b6',
+                            500: '#ec4899',
+                            600: '#db2777',
+                            700: '#be185d',
+                            800: '#9d174d',
+                            900: '#831843',
+                        },
+                    },
+                    typography: {
+                        DEFAULT: {
+                            css: {
+                                maxWidth: '100ch',
+                                a: {
+                                    textDecoration: 'none',
+                                    '&:hover': {
+                                        textDecoration: 'underline',
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer base {
+            body {
+                @apply bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 transition-colors duration-300;
+            }
+            h1, h2, h3, h4, h5, h6 {
+                @apply font-bold text-gray-900 dark:text-white tracking-tight;
+            }
+            .card {
+                @apply bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-gray-100 dark:border-gray-700 hover:border-primary-300 dark:hover:border-primary-500;
+            }
+            .btn {
+                @apply inline-flex items-center justify-center px-6 py-3 rounded-md font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
+            }
+            .btn-primary {
+                @apply bg-primary-600 hover:bg-primary-700 text-white focus:ring-primary-500 hover:scale-105;
+            }
+            .btn-secondary {
+                @apply bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-700 focus:ring-primary-500 hover:scale-105;
+            }
+            .progress-stat {
+                @apply flex items-center mb-4;
+            }
+            .progress-stat-label {
+                @apply w-32 text-sm text-gray-600 dark:text-gray-400;
+            }
+            .progress-stat-bar {
+                @apply flex-1 h-2 rounded-full bg-gray-100 dark:bg-gray-700 overflow-hidden;
+            }
+            .progress-stat-value {
+                @apply ml-3 text-sm font-medium text-gray-900 dark:text-white;
+            }
+            .nav-link {
+                @apply text-gray-600 dark:text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 font-medium;
+            }
+            .nav-link.active {
+                @apply text-primary-600 dark:text-primary-400 font-semibold;
+            }
+            .section-title {
+                @apply text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center;
+            }
+            .section-icon {
+                @apply mr-3 text-primary-500 dark:text-primary-400 flex-shrink-0;
+            }
+            .highlight-text {
+                @apply text-primary-600 dark:text-primary-400 font-medium;
+            }
+            .fade-in {
+                opacity: 0;
+                transform: translateY(20px);
+                transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+            }
+            .fade-in.appear {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <!-- 检测系统颜色偏好并设置主题 -->
+    <script>
+        // 检查系统偏好
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+        
+        // 监听系统主题变更
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
+    </script>
+
+    <!-- 导航栏 -->
+    <header class="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700">
+        <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+            <a href="#" class="flex items-center gap-2">
+                <span class="text-primary-600 dark:text-primary-400">
+                    <i class="fas fa-landmark text-xl"></i>
+                </span>
+                <span class="text-lg font-bold text-gray-900 dark:text-white">政府工作报告</span>
+            </a>
+            <div class="flex items-center gap-6">
+                <nav class="hidden md:flex items-center gap-6">
+                    <a href="#summary" class="nav-link">摘要</a>
+                    <a href="#review" class="nav-link">工作回顾</a>
+                    <a href="#goals" class="nav-link">发展目标</a>
+                    <a href="#tasks" class="nav-link">工作任务</a>
+                    <a href="#conclusion" class="nav-link">结语</a>
+                </nav>
+                <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200">
+                    <i class="fas fa-moon text-gray-600 dark:hidden"></i>
+                    <i class="fas fa-sun hidden dark:block text-yellow-300"></i>
+                </button>
+                <button class="md:hidden p-2" id="mobile-menu-button">
+                    <i class="fas fa-bars text-gray-600 dark:text-gray-300"></i>
+                </button>
+            </div>
+        </div>
+        <!-- 移动端菜单 -->
+        <div id="mobile-menu" class="hidden md:hidden">
+            <div class="px-4 py-3 space-y-3 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+                <a href="#summary" class="nav-link block">摘要</a>
+                <a href="#review" class="nav-link block">工作回顾</a>
+                <a href="#goals" class="nav-link block">发展目标</a>
+                <a href="#tasks" class="nav-link block">工作任务</a>
+                <a href="#conclusion" class="nav-link block">结语</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="flex-grow container mx-auto px-4 py-8">
+        <!-- 封面 -->
+        <section class="mb-16 text-center fade-in">
+            <div class="inline-block relative mb-6">
+                <div class="absolute inset-0 bg-primary-100 dark:bg-primary-900/30 rounded-full transform -rotate-6"></div>
+                <div class="relative">
+                    <i class="fas fa-book-open text-primary-600 dark:text-primary-400 text-4xl"></i>
+                </div>
+            </div>
+            <h1 class="text-3xl sm:text-4xl md:text-5xl font-black mb-4">政府工作报告</h1>
+            <p class="text-xl text-gray-600 dark:text-gray-400 mb-8">2025年3月5日在第十四届全国人民代表大会第三次会议上</p>
+            <div class="text-lg text-gray-700 dark:text-gray-300">
+                <p>国务院总理 李强</p>
+            </div>
+        </section>
+
+        <!-- 摘要 -->
+        <section id="summary" class="mb-16 fade-in">
+            <h2 class="section-title">
+                <span class="section-icon">
+                    <i class="fas fa-file-alt"></i>
+                </span>
+                报告摘要
+            </h2>
+            <div class="card p-6 md:p-8">
+                <div class="space-y-4">
+                    <p class="text-lg">过去一年，我国发展历程很不平凡。党的二十届三中全会胜利召开，对进一步全面深化改革、推进中国式现代化作出部署。我们隆重庆祝中华人民共和国成立75周年，极大激发了全国各族人民的爱国热情和奋斗精神。</p>
+                    
+                    <div class="my-6 border-l-4 border-primary-500 pl-4 py-2">
+                        <p class="text-lg font-medium text-gray-900 dark:text-white">国内生产总值达到134.9万亿元，增长5%，经济规模稳步扩大，增速居世界主要经济体前列，对全球经济增长的贡献率保持在30%左右。</p>
+                    </div>
+                    
+                    <p>在以习近平同志为核心的党中央坚强领导下，全国各族人民砥砺奋进、攻坚克难，经济运行总体平稳、稳中有进，全年经济社会发展主要目标任务顺利完成，高质量发展扎实推进，新质生产力稳步发展，综合国力持续增强，中国式现代化迈出新的坚实步伐。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2024工作回顾 -->
+        <section id="review" class="mb-16 fade-in">
+            <h2 class="section-title">
+                <span class="section-icon">
+                    <i class="fas fa-history"></i>
+                </span>
+                2024年工作回顾
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- 经济成就 -->
+                <div class="card p-6">
+                    <h3 class="text-xl font-bold mb-4 flex items-center">
+                        <i class="fas fa-chart-line text-primary-500 mr-2"></i>
+                        经济成就
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="progress-stat">
+                            <span class="progress-stat-label">国内生产总值</span>
+                            <div class="progress-stat-bar">
+                                <div class="h-full bg-primary-500" style="width: 100%"></div>
+                            </div>
+                            <span class="progress-stat-value">134.9万亿元</span>
+                        </div>
+                        <div class="progress-stat">
+                            <span class="progress-stat-label">GDP增长</span>
+                            <div class="progress-stat-bar">
+                                <div class="h-full bg-primary-500" style="width: 75%"></div>
+                            </div>
+                            <span class="progress-stat-value">5.0%</span>
+                        </div>
+                        <div class="progress-stat">
+                            <span class="progress-stat-label">城镇新增就业</span>
+                            <div class="progress-stat-bar">
+                                <div class="h-full bg-primary-500" style="width: 80%"></div>
+                            </div>
+                            <span class="progress-stat-value">1256万人</span>
+                        </div>
+                        <div class="progress-stat">
+                            <span class="progress-stat-label">城镇调查失业率</span>
+                            <div class="progress-stat-bar">
+                                <div class="h-full bg-primary-500" style="width: 65%"></div>
+                            </div>
+                            <span class="progress-stat-value">5.1%</span>
+                        </div>
+                        <div class="progress-stat">
+                            <span class="progress-stat-label">居民收入增长</span>
+                            <div class="progress-stat-bar">
+                                <div class="h-full bg-primary-500" style="width: 75%"></div>
+                            </div>
+                            <span class="progress-stat-value">5.1%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 创新发展 -->
+                <div class="card p-6">
+                    <h3 class="text-xl font-bold mb-4 flex items-center">
+                        <i class="fas fa-lightbulb text-primary-500 mr-2"></i>
+                        创新发展成果
+                    </h3>
+                    <ul class="space-y-2">
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span>高技术制造业、装备制造业增加值增长8.9%、7.7%</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span>信息传输软件和信息技术服务业增加值增长10.9%</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span>嫦娥六号实现人类首次月球背面采样返回</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span>新能源汽车年产量突破1300万辆</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span>集成电路、人工智能、量子科技等领域取得新成果</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span>技术合同成交额增长11.2%</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- 生态环境 -->
+                <div class="card p-6">
+                    <h3 class="text-xl font-bold mb-4 flex items-center">
+                        <i class="fas fa-leaf text-primary-500 mr-2"></i>
+                        生态环境改善
+                    </h3>
+                    <ul class="space-y-2">
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span>地级及以上城市细颗粒物(PM2.5)平均浓度下降2.7%</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span>优良天数比例上升至87.2%</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span>地表水优良水质断面比例提高到90.4%</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span>单位国内生产总值能耗降幅超过3%</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span>可再生能源新增装机3.7亿千瓦</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- 改革开放 -->
+                <div class="card p-6">
+                    <h3 class="text-xl font-bold mb-4 flex items-center">
+                        <i class="fas fa-door-open text-primary-500 mr-2"></i>
+                        改革开放进展
+                    </h3>
+                    <ul class="space-y-2">
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span>扎实有力落实党的二十届二中、三中全会改革部署</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span>机构改革全面完成</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span>构建全国统一大市场、渐进式延迟法定退休年龄等重大改革举措陆续推出</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span>制造业领域外资准入限制措施全部取消</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span>共建"一带一路"贸易投资合作不断扩容升级</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="mt-8 fade-in">
+                <div class="card p-6">
+                    <h3 class="text-xl font-bold mb-4 flex items-center">
+                        <i class="fas fa-tasks text-primary-500 mr-2"></i>
+                        主要工作
+                    </h3>
+                    <div class="space-y-5">
+                        <div>
+                            <h4 class="font-semibold text-lg text-gray-800 dark:text-gray-200 mb-2">一、因时因势加强和创新宏观调控，推动经济回升向好</h4>
+                            <p>积极实施财政货币政策，加强重点领域财力保障，社会融资成本进一步降低。围绕扩大有效需求，扎实推进"两新一重"建设，加力支持两重工作，设备购置投资增长15.7%，家电类商品零售额增长12.3%。</p>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-semibold text-lg text-gray-800 dark:text-gray-200 mb-2">二、坚定不移全面深化改革扩大开放，增强发展内生动力</h4>
+                            <p>清理废除妨碍全国统一市场的规定做法，制定实施公平竞争审查条例。提请全国人大常委会审议民营经济促进法草案，积极拓展外贸新增长点，外贸出口对经济增长贡献增大。</p>
+                        </div>
+
+                        <div>
+                            <h4 class="font-semibold text-lg text-gray-800 dark:text-gray-200 mb-2">三、大力推动创新驱动发展，促进产业结构优化升级</h4>
+                            <p>推进科技强国建设，全面启动实施国家科技重大专项。制造业投资增长9.2%。北斗应用、商业航天、新型储能等新兴产业快速发展，数字经济核心产业增加值占国内生产总值比重达到10%左右。</p>
+                        </div>
+
+                        <div>
+                            <h4 class="font-semibold text-lg text-gray-800 dark:text-gray-200 mb-2">四、统筹城乡区域协调发展，优化经济布局</h4>
+                            <p>出台实施新型城镇化战略五年行动计划，常住人口城镇化率提高到67%。坚持不懈夯实农业基础，严守耕地红线，严格占补平衡管理，乡村全面振兴取得新成效。</p>
+                        </div>
+
+                        <div>
+                            <h4 class="font-semibold text-lg text-gray-800 dark:text-gray-200 mb-2">五、积极发展社会事业，增进民生福祉</h4>
+                            <p>出台促进高质量充分就业的政策措施，巩固"双减"成果，优化基础教育生态，深化养老服务改革，制定促进银发经济发展的政策。文化和旅游市场持续活跃，我国体育健儿在巴黎奥运会取得境外参赛最好成绩。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2025发展目标 -->
+        <section id="goals" class="mb-16 fade-in">
+            <h2 class="section-title">
+                <span class="section-icon">
+                    <i class="fas fa-bullseye"></i>
+                </span>
+                2025年发展目标
+            </h2>
+            <div class="card p-6 md:p-8">
+                <p class="mb-6">今年是"十四五"规划收官之年，做好政府工作，要在以习近平同志为核心的党中央坚强领导下，以习近平新时代中国特色社会主义思想为指导，全面贯彻落实党的二十大和二十届二中、三中全会精神。</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="bg-gray-50 dark:bg-gray-800/50 p-5 rounded-lg border border-gray-100 dark:border-gray-700">
+                        <div class="flex items-center justify-center h-12 w-12 rounded-md bg-primary-100 dark:bg-primary-900/30 text-primary-600 mb-4">
+                            <i class="fas fa-chart-line text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">国内生产总值</h3>
+                        <p class="text-gray-600 dark:text-gray-400">增长5%左右</p>
+                    </div>
+
+                    <div class="bg-gray-50 dark:bg-gray-800/50 p-5 rounded-lg border border-gray-100 dark:border-gray-700">
+                        <div class="flex items-center justify-center h-12 w-12 rounded-md bg-primary-100 dark:bg-primary-900/30 text-primary-600 mb-4">
+                            <i class="fas fa-user-tie text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">城镇新增就业</h3>
+                        <p class="text-gray-600 dark:text-gray-400">1200万人以上</p>
+                    </div>
+
+                    <div class="bg-gray-50 dark:bg-gray-800/50 p-5 rounded-lg border border-gray-100 dark:border-gray-700">
+                        <div class="flex items-center justify-center h-12 w-12 rounded-md bg-primary-100 dark:bg-primary-900/30 text-primary-600 mb-4">
+                            <i class="fas fa-percentage text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">城镇调查失业率</h3>
+                        <p class="text-gray-600 dark:text-gray-400">5.5%左右</p>
+                    </div>
+
+                    <div class="bg-gray-50 dark:bg-gray-800/50 p-5 rounded-lg border border-gray-100 dark:border-gray-700">
+                        <div class="flex items-center justify-center h-12 w-12 rounded-md bg-primary-100 dark:bg-primary-900/30 text-primary-600 mb-4">
+                            <i class="fas fa-shopping-cart text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">居民消费价格</h3>
+                        <p class="text-gray-600 dark:text-gray-400">涨幅3%左右</p>
+                    </div>
+
+                    <div class="bg-gray-50 dark:bg-gray-800/50 p-5 rounded-lg border border-gray-100 dark:border-gray-700">
+                        <div class="flex items-center justify-center h-12 w-12 rounded-md bg-primary-100 dark:bg-primary-900/30 text-primary-600 mb-4">
+                            <i class="fas fa-wallet text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">居民收入</h3>
+                        <p class="text-gray-600 dark:text-gray-400">增长与经济增长同步</p>
+                    </div>
+
+                    <div class="bg-gray-50 dark:bg-gray-800/50 p-5 rounded-lg border border-gray-100 dark:border-gray-700">
+                        <div class="flex items-center justify-center h-12 w-12 rounded-md bg-primary-100 dark:bg-primary-900/30 text-primary-600 mb-4">
+                            <i class="fas fa-globe text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">国际收支</h3>
+                        <p class="text-gray-600 dark:text-gray-400">基本平衡</p>
+                    </div>
+
+                    <div class="bg-gray-50 dark:bg-gray-800/50 p-5 rounded-lg border border-gray-100 dark:border-gray-700">
+                        <div class="flex items-center justify-center h-12 w-12 rounded-md bg-primary-100 dark:bg-primary-900/30 text-primary-600 mb-4">
+                            <i class="fas fa-seedling text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">粮食产量</h3>
+                        <p class="text-gray-600 dark:text-gray-400">1.4万亿斤左右</p>
+                    </div>
+
+                    <div class="bg-gray-50 dark:bg-gray-800/50 p-5 rounded-lg border border-gray-100 dark:border-gray-700">
+                        <div class="flex items-center justify-center h-12 w-12 rounded-md bg-primary-100 dark:bg-primary-900/30 text-primary-600 mb-4">
+                            <i class="fas fa-bolt text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">能源消耗</h3>
+                        <p class="text-gray-600 dark:text-gray-400">单位国内生产总值能耗降低3%左右</p>
+                    </div>
+
+                    <div class="bg-gray-50 dark:bg-gray-800/50 p-5 rounded-lg border border-gray-100 dark:border-gray-700">
+                        <div class="flex items-center justify-center h-12 w-12 rounded-md bg-primary-100 dark:bg-primary-900/30 text-primary-600 mb-4">
+                            <i class="fas fa-tree text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">生态环境</h3>
+                        <p class="text-gray-600 dark:text-gray-400">质量持续改善</p>
+                    </div>
+                </div>
+
+                <div class="mt-8">
+                    <h3 class="text-xl font-bold mb-4">政策取向</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-start">
+                            <div class="h-6 w-6 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400 mt-0.5 mr-3">
+                                <i class="fas fa-check text-sm"></i>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-gray-900 dark:text-gray-100">实施更加积极的财政政策</p>
+                                <p class="text-gray-700 dark:text-gray-300 mt-1">赤字率拟按4%左右安排，比上年提高0.2个百分点。拟发行超长期特别国债1.3万亿元，支持国有大型商业银行补充资本。</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <div class="h-6 w-6 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400 mt-0.5 mr-3">
+                                <i class="fas fa-check text-sm"></i>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-gray-900 dark:text-gray-100">实施适度宽松的货币政策</p>
+                                <p class="text-gray-700 dark:text-gray-300 mt-1">适时降准降息，优化和创新结构性货币政策工具，使社会融资规模、货币供应量增长同经济增长、价格总水平预期目标相匹配。</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <div class="h-6 w-6 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400 mt-0.5 mr-3">
+                                <i class="fas fa-check text-sm"></i>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-gray-900 dark:text-gray-100">强化宏观政策民生导向</p>
+                                <p class="text-gray-700 dark:text-gray-300 mt-1">坚持以人民为中心，经济政策的着力点更多转向惠民生、促消费，推动更多资金资源"投资于人"、服务于民生。</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <div class="h-6 w-6 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400 mt-0.5 mr-3">
+                                <i class="fas fa-check text-sm"></i>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-gray-900 dark:text-gray-100">打好政策"组合拳"</p>
+                                <p class="text-gray-700 dark:text-gray-300 mt-1">加强财政、货币、就业、产业、区域、贸易、环保、监管等政策协同以及与改革开放举措的协调配合，增强政策合力。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2025年政府工作任务 -->
+        <section id="tasks" class="mb-16 fade-in">
+            <h2 class="section-title">
+                <span class="section-icon">
+                    <i class="fas fa-clipboard-list"></i>
+                </span>
+                2025年政府工作任务
+            </h2>
+            
+            <div class="grid grid-cols-1 gap-6">
+                <!-- 任务一 -->
+                <div class="card p-6 hover:border-primary-300 dark:hover:border-primary-500 transition-all duration-300">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 h-10 w-10 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400 mr-4">
+                            <span class="text-lg font-bold">1</span>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold mb-3">大力提振消费，提高投资效益，全方位扩大国内需求</h3>
+                            <div class="space-y-3 text-gray-700 dark:text-gray-300">
+                                <p>实施提振消费专项行动，制定提升消费能力、改善消费环境专项措施，释放多样化、差异化消费潜力。推动消费提质升级，多渠道促进居民增收、减负，推动中低收入群体增收。</p>
+                                <p>安排超长期特别国债，安排超过3000亿元支持消费品以旧换新。从放宽准入、减少限制、优化监管等方面入手，创新和丰富消费场景，扩大健康、养老、托幼、家政等多元化服务供给，加快数字、绿色、智能等新型消费发展。</p>
+                                <p>紧扣国家发展战略和民生需求，积极扩大有效投资。加强财政与金融配合，强化项目储备和要素保障，加快实施一批重点项目。切实选准选好项目，管好用好资金，坚决防止低效无效投资。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 任务二 -->
+                <div class="card p-6 hover:border-primary-300 dark:hover:border-primary-500 transition-all duration-300">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 h-10 w-10 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400 mr-4">
+                            <span class="text-lg font-bold">2</span>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold mb-3">因地制宜发展新质生产力，加快建设现代化产业体系</h3>
+                            <div class="space-y-3 text-gray-700 dark:text-gray-300">
+                                <p>推动科技创新和产业创新融合发展，大力推进新型工业化，做大做强先进制造业，积极发展现代服务业，促进新动能积厚成势、传统动能焕新升级。</p>
+                                <p>培育壮大新兴产业、未来产业。开展新技术新产品新场景大规模应用示范行动，推动商业航天、低空经济等新兴产业安全健康发展，建立未来产业投入增长机制，培育生物制造、量子科技、6G等未来产业。</p>
+                                <p>深入推进战略性新兴产业融合集群发展，深化先进制造业和现代服务业融合发展试点，加快发展服务型制造。加强产业统筹布局和产能监测预警，促进产业有序发展和良性竞争。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 任务三 -->
+                <div class="card p-6 hover:border-primary-300 dark:hover:border-primary-500 transition-all duration-300">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 h-10 w-10 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400 mr-4">
+                            <span class="text-lg font-bold">3</span>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold mb-3">坚持创新引领发展，深入实施科教兴国战略</h3>
+                            <div class="space-y-3 text-gray-700 dark:text-gray-300">
+                                <p>提升国家创新体系整体效能，一体推进教育发展、科技创新、人才培养，筑牢中国式现代化的基础性、战略性支撑。</p>
+                                <p>加快建设高质量教育体系。制定实施教育强国建设三年行动计划，全面实施新时代立德树人工程，推进大中小学思政课一体化改革创新。深入实施基础教育扩优提质工程，健全与人口变化相适应的资源统筹调配机制，加强义务教育学校标准化建设，推动义务教育优质均衡发展。</p>
+                                <p>推进高水平科技自立自强。充分发挥新型举国体制优势，强化关键核心技术攻关和前沿性、颠覆性技术研发，加快组织实施和超前布局重大科技项目。优化国家战略科技力量布局，推进科研院所改革，探索国家实验室新型科研组织模式，增强国际和区域科技创新中心辐射带动能力。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 任务四 -->
+                <div class="card p-6 hover:border-primary-300 dark:hover:border-primary-500 transition-all duration-300">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 h-10 w-10 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400 mr-4">
+                            <span class="text-lg font-bold">4</span>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold mb-3">推动标志性改革举措加快落地，更好发挥经济体制改革牵引作用</h3>
+                            <div class="space-y-3 text-gray-700 dark:text-gray-300">
+                                <p>扎实推进重点领域改革，着力破除制约发展的体制机制障碍，创造更加公平、更有活力的市场环境。</p>
+                                <p>有效激发各类经营主体活力。坚持和落实"两个毫不动摇"。高质量完成国有企业改革深化提升行动，实施国有经济布局优化和结构调整指引，加快建立国有企业履行战略使命评价制度。</p>
+                                <p>纵深推进全国统一大市场建设。加快建立健全基础制度规则，破除地方保护和市场分割，打通市场准入退出、要素配置等方面制约经济循环的卡点堵点，综合整治"内卷式"竞争。实施全国统一大市场建设指引，修订出台新版市场准入负面清单，优化新业态新领域市场准入环境。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 任务五 -->
+                <div class="card p-6 hover:border-primary-300 dark:hover:border-primary-500 transition-all duration-300">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 h-10 w-10 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400 mr-4">
+                            <span class="text-lg font-bold">5</span>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold mb-3">扩大高水平对外开放，积极稳外贸稳外资</h3>
+                            <div class="space-y-3 text-gray-700 dark:text-gray-300">
+                                <p>无论外部环境如何变化，始终坚持对外开放不动摇，稳步扩大制度型开放，有序扩大自主开放和单边开放，以开放促改革促发展。</p>
+                                <p>稳定对外贸易发展。加大稳外贸政策力度，支持企业稳订单、拓市场。扩大出口信用保险承保规模和覆盖面，优化融资、结算等金融服务，强化企业境外参展办展支持，拓展境外经贸合作区功能。支持内外贸一体化发展，完善跨境寄递物流体系，加强海外仓建设，开拓多元化市场，发展中间品贸易。</p>
+                                <p>大力鼓励外商投资。推进服务业扩大开放综合试点示范，扩大电信、医疗、教育等领域开放试点，鼓励外国投资者扩大再投资，支持参与产业链上下游配套协作，切实保障外资企业在要素获取、资质许可、标准制定、政府采购等方面的国民待遇。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 任务六 -->
+                <div class="card p-6 hover:border-primary-300 dark:hover:border-primary-500 transition-all duration-300">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 h-10 w-10 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400 mr-4">
+                            <span class="text-lg font-bold">6</span>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold mb-3">有效防范化解重点领域风险，更好统筹发展和安全</h3>
+                            <div class="space-y-3 text-gray-700 dark:text-gray-300">
+                                <p>坚持在发展中逐步化解风险，努力实现高质量发展和高水平安全的良性互动，牢牢守住不发生系统性风险底线。</p>
+                                <p>持续用力推动房地产市场止跌回稳。因城施策调减限制性措施，加力实施城中村和危旧房改造，充分释放刚性和改善性住房需求，优化城市空间结构和土地利用方式，合理控制新增房地产用地供应。在收购主体、价格和用途方面给予城市政府更大自主权，推进收购存量商品房，扩宽保障性住房再贷款使用范围。</p>
+                                <p>稳妥化解地方政府债务风险。坚持在发展中化债、在化债中发展，优化考核和管控措施，动态调整债务高风险地区名单。按照科学分类、精准置换的原则，做好地方政府隐性债务置换工作。完善政府债务管理制度，坚决遏制违规举债冲动，加快剥离地方融资平台政府融资功能，推动市场化转型和债务风险化解。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 任务七 -->
+                <div class="card p-6 hover:border-primary-300 dark:hover:border-primary-500 transition-all duration-300">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 h-10 w-10 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400 mr-4">
+                            <span class="text-lg font-bold">7</span>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold mb-3">着力抓好"三农"工作，深入推进乡村全面振兴</h3>
+                            <div class="space-y-3 text-gray-700 dark:text-gray-300">
+                                <p>坚持农业农村优先发展，学习运用"千万工程"经验，完善强农惠农支持制度，千方百计推动农业增效益、农村增活力、农民增收入。</p>
+                                <p>持续增强粮食等重要农产品稳产保供能力。稳定粮食播种面积，巩固大豆扩种成果，主攻单产和品质提升，挖掘油料扩产潜力。推动棉糖胶等稳产提质，发展现代设施农业，扶持畜牧业、渔业稳定发展。严守耕地红线，严格占补平衡管理，全方位开发食物资源，高质量推进高标准农田建设，加强农田水利设施和现代化灌区建设，推进退化耕地治理。</p>
+                                <p>毫不松懈巩固拓展脱贫攻坚成果。持续巩固提升"三保障"和饮水安全成果，提高监测帮扶效能，确保不发生规模性返贫致贫。加强易地搬迁后续扶持，分类推进帮扶产业提质增效，加大就业帮扶力度，扩大以工代赈规模，深化东西部协作、定点帮扶、消费帮扶。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 任务八 -->
+                <div class="card p-6 hover:border-primary-300 dark:hover:border-primary-500 transition-all duration-300">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 h-10 w-10 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400 mr-4">
+                            <span class="text-lg font-bold">8</span>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold mb-3">推进新型城镇化和区域协调发展，进一步优化发展空间格局</h3>
+                            <div class="space-y-3 text-gray-700 dark:text-gray-300">
+                                <p>完善实施区域协调发展战略机制，构建优势互补的区域经济布局和国土空间体系，坚持以人为本提高城镇化质量水平。</p>
+                                <p>深入实施新型城镇化战略行动。科学有序推进农业转移人口市民化，全面推进常住地提供基本公共服务，强化随迁子女义务教育保障，推动将符合条件的农业转移人口纳入住房保障体系，畅通参加社会保险渠道。加快补齐县城基础设施和公共服务短板，大力发展县域经济，提高城乡规划、建设、治理融合水平。</p>
+                                <p>加大区域战略实施力度。深入实施西部大开发、东北全面振兴、中部地区加快崛起、东部地区加快推进现代化等战略。提升京津冀、长三角、粤港澳大湾区等经济发展优势区域的创新能力和辐射带动作用。深入推动长江经济带建设、黄河流域生态保护和高质量发展。支持经济大省挑大梁，在要素保障、科技创新、改革开放先行先试等方面制定支持政策，鼓励其他地区因地制宜、各展所长。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 任务九 -->
+                <div class="card p-6 hover:border-primary-300 dark:hover:border-primary-500 transition-all duration-300">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 h-10 w-10 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400 mr-4">
+                            <span class="text-lg font-bold">9</span>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold mb-3">协同推进降碳减污扩绿增长，加快经济社会发展全面绿色转型</h3>
+                            <div class="space-y-3 text-gray-700 dark:text-gray-300">
+                                <p>进一步深化生态文明体制改革，统筹产业结构调整、污染治理、生态保护、应对气候变化，推进生态优先、绿色低碳发展。</p>
+                                <p>加强污染防治和生态建设。持续深入推进蓝天、碧水、净土保卫战。制定固体废物综合治理行动计划，加强新污染物协同治理和环境风险管控。深入实施生态环境分区管控，统筹推进山水林田湖草沙一体化保护和系统治理，全面推进以国家公园为主体的自然保护地体系建设，推动"三北"工程标志性战役取得重要成果。</p>
+                                <p>加快发展绿色低碳经济。完善支持绿色低碳发展的政策和标准体系，营造绿色低碳产业健康发展生态，深入实施绿色低碳先进技术示范工程，培育绿色建筑等新增长点。完善资源总量管理和全面节约制度，加强重点用能用水单位节能节水管理，有力有效管控高耗能项目，加强废弃物循环利用，大力推广再生材料使用。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 任务十 -->
+                <div class="card p-6 hover:border-primary-300 dark:hover:border-primary-500 transition-all duration-300">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 h-10 w-10 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400 mr-4">
+                            <span class="text-lg font-bold">10</span>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold mb-3">加大保障和改善民生力度，提升社会治理效能</h3>
+                            <div class="space-y-3 text-gray-700 dark:text-gray-300">
+                                <p>加强普惠性、基础性、兜底性民生建设，稳步提高公共服务和社会保障水平，促进社会和谐稳定，不断增强人民群众获得感幸福感安全感。</p>
+                                <p>更大力度稳定和扩大就业。就业是民生之本。完善就业优先政策，加大各类资金资源统筹支持力度，促进充分就业、提高就业质量。实施重点领域、重点行业、城乡基层和中小微企业就业支持计划，用足用好稳岗返还、税费减免、就业补贴等政策，支持劳动密集型产业吸纳和稳定就业。</p>
+                                <p>强化基本医疗卫生服务。实施健康优先发展战略，促进医疗、医保、医药协同发展和治理。深化以公益性为导向的公立医院改革，推进编制动态调整，建立以医疗服务为主导的收费机制，完善薪酬制度。以患者为中心持续改善医疗服务，改善病房条件，促进优质医疗资源扩容下沉和区域均衡布局。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 结语 -->
+        <section id="conclusion" class="mb-16 fade-in">
+            <h2 class="section-title">
+                <span class="section-icon">
+                    <i class="fas fa-flag-checkered"></i>
+                </span>
+                结语
+            </h2>
+            <div class="card p-6 md:p-8">
+                <div class="space-y-4 text-gray-700 dark:text-gray-300">
+                    <p>今年将开展"十五五"规划编制工作。要深入分析"十五五"时期新的阶段性特征，科学确定发展目标，谋划好重大战略、重大政策举措、重大工程项目，更好发挥规划对经济社会发展的引领指导作用。</p>
+                    
+                    <p>应对新挑战、完成新任务，对政府工作提出新的更高要求。各级政府及其工作人员要深刻领悟"两个确立"的决定性意义，增强"四个意识"、坚定"四个自信"、做到"两个维护"，在思想上政治上行动上同以习近平同志为核心的党中央保持高度一致，坚决扛起全面从严治党政治责任，深入贯彻中央八项规定精神，坚定不移推进政府党风廉政建设和反腐败斗争，确保党中央决策部署不折不扣落实到位。</p>
+                    
+                    <p>政府工作人员要恪尽职守、廉洁奉公、依法办事，确保党和人民赋予的权力始终用来为人民谋幸福、为民族谋复兴。坚持求真务实，从实际出发解决问题，善于把党中央决策部署与自身实际结合起来，谋划牵引性、撬动性强的工作抓手和载体，提高创造性贯彻落实能力。</p>
+                    
+                    <p>各级政府工作人员要坚持干字当头、脚踏实地，创造更多经得起历史和人民检验的发展业绩。</p>
+
+                    <div class="my-6">
+                        <p class="text-xl font-bold text-gray-900 dark:text-white text-center">信心凝聚力量，实干谱写华章</p>
+                    </div>
+                    
+                    <p>我们要更加紧密地团结在以习近平同志为核心的党中央周围，高举中国特色社会主义伟大旗帜，以习近平新时代中国特色社会主义思想为指导，迎难而上、锐意进取，努力完成全年经济社会发展目标任务，确保"十四五"规划圆满收官，为以中国式现代化全面推进强国建设、民族复兴伟业不懈奋斗！</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 重点数据可视化 -->
+        <section class="mb-16 fade-in">
+            <h2 class="section-title">
+                <span class="section-icon">
+                    <i class="fas fa-chart-pie"></i>
+                </span>
+                重点数据一览
+            </h2>
+            <div class="card p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- GDP 增长对比 -->
+                    <div>
+                        <h3 class="text-lg font-bold mb-4">GDP 增长（%）</h3>
+                        <div class="h-60 bg-gray-50 dark:bg-gray-800 rounded-lg p-4 relative">
+                            <!-- 纵轴 -->
+                            <div class="absolute left-12 top-0 bottom-8 border-l border-gray-300 dark:border-gray-600"></div>
+                            <!-- 横轴 -->
+                            <div class="absolute left-12 right-4 bottom-8 border-b border-gray-300 dark:border-gray-600"></div>
+                            
+                            <!-- 数据点 -->
+                            <div class="absolute left-28 bottom-8 h-32 w-16 bg-primary-500 dark:bg-primary-600 rounded-t-md flex flex-col items-center justify-end">
+                                <div class="absolute -top-7 text-sm font-medium text-gray-800 dark:text-gray-200">5.0%</div>
+                                <div class="absolute -bottom-8 text-sm font-medium text-gray-600 dark:text-gray-400">2024年</div>
+                            </div>
+                            
+                            <div class="absolute left-56 bottom-8 h-32 w-16 bg-primary-300 dark:bg-primary-800 rounded-t-md flex flex-col items-center justify-end">
+                                <div class="absolute -top-7 text-sm font-medium text-gray-800 dark:text-gray-200">5.0%</div>
+                                <div class="absolute -bottom-8 text-sm font-medium text-gray-600 dark:text-gray-400">2025年<br>（预期）</div>
+                            </div>
+                            
+                            <!-- 轴标签 -->
+                            <div class="absolute left-4 bottom-8 transform -translate-y-1/2 text-sm text-gray-600 dark:text-gray-400">0</div>
+                            <div class="absolute left-4 bottom-[calc(8rem+32px)] transform -translate-y-1/2 text-sm text-gray-600 dark:text-gray-400">5%</div>
+                            <div class="absolute left-4 bottom-[calc(16rem+32px)] transform -translate-y-1/2 text-sm text-gray-600 dark:text-gray-400">10%</div>
+                        </div>
+                    </div>
+                    
+                    <!-- 居民收入增长对比 -->
+                    <div>
+                        <h3 class="text-lg font-bold mb-4">居民收入实际增长（%）</h3>
+                        <div class="h-60 bg-gray-50 dark:bg-gray-800 rounded-lg p-4 relative">
+                            <!-- 纵轴 -->
+                            <div class="absolute left-12 top-0 bottom-8 border-l border-gray-300 dark:border-gray-600"></div>
+                            <!-- 横轴 -->
+                            <div class="absolute left-12 right-4 bottom-8 border-b border-gray-300 dark:border-gray-600"></div>
+                            
+                            <!-- 数据点 -->
+                            <div class="absolute left-28 bottom-8 h-32 w-16 bg-secondary-500 dark:bg-secondary-600 rounded-t-md flex flex-col items-center justify-end">
+                                <div class="absolute -top-7 text-sm font-medium text-gray-800 dark:text-gray-200">5.1%</div>
+                                <div class="absolute -bottom-8 text-sm font-medium text-gray-600 dark:text-gray-400">2024年</div>
+                            </div>
+                            
+                            <div class="absolute left-56 bottom-8 h-32 w-16 bg-secondary-300 dark:bg-secondary-800 rounded-t-md flex flex-col items-center justify-end">
+                                <div class="absolute -top-7 text-sm font-medium text-gray-800 dark:text-gray-200">≈5.0%</div>
+                                <div class="absolute -bottom-8 text-sm font-medium text-gray-600 dark:text-gray-400">2025年<br>（预期）</div>
+                            </div>
+                            
+                            <!-- 轴标签 -->
+                            <div class="absolute left-4 bottom-8 transform -translate-y-1/2 text-sm text-gray-600 dark:text-gray-400">0</div>
+                            <div class="absolute left-4 bottom-[calc(8rem+32px)] transform -translate-y-1/2 text-sm text-gray-600 dark:text-gray-400">5%</div>
+                            <div class="absolute left-4 bottom-[calc(16rem+32px)] transform -translate-y-1/2 text-sm text-gray-600 dark:text-gray-400">10%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 进度条数据展示 -->
+                <div class="mt-8">
+                    <h3 class="text-lg font-bold mb-4">主要指标完成情况</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8">
+                        <div class="flex flex-col">
+                            <div class="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-1">
+                                <span>城镇新增就业</span>
+                                <span>1256万人 / 1200万人目标</span>
+                            </div>
+                            <div class="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                <div class="h-full bg-green-500 dark:bg-green-600" style="width: 104%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex flex-col">
+                            <div class="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-1">
+                                <span>城镇调查失业率</span>
+                                <span>5.1% / 5.5%目标</span>
+                            </div>
+                            <div class="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                <div class="h-full bg-green-500 dark:bg-green-600" style="width: 93%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex flex-col">
+                            <div class="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-1">
+                                <span>粮食产量</span>
+                                <span>首次突破1.4万亿斤</span>
+                            </div>
+                            <div class="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                <div class="h-full bg-green-500 dark:bg-green-600" style="width: 100%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex flex-col">
+                            <div class="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-1">
+                                <span>单位GDP能耗降低</span>
+                                <span>超过3%</span>
+                            </div>
+                            <div class="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                <div class="h-full bg-green-500 dark:bg-green-600" style="width: 100%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 py-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                    <h3 class="text-lg font-bold mb-4 text-gray-900 dark:text-white">关于本站</h3>
+                    <p class="text-gray-600 dark:text-gray-400 mb-4">本网站基于2025年政府工作报告内容制作，旨在以更直观、可视化的方式呈现政府工作报告的核心内容，便于公众了解国家发展规划和政策方向。</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold mb-4 text-gray-900 dark:text-white">作者信息</h3>
+                    <div class="flex items-center mb-4">
+                        <div class="h-12 w-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400">
+                            <i class="fas fa-user text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h4 class="font-medium text-gray-900 dark:text-white">[作者姓名]</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">数据可视化与网页设计师</p>
+                        </div>
+                    </div>
+                    <div class="flex space-x-4 mb-4">
+                        <a href="https://github.com/" target="_blank" class="text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200">
+                            <i class="fab fa-github text-xl"></i>
+                        </a>
+                        <a href="https://twitter.com/" target="_blank" class="text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200">
+                            <i class="fab fa-twitter text-xl"></i>
+                        </a>
+                        <a href="https://linkedin.com/" target="_blank" class="text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200">
+                            <i class="fab fa-linkedin text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-200 dark:border-gray-700 mt-6 pt-6 text-center text-gray-500 dark:text-gray-400">
+                <p>&copy; 2025 政府工作报告可视化项目 | 版权所有</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // 暗黑模式切换
+        const themeToggle = document.getElementById('theme-toggle');
+        themeToggle.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+        });
+
+        // 移动端菜单
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // 滚动动画
+        document.addEventListener('DOMContentLoaded', function() {
+            const fadeElements = document.querySelectorAll('.fade-in');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        setTimeout(() => {
+                            entry.target.classList.add('appear');
+                        }, 100);
+                    }
+                });
+            }, {
+                threshold: 0.1
+            });
+            
+            fadeElements.forEach(element => {
+                observer.observe(element);
+            });
+        });
+
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    // 关闭移动端菜单（如果打开）
+                    if (!mobileMenu.classList.contains('hidden')) {
+                        mobileMenu.classList.add('hidden');
+                    }
+                    
+                    // 滚动到目标位置
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // 导航栏高亮当前部分
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('main > section');
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            let currentSection = '';
+
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 100;
+                if (window.pageYOffset >= sectionTop) {
+                    currentSection = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${currentSection}`) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
