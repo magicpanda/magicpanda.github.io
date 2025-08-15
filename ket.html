@@ -91,6 +91,18 @@
             margin-bottom: 0.2rem;
             line-height: 1.4;
         }
+        .grammar-example {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-top: 0.75rem;
+            line-height: 1.3;
+            text-align: left;
+            padding-left: 0.5rem;
+            border-left: 2px solid #e2e8f0;
+        }
+        .grammar-example p {
+            margin-bottom: 0.2rem;
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -135,7 +147,7 @@
                     </div>
                     <div class="card p-6 rounded-xl shadow-md">
                         <h4 class="font-bold text-lg text-slate-800">听力</h4>
-                        <p class="text-slate-500">时长: 约30分钟 | 占比: <span class="font-bold text-teal-600">25%</span></p>
+                        <p class="text-slate-500">时长: 約30分钟 | 占比: <span class="font-bold text-teal-600">25%</span></p>
                         <p class="mt-2 text-sm">理解日常对话与独白中的关键信息。</p>
                     </div>
                     <div class="card p-6 rounded-xl shadow-md">
@@ -666,7 +678,7 @@
                         "How much sugar do we need?",
                         "There are some students in the classroom."
                     ] },
-                    { day: 13, focus: "模拟测试 (听力+读写)", tasks: "完成一套完整的听力与读写模拟测试。对答案，分析错误。", examples: [
+                    { day: 13, focus: "模拟测试 (听力+读写)", tasks: "完成一套完整的听力与阅读与写作模拟测试。对答案，分析错误。", examples: [
                         "I need to complete the listening test.",
                         "How many did I get wrong in the reading section?",
                         "What score did I get on this mock exam?",
@@ -899,12 +911,102 @@
         ];
 
         const grammarData = [
-            { title: "时态", content: "一般现在时、现在进行时、一般过去时、过去进行时、现在完成时。" },
-            { title: "情态动词", content: "can/could (能力/请求), have to (义务), should (建议), must/mustn't (义务/禁止)。" },
-            { title: "名词与冠词", content: "可数/不可数名词，a/an/the，量词 (much/many, some/any)。" },
-            { title: "形容词与副词", content: "比较级和最高级，频率副词 (always, often), 方式、时间、地点副词。" },
-            { title: "介词", content: "时间介词 (on/in/at)，地点介词和运动介词。" },
-            { title: "条件句", content: "零条件句 (普遍真理) 和第一条件句 (未来真实可能性)。" }
+            {
+                title: "时态",
+                content: "一般现在时、现在进行时、一般过去时、过去进行时、现在完成时。",
+                examples: [
+                    "She <b>walks</b> to school every day. (一般现在时)",
+                    "I <b>am studying</b> English now. (现在进行时)",
+                    "They <b>played</b> football yesterday. (一般过去时)",
+                    "He <b>was sleeping</b> when I called. (过去进行时)",
+                    "I <b>have finished</b> my homework. (现在完成时)",
+                    "We <b>are going</b> to the cinema tomorrow. (现在进行时表未来)",
+                    "The sun <b>rises</b> in the east. (一般现在时)",
+                    "They <b>were watching</b> TV all evening. (过去进行时)",
+                    "She <b>has lived</b> in London for five years. (现在完成时)",
+                    "What <b>do</b> you <b>do</b> on weekends? (一般现在时)"
+                ]
+            },
+            {
+                title: "情态动词",
+                content: "can/could (能力/请求), have to (义务), should (建议), must/mustn't (义务/禁止)。",
+                examples: [
+                    "I <b>can</b> swim very well. (能力)",
+                    "<b>Could</b> you please help me? (请求)",
+                    "You <b>have to</b> wear a uniform at school. (义务)",
+                    "You <b>should</b> study hard for the exam. (建议)",
+                    "You <b>must</b> be quiet in the library. (义务)",
+                    "You <b>mustn't</b> use your phone here. (禁止)",
+                    "He <b>can</b> play the guitar. (能力)",
+                    "We <b>could</b> go to the park later. (可能性)",
+                    "I <b>have to</b> leave early tomorrow. (义务)",
+                    "She <b>should</b> eat more vegetables. (建议)"
+                ]
+            },
+            {
+                title: "名词与冠词",
+                content: "可数/不可数名词，a/an/the，量词 (much/many, some/any)。",
+                examples: [
+                    "I have <b>a</b> cat and <b>a</b> dog. (可数名词，不定冠词)",
+                    "Please buy <b>some</b> milk. (不可数名词，量词)",
+                    "There are <b>many</b> books on <b>the</b> table. (可数名词，量词，定冠词)",
+                    "I don't have <b>much</b> time. (不可数名词，量词)",
+                    "Do you have <b>any</b> questions? (可数/不可数名词，量词)",
+                    "She needs <b>an</b> apple. (可数名词，不定冠词)",
+                    "I saw <b>the</b> Eiffel Tower in Paris. (定冠词)",
+                    "We need <b>a lot of</b> water. (量词)",
+                    "There is <b>little</b> sugar left. (不可数名词，量词)",
+                    "He ate <b>a piece of</b> cake. (量词)"
+                ]
+            },
+            {
+                title: "形容词与副词",
+                content: "比较级和最高级，频率副词 (always, often), 方式、时间、地点副词。",
+                examples: [
+                    "She is <b>taller</b> than her brother. (比较级)",
+                    "This is <b>the best</b> film I've ever seen. (最高级)",
+                    "He <b>always</b> wakes up early. (频率副词)",
+                    "She sings <b>beautifully</b>. (方式副词)",
+                    "I will see you <b>tomorrow</b>. (时间副词)",
+                    "The book is <b>on the table</b>. (地点副词)",
+                    "He runs <b>faster</b> than me. (比较级副词)",
+                    "This is <b>the most interesting</b> book. (最高级)",
+                    "They <b>often</b> go to the cinema. (频率副词)",
+                    "He drives <b>carefully</b>. (方式副词)"
+                ]
+            },
+            {
+                title: "介词",
+                content: "时间介词 (on/in/at)，地点介词和运动介词。",
+                examples: [
+                    "I was born <b>in</b> July. (时间介词)",
+                    "Let's meet <b>at</b> 3 o'clock. (时间介词)",
+                    "The book is <b>on</b> the desk. (地点介词)",
+                    "She walked <b>into</b> the room. (运动介词)",
+                    "He lives <b>in</b> London. (地点介词)",
+                    "The party is <b>on</b> Saturday. (时间介词)",
+                    "The cat is <b>under</b> the chair. (地点介词)",
+                    "They drove <b>across</b> the bridge. (运动介词)",
+                    "I get up <b>at</b> 7 AM. (时间介词)",
+                    "She sat <b>next to</b> him. (地点介词)"
+                ]
+            },
+            {
+                title: "条件句",
+                content: "零条件句 (普遍真理) 和第一条件句 (未来真实可能性)。",
+                examples: [
+                    "If you <b>heat</b> ice, it <b>melts</b>. (零条件句)",
+                    "If it <b>rains</b> tomorrow, I <b>will stay</b> at home. (第一条件句)",
+                    "When you <b>mix</b> red and blue, you <b>get</b> purple. (零条件句)",
+                    "If I <b>find</b> your keys, I <b>will call</b> you. (第一条件句)",
+                    "If you <b>don't water</b> plants, they <b>die</b>. (零条件句)",
+                    "If she <b>studies</b> hard, she <b>will pass</b> the exam. (第一条件句)",
+                    "If I <b>am</b> tired, I <b>go</b> to bed early. (零条件句)",
+                    "If he <b>comes</b>, we <b>will have</b> a party. (第一条件句)",
+                    "When the sun <b>sets</b>, it <b>gets</b> dark. (零条件句)",
+                    "If you <b>need</b> help, just <b>ask</b> me. (第一条件句)"
+                ]
+            }
         ];
 
         const skillsData = [
@@ -1111,6 +1213,16 @@
                 <h4 class="font-bold text-lg text-slate-800 mb-2">${point.title}</h4>
                 <p class="text-slate-600">${point.content}</p>
             `;
+            if (point.examples && point.examples.length > 0) {
+                const examplesDiv = document.createElement('div');
+                examplesDiv.className = 'grammar-example w-full';
+                point.examples.forEach(example => {
+                    const p = document.createElement('p');
+                    p.innerHTML = example; /* Use innerHTML to render HTML tags */
+                    examplesDiv.appendChild(p);
+                });
+                card.appendChild(examplesDiv);
+            }
             grammarContainer.appendChild(card);
         });
 
