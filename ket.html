@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KET A2 Key - 交互式备考仪表盘</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Harmony (Warm Neutrals with Soft Blue/Teal accents) -->
+    <!-- Application Structure Plan: A task-oriented SPA with a top navigation bar and five distinct sections: 1. Dashboard/Overview with a visual breakdown of the exam. 2. Interactive Vocabulary Explorer with thematic filtering and search. 3. 30-Day Study Plan presented as a weekly accordion. 4. Grammar Reference with a tabbed/accordion interface. 5. Exam Skills & Tips section. This structure deconstructs the linear report into a user-friendly, non-linear tool, allowing students to easily access specific study materials as needed, which is more effective for daily study and revision than a long, scrollable document. -->
+    <!-- Visualization & Content Choices: 1. Exam Structure -> Goal: Inform -> Viz: Donut Chart -> Interaction: Hover tooltips -> Justification: Visually communicates score weighting better than text/table -> Library: Chart.js. 2. Vocabulary List -> Goal: Organize/Explore -> Method: Thematic filter buttons + dynamic list -> Interaction: Click to filter, type to search -> Justification: Makes a large word list manageable and interactive for study -> Method: Vanilla JS DOM manipulation. 3. 30-Day Plan -> Goal: Organize/Guide -> Method: Weekly Accordion -> Interaction: Click to expand/collapse -> Justification: Prevents information overload and focuses user on a weekly basis -> Method: Vanilla JS. 4. Grammar/Skills -> Goal: Reference -> Method: Tabs/Accordion -> Interaction: Click to show content -> Justification: Standard UI for organizing dense reference material -> Method: Vanilla JS. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #fdfcf9;
+            color: #3f3f46;
+        }
+        .nav-link {
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link.active, .nav-link:hover {
+            color: #0d9488;
+            border-bottom-color: #0d9488;
+        }
+        .section-title {
+            color: #0f766e;
+        }
+        .card {
+            background-color: #ffffff;
+            border: 1px solid #f1f5f9;
+        }
+        .btn-primary {
+            background-color: #14b8a6;
+            color: white;
+            transition: background-color 0.3s ease;
+        }
+        .btn-primary:hover {
+            background-color: #0d9488;
+        }
+        .btn-secondary {
+            background-color: #f1f5f9;
+            color: #334155;
+            transition: background-color 0.3s ease;
+        }
+        .btn-secondary.active, .btn-secondary:hover {
+            background-color: #ccfbf1;
+            color: #0f766e;
+        }
+        .accordion-header svg {
+            transition: transform 0.3s ease;
+        }
+        .accordion-header.open svg {
+            transform: rotate(180deg);
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 380px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 380px;
+            }
+        }
+        .vocab-example {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-top: 0.5rem;
+            line-height: 1.3;
+            text-align: left;
+            padding-left: 0.5rem;
+            border-left: 2px solid #e2e8f0;
+        }
+        .day-example {
+            margin-top: 0.75rem;
+            padding-left: 1rem;
+            border-left: 3px solid #0d9488;
+        }
+        .day-example p {
+            font-size: 0.9rem;
+            color: #3f3f46;
+            margin-bottom: 0.2rem;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-sm sticky top-0 z-50 shadow-sm">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex-shrink-0">
+                    <h1 class="text-2xl font-bold text-teal-700">KET 备考助手</h1>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#overview" class="nav-link px-3 py-2 rounded-md text-sm font-medium">考试概览</a>
+                        <a href="#vocabulary" class="nav-link px-3 py-2 rounded-md text-sm font-medium">高频词汇</a>
+                        <a href="#plan" class="nav-link px-3 py-2 rounded-md text-sm font-medium">30天计划</a>
+                        <a href="#grammar" class="nav-link px-3 py-2 rounded-md text-sm font-medium">核心语法</a>
+                        <a href="#skills" class="nav-link px-3 py-2 rounded-md text-sm font-medium">考试技巧</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        
+        <section id="overview" class="mb-16 scroll-mt-20">
+            <h2 class="text-3xl font-bold mb-2 section-title">KET (A2 Key) 考试概览</h2>
+            <p class="text-lg text-slate-600 mb-8">KET是一项基础英语语言认证，评估您在日常简单场景中的沟通能力。了解考试结构是成功的第一步。</p>
+            <div class="grid md:grid-cols-2 gap-8 items-center">
+                <div class="card p-6 rounded-xl shadow-lg">
+                    <h3 class="text-xl font-bold text-teal-700 mb-4">分数权重分布</h3>
+                    <p class="text-slate-500 mb-4">阅读与写作部分占据总分的一半，是备考的重中之重。合理分配您的学习精力至关重要。</p>
+                    <div class="chart-container">
+                        <canvas id="examStructureChart"></canvas>
+                    </div>
+                </div>
+                <div class="space-y-6">
+                    <div class="card p-6 rounded-xl shadow-md">
+                        <h4 class="font-bold text-lg text-slate-800">阅读与写作</h4>
+                        <p class="text-slate-500">时长: 1小时 | 占比: <span class="font-bold text-teal-600">50%</span></p>
+                        <p class="mt-2 text-sm">评估阅读理解、词汇语法应用和简短写作能力。</p>
+                    </div>
+                    <div class="card p-6 rounded-xl shadow-md">
+                        <h4 class="font-bold text-lg text-slate-800">听力</h4>
+                        <p class="text-slate-500">时长: 约30分钟 | 占比: <span class="font-bold text-teal-600">25%</span></p>
+                        <p class="mt-2 text-sm">理解日常对话与独白中的关键信息。</p>
+                    </div>
+                    <div class="card p-6 rounded-xl shadow-md">
+                        <h4 class="font-bold text-lg text-slate-800">口语</h4>
+                        <p class="text-slate-500">时长: 8-10分钟 | 占比: <span class="font-bold text-teal-600">25%</span></p>
+                        <p class="mt-2 text-sm">面对面互动，进行个人信息交流与讨论。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="vocabulary" class="mb-16 scroll-mt-20">
+            <h2 class="text-3xl font-bold mb-2 section-title">高频词汇浏览器</h2>
+            <p class="text-lg text-slate-600 mb-8">按主题学习词汇比死记硬背更有效。选择一个主题开始，或使用搜索功能快速查找。</p>
+            <div class="flex flex-wrap gap-2 mb-6" id="vocab-filters">
+            </div>
+            <div class="mb-6">
+                <input type="text" id="vocab-search" placeholder="搜索词汇 (例如: apple)..." class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition">
+            </div>
+            <div id="vocab-list" class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            </div>
+        </section>
+
+        <section id="plan" class="mb-16 scroll-mt-20">
+            <h2 class="text-3xl font-bold mb-2 section-title">30天加速备考计划</h2>
+            <p class="text-lg text-slate-600 mb-8">这是一个高强度的备考计划，需要您每天投入足够的时间。点击下方的周数，查看每日学习任务。</p>
+            <div id="study-plan-accordion" class="space-y-4">
+            </div>
+        </section>
+
+        <section id="grammar" class="mb-16 scroll-mt-20">
+            <h2 class="text-3xl font-bold mb-2 section-title">核心语法要点</h2>
+            <p class="text-lg text-slate-600 mb-8">扎实的语法是准确表达的基础。这里总结了KET考试要求的核心A2语法主题。</p>
+            <div id="grammar-points" class="grid md:grid-cols-2 gap-6">
+            </div>
+        </section>
+
+        <section id="skills" class="scroll-mt-20">
+            <h2 class="text-3xl font-bold mb-2 section-title">考试技能与最终建议</h2>
+            <p class="text-lg text-slate-600 mb-8">熟悉各题型要求和应试策略，能帮您在考场上更好地发挥。</p>
+            <div id="skills-tips" class="space-y-8">
+            </div>
+        </section>
+
+    </main>
+    
+    <footer class="bg-slate-100 mt-16">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-slate-500">
+            <p>祝您 KET A2 Key 考试顺利！</p>
+        </div>
+    </footer>
+
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        
+        const vocabularyData = {
+            "食物与饮品": [
+                { word: "apple", examples: ["I like to eat a red apple.", "An apple a day keeps the doctor away.", "Do you want an apple or a banana?"] },
+                { word: "banana", examples: ["Monkeys love bananas.", "She peeled a banana.", "Can I have a banana for breakfast?"] },
+                { word: "bread", examples: ["Please buy some bread.", "I eat bread for breakfast.", "This bread is fresh."] },
+                { word: "cake", examples: ["We had cake for dessert.", "She baked a delicious cake.", "Happy birthday, here's a cake!"] },
+                { word: "cheese", examples: ["I like cheese on my pizza.", "Do you want a cheese sandwich?", "Cheese is made from milk."] },
+                { word: "chicken", examples: ["We had roast chicken for dinner.", "I like fried chicken.", "Chicken is a popular meat."] },
+                { word: "chips", examples: ["Can I have some chips?", "He is eating a bag of chips.", "Chips are crispy."] },
+                { word: "chocolate", examples: ["I love chocolate.", "She bought a bar of chocolate.", "Chocolate is sweet."] },
+                { word: "coffee", examples: ["I drink coffee every morning.", "Would you like a cup of coffee?", "Coffee helps me wake up."] },
+                { word: "drink", examples: ["I need a drink of water.", "What would you like to drink?", "He is drinking juice."] },
+                { word: "egg", examples: ["I eat eggs for breakfast.", "She cracked an egg.", "Eggs are good for protein."] },
+                { word: "fish", examples: ["I like to eat fish.", "The fish lives in the water.", "He caught a big fish."] },
+                { word: "food", examples: ["What's your favorite food?", "We need to buy some food.", "This food is delicious."] },
+                { word: "juice", examples: ["I like orange juice.", "She is drinking apple juice.", "Juice is healthy."] },
+                { word: "milk", examples: ["Drink your milk.", "I put milk in my coffee.", "Milk is white."] },
+                { word: "pizza", examples: ["Let's order a pizza tonight.", "Pizza is my favorite.", "This pizza has a lot of cheese."] },
+                { word: "rice", examples: ["We eat rice with every meal.", "She cooked some rice.", "Rice is a staple food."] },
+                { word: "salad", examples: ["I had a fresh salad for lunch.", "This salad has many vegetables.", "Do you want salad dressing?"] },
+                { word: "sandwich", examples: ["I made a chicken sandwich.", "He packed a sandwich for school.", "This sandwich is big."] },
+                { word: "soup", examples: ["I like hot soup in winter.", "She made vegetable soup.", "This soup is delicious."] },
+                { word: "sugar", examples: ["Do you want sugar in your tea?", "Too much sugar is not good.", "Sugar is sweet."] },
+                { word: "tea", examples: ["I like to drink hot tea.", "Would you like some tea?", "Tea is a popular drink."] },
+                { word: "tomato", examples: ["I love fresh tomatoes.", "She added a tomato to the salad.", "Tomatoes are red."] },
+                { word: "vegetable", examples: ["Eat your vegetables.", "Carrots are a healthy vegetable.", "Vegetables are good for you."] },
+                { word: "water", examples: ["Please give me some water.", "Water is essential for life.", "Drink plenty of water."] }
+            ],
+            "居家生活": [
+                { word: "apartment", examples: ["I live in a small apartment.", "My apartment has two bedrooms.", "The apartment is on the third floor."] },
+                { word: "bath", examples: ["I took a warm bath.", "Do you want a bath or a shower?", "The baby is having a bath."] },
+                { word: "bathroom", examples: ["The bathroom is next to the kitchen.", "I need to use the bathroom.", "The bathroom has a big mirror."] },
+                { word: "bed", examples: ["I sleep in my bed.", "The bed is very comfortable.", "He made his bed."] },
+                { word: "bedroom", examples: ["My bedroom is upstairs.", "The bedroom has a large window.", "She decorated her bedroom."] },
+                { word: "chair", examples: ["Sit on the chair.", "There are four chairs around the table.", "The chair is made of wood."] },
+                { word: "clean", examples: ["Please clean your room.", "The car is very clean.", "I like a clean house."] },
+                { word: "clock", examples: ["What time is it on the clock?", "The clock is on the wall.", "The clock is ticking."] },
+                { word: "cooker", examples: ["The cooker is in the kitchen.", "She is cooking on the cooker.", "The new cooker is electric."] },
+                { word: "cupboard", examples: ["Put the plates in the cupboard.", "The cupboard is full.", "I opened the kitchen cupboard."] },
+                { word: "desk", examples: ["I work at my desk.", "The desk is made of wood.", "There are books on the desk."] },
+                { word: "door", examples: ["Open the door, please.", "The door is closed.", "She knocked on the door."] },
+                { word: "floor", examples: ["The floor is clean.", "Don't drop anything on the floor.", "The house has wooden floors."] },
+                { word: "fridge", examples: ["The milk is in the fridge.", "Please put the food in the fridge.", "The fridge is full."] },
+                { word: "garden", examples: ["We have a beautiful garden.", "He is working in the garden.", "The children are playing in the garden."] },
+                { word: "house", examples: ["I live in a big house.", "Their house is near the park.", "This house has a red roof."] },
+                { word: "kitchen", examples: ["I cook in the kitchen.", "The kitchen is very modern.", "She is in the kitchen."] },
+                { word: "lamp", examples: ["Turn on the lamp.", "The lamp is on the bedside table.", "The room needs a new lamp."] },
+                { word: "living room", examples: ["We watch TV in the living room.", "The living room has a large sofa.", "The living room is cozy."] },
+                { word: "room", examples: ["This is my room.", "The house has five rooms.", "Clean your room."] },
+                { word: "sofa", examples: ["Sit on the sofa.", "The sofa is very soft.", "I bought a new sofa."] },
+                { word: "table", examples: ["Put the books on the table.", "We eat dinner at the table.", "The table is round."] },
+                { word: "wall", examples: ["The picture is on the wall.", "The wall is painted blue.", "He leaned against the wall."] },
+                { word: "window", examples: ["Open the window, please.", "The window is broken.", "The sun shines through the window."] }
+            ],
+            "旅行与交通": [
+                { word: "aeroplane", examples: ["I traveled by aeroplane.", "The aeroplane is flying high.", "The aeroplane landed safely."] },
+                { word: "airport", examples: ["I am going to the airport.", "The airport is very busy.", "My flight is from this airport."] },
+                { word: "arrive", examples: ["What time will you arrive?", "The train arrived late.", "They arrived at the hotel."] },
+                { word: "bicycle", examples: ["I ride my bicycle to school.", "He bought a new bicycle.", "The bicycle has two wheels."] },
+                { word: "bike", examples: ["I ride my bike every day.", "My bike is blue.", "He enjoys riding his bike."] },
+                { word: "boat", examples: ["We went for a boat ride.", "The boat is on the lake.", "He sailed the boat."] },
+                { word: "bus", examples: ["I take the bus to work.", "The bus stop is near my house.", "The bus is full of people."] },
+                { word: "car", examples: ["I drive my car to work.", "He bought a new car.", "The car is red."] },
+                { word: "drive", examples: ["Can you drive a car?", "He drives to the office every day.", "I love to drive on the highway."] },
+                { word: "flight", examples: ["My flight is at 3 PM.", "The flight was delayed.", "She booked a flight to London."] },
+                { word: "journey", examples: ["The journey was long.", "I enjoyed the journey.", "Our journey began early."] },
+                { word: "lorry", examples: ["A big lorry is on the road.", "The lorry carries heavy goods.", "The lorry driver stopped."] },
+                { word: "map", examples: ["Look at the map.", "I need a map to find the way.", "The map shows our location."] },
+                { word: "motorbike", examples: ["He rides a fast motorbike.", "She has a new motorbike.", "Motorbikes are fun to ride."] },
+                { word: "plane", examples: ["I am going by plane.", "The plane is very fast.", "The plane took off."] },
+                { word: "road", examples: ["The road is busy.", "Be careful on the road.", "The new road is smooth."] },
+                { word: "station", examples: ["I am at the train station.", "The bus station is downtown.", "We waited at the station."] },
+                { word: "taxi", examples: ["Let's take a taxi.", "I called a taxi.", "The taxi driver was friendly."] },
+                { word: "train", examples: ["I travel by train.", "The train is fast.", "The train station is busy."] },
+                { word: "travel", examples: ["I love to travel.", "She travels a lot for work.", "Where do you want to travel?"] },
+                { word: "trip", examples: ["We went on a trip to the beach.", "Did you enjoy your trip?", "The trip was short."] },
+                { word: "underground", examples: ["I take the underground to work.", "The underground station is busy.", "The underground trains are fast."] }
+            ],
+            "人物与家庭": [
+                { word: "aunt", examples: ["My aunt lives in a big house.", "I visited my aunt last weekend.", "My aunt is my mother's sister."] },
+                { word: "baby", examples: ["The baby is sleeping.", "She has a cute baby.", "The baby is crying."] },
+                { word: "boy", examples: ["The boy is playing with a ball.", "He is a smart boy.", "There are two boys in the park."] },
+                { word: "brother", examples: ["My brother is older than me.", "I have one brother.", "My brother loves to play games."] },
+                { word: "child", examples: ["The child is happy.", "She has two children.", "A child learns quickly."] },
+                { word: "cousin", examples: ["My cousin lives in another city.", "I played with my cousin.", "She is my favorite cousin."] },
+                { word: "dad", examples: ["My dad is a great cook.", "I love my dad.", "My dad works hard."] },
+                { word: "daughter", examples: ["She has one daughter.", "His daughter is very kind.", "My daughter is a student."] },
+                { word: "family", examples: ["I love my family.", "We are a big family.", "Family is important to me."] },
+                { word: "father", examples: ["My father works in a bank.", "He is a good father.", "Father and son are playing."] },
+                { word: "friend", examples: ["She is my best friend.", "I have many friends.", "My friend helped me with homework."] },
+                { word: "girl", examples: ["The girl is singing.", "She is a beautiful girl.", "There are many girls in the class."] },
+                { word: "grandfather", examples: ["My grandfather tells great stories.", "He visits his grandfather often.", "My grandfather is old."] },
+                { word: "grandmother", examples: ["My grandmother bakes delicious cakes.", "I love my grandmother.", "She lives with her grandmother."] },
+                { word: "man", examples: ["The man is walking fast.", "He is a tall man.", "There is a man at the door."] },
+                { word: "mother", examples: ["My mother cooks dinner.", "I call my mother every day.", "She is a loving mother."] },
+                { word: "parent", examples: ["My parents are supportive.", "Good parents teach their children well.", "She is a single parent."] },
+                { word: "people", examples: ["Many people are here.", "People like to travel.", "These people are friendly."] },
+                { word: "sister", examples: ["My sister is younger than me.", "I have a sister.", "My sister likes to dance."] },
+                { word: "son", examples: ["He has a son.", "His son is a doctor.", "My son is playing outside."] },
+                { word: "teenager", examples: ["She is a teenager.", "Teenagers love social media.", "He is a healthy teenager."] },
+                { word: "uncle", examples: ["My uncle lives in the city.", "I visited my uncle last summer.", "My uncle is my father's brother."] },
+                { word: "woman", examples: ["The woman is reading a book.", "She is a kind woman.", "There is a woman in the garden."] }
+            ],
+            "日常活动": [
+                { word: "ask", examples: ["Can I ask a question?", "She asked for help.", "He asked me to wait."] },
+                { word: "begin", examples: ["Let's begin the lesson.", "The show begins at 8 PM.", "When did you begin learning English?"] },
+                { word: "believe", examples: ["I believe you.", "Do you believe in magic?", "She believes in herself."] },
+                { word: "call", examples: ["Can you call me later?", "She called her friend.", "He made a phone call."] },
+                { word: "check", examples: ["Please check your email.", "I need to check the time.", "Did you check the answer?"] },
+                { word: "choose", examples: ["Which one do you choose?", "She chose the red dress.", "It's difficult to choose."] },
+                { word: "clean", examples: ["Clean your room.", "The car is clean.", "I like a clean house."] },
+                { word: "close", examples: ["Close the door, please.", "The shop closes at 9 PM.", "Close your eyes."] },
+                { word: "come", examples: ["Come here, please.", "She came to my party.", "When will you come home?"] },
+                { word: "cook", examples: ["I like to cook dinner.", "He is a good cook.", "She cooked a delicious meal."] },
+                { word: "cut", examples: ["Can you cut the cake?", "He cut his finger.", "I cut the paper with scissors."] },
+                { word: "dance", examples: ["Let's dance!", "She loves to dance.", "They danced all night."] },
+                { word: "do", examples: ["What do you do?", "I do my homework every day.", "He did a great job."] },
+                { word: "eat", examples: ["I want to eat pizza.", "She eats healthy food.", "Let's eat dinner together."] },
+                { word: "enjoy", examples: ["I enjoy reading books.", "Did you enjoy the movie?", "They enjoy spending time together."] },
+                { word: "finish", examples: ["I finished my work.", "When will you finish?", "The race finished quickly."] },
+                { word: "get", examples: ["I need to get some milk.", "He got a new job.", "Can you get me a glass of water?"] },
+                { word: "give", examples: ["Please give me the book.", "She gave him a present.", "Can I give you a hand?"] },
+                { word: "go", examples: ["Let's go to the park.", "She went home early.", "Where do you want to go?"] },
+                { word: "have", examples: ["I have a cat.", "Do you have any questions?", "We had a good time."] },
+                { word: "help", examples: ["Can you help me?", "He helped his friend.", "Your help is appreciated."] },
+                { word: "know", examples: ["I know the answer.", "Do you know him?", "She knows a lot about history."] },
+                { word: "learn", examples: ["I want to learn English.", "She learns very fast.", "Learning a new language is fun."] },
+                { word: "listen", examples: ["Listen to the music.", "He is listening to the radio.", "Listen carefully."] },
+                { word: "live", examples: ["I live in New York.", "She lives with her parents.", "Where do you live?"] },
+                { word: "look", examples: ["Look at that bird!", "She looked at me.", "He is looking for his keys."] },
+                { word: "make", examples: ["I can make a cake.", "She made a decision.", "Let's make some plans."] },
+                { word: "open", examples: ["Open the door, please.", "The shop opens at 9 AM.", "He opened the box."] },
+                { word: "pay", examples: ["I need to pay the bill.", "He paid for the dinner.", "Can I pay by card?"] },
+                { word: "read", examples: ["I like to read books.", "She is reading a newspaper.", "Have you read this book?"] },
+                { word: "remember", examples: ["I can't remember his name.", "Do you remember me?", "Please remember to call."] },
+                { word: "say", examples: ["What did you say?", "She said hello.", "He always says goodbye."] },
+                { word: "see", examples: ["I can see a bird.", "Did you see the movie?", "I'll see you tomorrow."] },
+                { word: "send", examples: ["Can you send me an email?", "She sent a letter.", "I sent the package."] },
+                { word: "show", examples: ["Can you show me your new phone?", "He showed me the way.", "The map shows the path."] },
+                { word: "sing", examples: ["She loves to sing.", "He is singing a song.", "Let's sing together."] },
+                { word: "sleep", examples: ["I need to sleep.", "He is sleeping soundly.", "Did you sleep well?"] },
+                { word: "speak", examples: ["Can you speak English?", "She speaks very fast.", "I need to speak to you."] },
+                { word: "spend", examples: ["I like to spend time with friends.", "How much money do you spend?", "He spends hours reading."] },
+                { word: "start", examples: ["Let's start the game.", "The class starts at 9 AM.", "When did you start learning?"] },
+                { word: "study", examples: ["I need to study for the exam.", "She studies hard.", "He studies English every day."] },
+                { word: "take", examples: ["Can I take your picture?", "She took a deep breath.", "He took the bus to work."] },
+                { word: "talk", examples: ["Let's talk about it.", "She is talking on the phone.", "They talked for hours."] },
+                { word: "tell", examples: ["Can you tell me a story?", "He told me the truth.", "Tell me about your day."] },
+                { word: "think", examples: ["What do you think?", "I think it's a good idea.", "She thought about it."] },
+                { word: "understand", examples: ["Do you understand?", "I don't understand this.", "He understood the instructions."] },
+                { word: "use", examples: ["Can I use your pen?", "She uses her computer for work.", "This tool is useful."] },
+                { word: "wait", examples: ["Please wait for me.", "I waited for an hour.", "Can you wait a moment?"] },
+                { word: "walk", examples: ["Let's go for a walk.", "She walks to school every day.", "He is walking his dog."] },
+                { word: "want", examples: ["I want a new car.", "What do you want to eat?", "She wants to travel."] },
+                { word: "watch", examples: ["I like to watch movies.", "He is watching TV.", "Watch out for cars!"] },
+                { word: "wear", examples: ["I wear glasses.", "She is wearing a beautiful dress.", "He wears a hat."] },
+                { word: "work", examples: ["I work in an office.", "She works hard.", "He is looking for work."] },
+                { word: "write", examples: ["I need to write an email.", "She wrote a letter.", "Can you write your name?"] }
+            ],
+            "爱好与休闲": [
+                { word: "art", examples: ["I like modern art.", "She is studying art.", "Art is a form of expression."] },
+                { word: "book", examples: ["I am reading a book.", "She bought a new book.", "This book is interesting."] },
+                { word: "camp", examples: ["Let's go camp in the forest.", "We will camp near the lake.", "They camped for a week."] },
+                { word: "cinema", examples: ["Let's go to the cinema.", "The cinema is showing a new film.", "I love going to the cinema."] },
+                { word: "club", examples: ["I joined a sports club.", "They go to the club every Friday.", "The club has many members."] },
+                { word: "computer", examples: ["I use my computer for work.", "She bought a new computer.", "The computer is fast."] },
+                { word: "concert", examples: ["We went to a concert last night.", "The concert was amazing.", "Do you like classical concert?"] },
+                { word: "dance", examples: ["Let's dance!", "She loves to dance.", "They danced all night."] },
+                { word: "drawing", examples: ["She loves drawing.", "He is good at drawing.", "I saw a beautiful drawing."] },
+                { word: "film", examples: ["Let's watch a film.", "This is a great film.", "The film is about history."] },
+                { word: "game", examples: ["Let's play a game.", "He likes computer games.", "The game was exciting."] },
+                { word: "guitar", examples: ["He plays the guitar.", "She is learning to play the guitar.", "The guitar has six strings."] },
+                { word: "hobby", examples: ["What's your hobby?", "My hobby is reading.", "He has many hobbies."] },
+                { word: "music", examples: ["I love listening to music.", "What kind of music do you like?", "She plays music on her phone."] },
+                { word: "museum", examples: ["We visited the museum yesterday.", "The museum has old artifacts.", "I enjoy going to museums."] },
+                { word: "paint", examples: ["She likes to paint pictures.", "He is painting the wall.", "I used red paint."] },
+                { word: "photo", examples: ["Take a photo of me.", "I saw your photo on social media.", "She keeps her photos in an album."] },
+                { word: "play", examples: ["Let's play a game.", "He plays football.", "The children are playing outside."] },
+                { word: "radio", examples: ["I listen to the radio.", "The radio is playing music.", "Turn on the radio."] },
+                { word: "read", examples: ["I like to read books.", "She is reading a newspaper.", "Have you read this book?"] },
+                { word: "sport", examples: ["What's your favorite sport?", "He plays many sports.", "Sport is good for health."] },
+                { word: "swim", examples: ["I like to swim in the pool.", "Can you swim?", "She goes swimming every day."] },
+                { word: "television", examples: ["I watch television every evening.", "The television is big.", "Turn off the television."] },
+                { word: "video", examples: ["Let's watch a video.", "He is making a video.", "The video is funny."] }
+            ],
+            "地点": [
+                { word: "beach", examples: ["We went to the beach.", "The beach is sandy.", "I love walking on the beach."] },
+                { word: "cafe", examples: ["Let's meet at the cafe.", "The cafe serves good coffee.", "She works in a cafe."] },
+                { word: "castle", examples: ["We visited an old castle.", "The castle is beautiful.", "The king lives in a castle."] },
+                { word: "city", examples: ["I live in a big city.", "The city is always busy.", "London is a famous city."] },
+                { word: "country", examples: ["Which country are you from?", "I love my country.", "The country is beautiful."] },
+                { word: "countryside", examples: ["I like to walk in the countryside.", "The countryside is peaceful.", "They live in the countryside."] },
+                { word: "church", examples: ["We go to church every Sunday.", "The church is old.", "The wedding was in the church."] },
+                { word: "cinema", examples: ["Let's go to the cinema.", "The cinema is showing a new film.", "I love going to the cinema."] },
+                { word: "park", examples: ["Let's go to the park.", "The park has many trees.", "Children play in the park."] },
+                { word: "restaurant", examples: ["Let's eat at a restaurant.", "This restaurant has good food.", "I like Italian restaurants."] },
+                { word: "shop", examples: ["I need to go to the shop.", "The shop sells clothes.", "She works in a shop."] },
+                { word: "school", examples: ["I go to school every day.", "My school is big.", "She is a student at this school."] },
+                { word: "museum", examples: ["We visited the museum yesterday.", "The museum has old artifacts.", "I enjoy going to museums."] },
+                { word: "street", examples: ["The street is busy.", "Be careful on the street.", "My house is on this street."] },
+                { word: "town", examples: ["I live in a small town.", "The town is quiet.", "The town hall is old."] },
+                { word: "zoo", examples: ["We went to the zoo.", "The zoo has many animals.", "I saw a lion at the zoo."] }
+            ],
+            "形容词": [
+                { word: "afraid", examples: ["She is afraid of spiders.", "Don't be afraid.", "I am afraid of the dark."] },
+                { word: "amazing", examples: ["This is an amazing view.", "The concert was amazing.", "You did an amazing job."] },
+                { word: "angry", examples: ["He is angry.", "Don't be angry with me.", "She looked very angry."] },
+                { word: "bad", examples: ["This is a bad idea.", "I had a bad dream.", "Don't feel bad."] },
+                { word: "beautiful", examples: ["She is a beautiful girl.", "The flowers are beautiful.", "What a beautiful day!"] },
+                { word: "big", examples: ["I live in a big house.", "He has a big dog.", "The elephant is a big animal."] },
+                { word: "black", examples: ["My car is black.", "She is wearing a black dress.", "The cat is black."] },
+                { word: "blue", examples: ["The sky is blue.", "He has blue eyes.", "I like the color blue."] },
+                { word: "bored", examples: ["I am bored.", "He felt bored during the lesson.", "She was bored at home."] },
+                { word: "boring", examples: ["This film is boring.", "The lesson was boring.", "I hate boring books."] },
+                { word: "bright", examples: ["The sun is very bright.", "The room is bright.", "She has a bright idea."] },
+                { word: "brilliant", examples: ["That's a brilliant idea!", "The concert was brilliant.", "You are brilliant!"] },
+                { word: "cheap", examples: ["This shirt is cheap.", "The food is cheap and tasty.", "I bought a cheap phone."] },
+                { word: "clean", examples: ["My room is clean.", "The car is clean.", "I like a clean house."] },
+                { word: "clear", examples: ["The sky is clear.", "The water is clear.", "Make sure your instructions are clear."] },
+                { word: "clever", examples: ["He is a clever boy.", "She gave a clever answer.", "The dog is very clever."] },
+                { word: "cold", examples: ["It's cold outside.", "I feel cold.", "She likes cold drinks."] },
+                { word: "comfortable", examples: ["This sofa is comfortable.", "I feel comfortable here.", "The shoes are comfortable."] },
+                { word: "cool", examples: ["It's cool today.", "That's a cool idea!", "He looks cool in sunglasses."] },
+                { word: "correct", examples: ["That's the correct answer.", "Please correct your mistakes.", "Is this correct?"] },
+                { word: "crowded", examples: ["The street is crowded.", "The bus was crowded.", "The market was very crowded."] },
+                { word: "dangerous", examples: ["Driving fast is dangerous.", "This road is dangerous.", "Don't go near dangerous animals."] },
+                { word: "dark", examples: ["It's dark outside.", "The room is dark.", "She has dark hair."] },
+                { word: "dead", examples: ["The plant is dead.", "He found a dead bird.", "The battery is dead."] },
+                { word: "different", examples: ["These two cars are different.", "We have different opinions.", "Try something different."] },
+                { word: "difficult", examples: ["The exam was difficult.", "This is a difficult question.", "Learning a new language can be difficult."] },
+                { word: "dirty", examples: ["My hands are dirty.", "The car is dirty.", "Don't touch that dirty surface."] },
+                { word: "easy", examples: ["The test was easy.", "This is an easy question.", "It's easy to learn."] },
+                { word: "excited", examples: ["I am excited about the trip.", "She felt excited.", "The children were excited."] },
+                { word: "exciting", examples: ["This is an exciting game.", "The news is exciting.", "It was an exciting day."] },
+                { word: "expensive", examples: ["This car is expensive.", "The watch is very expensive.", "He bought an expensive gift."] },
+                { word: "famous", examples: ["He is a famous singer.", "The museum is famous.", "London is a famous city."] },
+                { word: "fantastic", examples: ["That's fantastic news!", "The food was fantastic.", "You did a fantastic job."] },
+                { word: "fast", examples: ["He runs very fast.", "The car is fast.", "Fast food is convenient."] },
+                { word: "fat", examples: ["The cat is fat.", "He has a fat stomach.", "Don't eat too much fat."] },
+                { word: "favourite", examples: ["What's your favourite color?", "My favourite food is pizza.", "She is my favourite singer."] },
+                { word: "fine", examples: ["I'm fine, thank you.", "The weather is fine today.", "Everything is fine."] },
+                { word: "friendly", examples: ["She is a friendly person.", "The dog is friendly.", "He has a friendly smile."] },
+                { word: "full", examples: ["The glass is full.", "I am full after dinner.", "The bus is full."] },
+                { word: "funny", examples: ["He told a funny joke.", "The film was very funny.", "She has a funny personality."] },
+                { word: "good", examples: ["This is a good book.", "He is a good student.", "Have a good day!"] },
+                { word: "great", examples: ["That's a great idea!", "We had a great time.", "You did a great job."] },
+                { word: "happy", examples: ["I am happy today.", "She looks happy.", "Happy birthday!"] },
+                { word: "hard", examples: ["The test was hard.", "He works very hard.", "It's a hard problem."] },
+                { word: "healthy", examples: ["Eat healthy food.", "She is a healthy person.", "Exercise keeps you healthy."] },
+                { word: "heavy", examples: ["The box is heavy.", "He lifted a heavy weight.", "The rain was heavy."] },
+                { word: "helpful", examples: ["Thank you, that was very helpful.", "She is a helpful person.", "The instructions are helpful."] },
+                { word: "high", examples: ["The mountain is very high.", "He threw the ball high.", "The bird is flying high."] },
+                { word: "hot", examples: ["It's hot today.", "The soup is hot.", "I like hot weather."] },
+                { word: "huge", examples: ["He lives in a huge house.", "The elephant is huge.", "It was a huge mistake."] },
+                { word: "hungry", examples: ["I am hungry.", "The cat is hungry.", "Are you hungry?"] },
+                { word: "important", examples: ["This is important information.", "Family is important.", "It's important to study."] },
+                { word: "interested", examples: ["I am interested in history.", "She is interested in art.", "Are you interested?"] },
+                { word: "interesting", examples: ["This book is interesting.", "The story is interesting.", "It was an interesting conversation."] },
+                { word: "large", examples: ["We need a large table.", "He lives in a large apartment.", "The dog is large."] },
+                { word: "late", examples: ["I am late for work.", "Don't be late.", "The train was late."] },
+                { word: "lazy", examples: ["He is a lazy student.", "Don't be lazy.", "The cat is lazy."] },
+                { word: "light", examples: ["The room is full of light.", "This box is light.", "Turn on the light."] },
+                { word: "little", examples: ["I have a little dog.", "She ate a little cake.", "He knows a little English."] },
+                { word: "long", examples: ["The road is long.", "She has long hair.", "The film was long."] },
+                { word: "loud", examples: ["The music is too loud.", "He has a loud voice.", "Don't be loud."] },
+                { word: "lovely", examples: ["What a lovely dress!", "We had a lovely time.", "The flowers are lovely."] },
+                { word: "low", examples: ["The shelf is low.", "The price is low.", "He spoke in a low voice."] },
+                { word: "lucky", examples: ["I feel lucky today.", "You are so lucky!", "It was a lucky day."] },
+                { word: "modern", examples: ["I like modern art.", "The house is very modern.", "The city has modern buildings."] },
+                { word: "nervous", examples: ["I feel nervous before exams.", "She was nervous to speak.", "Don't be nervous."] },
+                { word: "new", examples: ["I bought a new phone.", "This is a new idea.", "Happy New Year!"] },
+                { word: "nice", examples: ["Have a nice day!", "She is a nice person.", "The weather is nice."] },
+                { word: "noisy", examples: ["The street is noisy.", "The children are noisy.", "It's a noisy place."] },
+                { word: "old", examples: ["He is an old man.", "This is an old house.", "How old are you?"] },
+                { word: "open", examples: ["The door is open.", "The shop is open.", "Keep your mind open."] },
+                { word: "perfect", examples: ["That's perfect!", "He is a perfect student.", "The weather is perfect."] },
+                { word: "polite", examples: ["He is a polite person.", "Be polite to others.", "She gave a polite smile."] },
+                { word: "popular", examples: ["Football is a popular sport.", "She is a popular singer.", "This song is popular."] },
+                { word: "possible", examples: ["Is it possible to do this?", "It's possible to learn quickly.", "Anything is possible."] },
+                { word: "pretty", examples: ["She is a pretty girl.", "The dress is pretty.", "What a pretty flower!"] },
+                { word: "quick", examples: ["Be quick!", "He is a quick learner.", "Let's have a quick lunch."] },
+                { word: "quiet", examples: ["The room is quiet.", "Please be quiet.", "She spoke in a quiet voice."] },
+                { word: "ready", examples: ["Are you ready?", "I am ready to go.", "Dinner is ready."] },
+                { word: "real", examples: ["This is a real diamond.", "Is it real or fake?", "He told the real story."] },
+                { word: "rich", examples: ["He is a rich man.", "The country is rich in resources.", "She became rich."] },
+                { word: "right", examples: ["That's the right answer.", "Turn right here.", "You are right."] },
+                { word: "sad", examples: ["I feel sad today.", "She looked sad.", "The story was sad."] },
+                { word: "safe", examples: ["Be safe!", "The place is safe.", "Keep your money safe."] },
+                { word: "short", examples: ["He has short hair.", "The story is short.", "The road is short."] },
+                { word: "shy", examples: ["She is a shy girl.", "He feels shy around new people.", "Don't be shy."] },
+                { word: "sick", examples: ["I feel sick.", "She is sick with a cold.", "He called in sick."] },
+                { word: "simple", examples: ["This is a simple question.", "Keep it simple.", "The design is simple."] },
+                { word: "slow", examples: ["The car is slow.", "He is a slow runner.", "Speak slowly, please."] },
+                { word: "small", examples: ["I live in a small apartment.", "He has a small dog.", "The cat is small."] },
+                { word: "smart", examples: ["He is a smart student.", "She has a smart phone.", "That's a smart decision."] },
+                { word: "soft", examples: ["The sofa is soft.", "Her voice is soft.", "The pillow is soft."] },
+                { word: "special", examples: ["This is a special day.", "You are special to me.", "He made a special dinner."] },
+                { word: "strong", examples: ["He is a strong man.", "The coffee is strong.", "She has a strong will."] },
+                { word: "sure", examples: ["Are you sure?", "I'm not sure.", "She is sure of herself."] },
+                { word: "surprised", examples: ["I was surprised to see him.", "She looked surprised.", "He was surprised by the news."] },
+                { word: "sweet", examples: ["The cake is sweet.", "She has a sweet voice.", "He is a sweet person."] },
+                { word: "tall", examples: ["He is a tall man.", "The building is tall.", "She is taller than me."] },
+                { word: "terrible", examples: ["The weather is terrible.", "I had a terrible day.", "That's a terrible idea."] },
+                { word: "thirsty", examples: ["I am thirsty.", "The plant is thirsty.", "Are you thirsty?"] },
+                { word: "tired", examples: ["I am tired.", "She feels tired after work.", "He is very tired."] },
+                { word: "true", examples: ["This is a true story.", "Is it true?", "Tell me the true."] },
+                { word: "unhappy", examples: ["She looks unhappy.", "He was unhappy with the result.", "Why are you unhappy?"] },
+                { word: "useful", examples: ["This tool is useful.", "The book is very useful.", "It's a useful skill."] },
+                { word: "usual", examples: ["This is my usual coffee.", "He arrived at his usual time.", "It's nothing unusual."] },
+                { word: "warm", examples: ["It's warm today.", "The soup is warm.", "She likes warm weather."] },
+                { word: "well", examples: ["I feel well.", "She sings very well.", "He did well on the test."] },
+                { word: "wet", examples: ["The ground is wet.", "My clothes are wet.", "Don't walk on wet paint."] },
+                { word: "wonderful", examples: ["What a wonderful day!", "You did a wonderful job.", "The trip was wonderful."] },
+                { word: "worried", examples: ["I am worried about the exam.", "She looked worried.", "Don't worry."] },
+                { word: "wrong", examples: ["That's the wrong answer.", "You are wrong.", "What went wrong?"] },
+                { word: "young", examples: ["He is a young boy.", "She looks very young.", "The young generation."] }
+            ]
+        };
+
+        const studyPlanData = [
+            {
+                week: 1,
+                title: "第1周：基础与熟悉",
+                days: [
+                    { day: 1, focus: "KET考试概览 & 个人信息词汇", tasks: "了解考试结构与评分。学习20个“人物与家庭”词汇。口语Part 1：回答关于自己的5个问题。", examples: [
+                        "My name is Li Ming.",
+                        "I am from China.",
+                        "I like to read books.",
+                        "I live in a big city.",
+                        "My favorite color is blue.",
+                        "I have a dog named Max.",
+                        "I study English every day.",
+                        "I enjoy playing computer games.",
+                        "My family is very important to me.",
+                        "I often visit my grandparents on weekends."
+                    ] },
+                    { day: 2, focus: "语法：一般现在时 & 日常活动词汇", tasks: "复习一般现在时用法。学习20个“日常活动”词汇。阅读与写作Part 1：完成2组练习。", examples: [
+                        "He runs every morning.",
+                        "She often studies in the library.",
+                        "We go to the cinema at the weekend.",
+                        "They usually have breakfast at 7 AM.",
+                        "The sun rises in the east.",
+                        "Cats like to sleep a lot.",
+                        "I drink coffee every day.",
+                        "He plays football on Tuesdays.",
+                        "The shop opens at 9 o'clock.",
+                        "Birds sing in the morning."
+                    ] },
+                    { day: 3, focus: "听力Part 1 & 居家生活词汇", tasks: "听力Part 1：完成2组练习。学习20个“居家生活”词汇。口语Part 1：描述自己的家。", examples: [
+                        "There is a bed in my bedroom.",
+                        "The bathroom is next to the kitchen.",
+                        "Our house has a beautiful garden.",
+                        "I usually watch TV in the living room.",
+                        "The fridge is in the kitchen.",
+                        "Please close the door when you leave.",
+                        "My desk is near the window.",
+                        "I like to clean my room on Saturdays.",
+                        "The lamp is on the table.",
+                        "The floor is made of wood."
+                    ] },
+                    { day: 4, focus: "语法：一般过去时 & 食物与饮品词汇", tasks: "复习一般过去时用法。学习20个“食物与饮品”词汇。阅读与写作Part 4：完成2组练习。", examples: [
+                        "I ate an apple yesterday.",
+                        "We went to Beijing last year.",
+                        "He didn't eat dinner.",
+                        "She bought some bread this morning.",
+                        "They had pizza for lunch.",
+                        "I cooked chicken last night.",
+                        "We drank a lot of water.",
+                        "He visited his aunt last week.",
+                        "The film started at 7 PM.",
+                        "She felt tired after work."
+                    ] },
+                    { day: 5, focus: "阅读与写作Part 2 & 地点词汇", tasks: "阅读与写作Part 2：完成2组练习。学习20个“地点”词汇。听力Part 2：完成1组练习。", examples: [
+                        "This information matches the third paragraph.",
+                        "Can you find the meaning of this word in the text?",
+                        "Please choose the correct answer.",
+                        "The park is a great place to relax.",
+                        "Let's meet at the cafe.",
+                        "The museum is open until 5 PM.",
+                        "I live in a small town.",
+                        "We walked down the busy street.",
+                        "The shop is closed on Sundays.",
+                        "They saw many animals at the zoo."
+                    ] },
+                    { day: 6, focus: "语法：情态动词(can/could) & 形容词", tasks: "复习情态动词can/could。学习20个“形容词”词汇。口语Part 1：描述喜欢/不喜欢的事物。", examples: [
+                        "I can speak a little English.",
+                        "Can she play the guitar?",
+                        "Could you help me, please?",
+                        "He is a very kind person.",
+                        "The weather is beautiful today.",
+                        "This book is interesting.",
+                        "I am hungry.",
+                        "She feels happy.",
+                        "The box is heavy.",
+                        "It's an important decision."
+                    ] },
+                    { day: 7, focus: "周末复习与休息", tasks: "复习第1周所有词汇和语法。进行简短的听力或阅读练习。识别薄弱环节。", examples: [
+                        "Review all new words and grammar.",
+                        "Which vocabulary am I still unsure about?",
+                        "I should practice listening more.",
+                        "Write down sentences using the new words.",
+                        "Read a short story in English.",
+                        "Watch an English video with subtitles.",
+                        "Test yourself on the past tense verbs.",
+                        "Identify areas where you made mistakes.",
+                        "Plan for the next week's study.",
+                        "Take a short break and relax."
+                    ] }
+                ]
+            },
+            {
+                week: 2,
+                title: "第2周：扩展技能与词汇",
+                days: [
+                    { day: 8, focus: "语法：现在进行时(未来) & 交通词汇", tasks: "复习现在进行时表未来。学习20个“旅行与交通”词汇。阅读与写作Part 3练习。", examples: [
+                        "I'm going to Beijing tomorrow.",
+                        "She's coming to see me next week.",
+                        "We are preparing to travel.",
+                        "They are flying to London on Monday.",
+                        "He is taking the bus to work.",
+                        "Are you meeting them tonight?",
+                        "The train is arriving at 10 AM.",
+                        "I'm taking my bike to the park.",
+                        "She's driving to the airport.",
+                        "We are planning a trip to the beach."
+                    ] },
+                    { day: 9, focus: "听力Part 3 & 爱好与休闲词汇", tasks: "听力Part 3练习。学习20个“爱好与休闲”词汇。口语Part 1：谈论爱好。", examples: [
+                        "I like listening to music.",
+                        "What's your favorite hobby?",
+                        "I usually play games at the weekend.",
+                        "She enjoys drawing pictures.",
+                        "He plays the guitar very well.",
+                        "We often go to the cinema.",
+                        "My hobby is reading books.",
+                        "Do you like to swim?",
+                        "They went to a concert last night.",
+                        "I watch television in the evening."
+                    ] },
+                    { day: 10, focus: "语法：比较级/最高级 & 购物词汇", tasks: "复习比较级/最高级。学习购物相关词汇。阅读与写作Part 5练习。", examples: [
+                        "This book is more expensive than that one.",
+                        "He is the tallest student in the class.",
+                        "My bag is smaller than yours.",
+                        "The red dress is prettier.",
+                        "This is the best restaurant in town.",
+                        "She is the most intelligent person I know.",
+                        "The new phone is much faster.",
+                        "This shop has cheaper prices.",
+                        "Is this the biggest size?",
+                        "Learning English is more interesting than math."
+                    ] },
+                    { day: 11, focus: "阅读与写作Part 6 (邮件) & 动词短语", tasks: "写作Part 6练习。学习10个常用动词短语。听力Part 4练习。", examples: [
+                        "Please send me an email.",
+                        "I like to call my friends.",
+                        "She sent me a postcard.",
+                        "Can you pick up some milk?",
+                        "I need to look for my keys.",
+                        "He turned on the light.",
+                        "Let's go out tonight.",
+                        "They put on their coats.",
+                        "She took off her shoes.",
+                        "We need to get up early tomorrow."
+                    ] },
+                    { day: 12, focus: "语法：可数/不可数名词 & 量词", tasks: "复习名词和量词。学习教育相关词汇。口语Part 2练习。", examples: [
+                        "I have a few books.",
+                        "He drank a lot of milk.",
+                        "There isn't much water here.",
+                        "Do you have any money?",
+                        "We need some chairs for the party.",
+                        "She has many friends.",
+                        "I eat a lot of fruit.",
+                        "How many apples do you want?",
+                        "How much sugar do we need?",
+                        "There are some students in the classroom."
+                    ] },
+                    { day: 13, focus: "模拟测试 (听力+读写)", tasks: "完成一套完整的听力与读写模拟测试。对答案，分析错误。", examples: [
+                        "I need to complete the listening test.",
+                        "How many did I get wrong in the reading section?",
+                        "What score did I get on this mock exam?",
+                        "Review your answers carefully.",
+                        "Find out why you made mistakes.",
+                        "Pay attention to the time limit.",
+                        "Did you understand all the questions?",
+                        "Circle the correct options.",
+                        "Write down what you heard.",
+                        "Check your spelling and grammar."
+                    ] },
+                    { day: 14, focus: "周末复习与调整", tasks: "复习第2周内容，重点复习模考错题。", examples: [
+                        "I should review all the grammar points.",
+                        "I need to practice writing more.",
+                        "Which parts did I not do well in?",
+                        "Re-do the exercises you struggled with.",
+                        "Watch English movies to improve listening.",
+                        "Read English newspapers for reading practice.",
+                        "Speak English with a friend.",
+                        "Review your vocabulary flashcards.",
+                        "Take notes on your weak areas.",
+                        "Prepare a study plan for the next week."
+                    ] }
+                ]
+            },
+            {
+                week: 3,
+                title: "第3周：产出性技能与复杂语法",
+                days: [
+                    { day: 15, focus: "语法：现在完成时 & 健康词汇", tasks: "复习现在完成时。学习健康医疗词汇。阅读与写作Part 7练习。", examples: [
+                        "I haven't eaten lunch yet today.",
+                        "She has already finished her homework.",
+                        "They have never been to Japan.",
+                        "He has lived here for five years.",
+                        "Have you ever seen a ghost?",
+                        "I've been to London twice.",
+                        "She hasn't visited her aunt recently.",
+                        "They have just arrived.",
+                        "The baby has grown so much.",
+                        "We have known each other since childhood."
+                    ] },
+                    { day: 16, focus: "听力Part 5 & 运动词汇", tasks: "听力Part 5练习。学习运动词汇。口语Part 2练习。", examples: [
+                        "He is running.",
+                        "I like playing football.",
+                        "She swims very fast.",
+                        "Do you play any sports?",
+                        "My favorite sport is basketball.",
+                        "We went cycling in the park.",
+                        "He likes to go for a run every morning.",
+                        "The team won the game.",
+                        "She is good at tennis.",
+                        "Swimming is a great exercise."
+                    ] },
+                    { day: 17, focus: "语法：条件句 & 连接词", tasks: "复习零/第一条件句。学习常用连接词。阅读与写作Part 4练习。", examples: [
+                        "If it rains, I will stay at home.",
+                        "If you study, you will pass the exam.",
+                        "If I'm thirsty, I drink water.",
+                        "When you heat ice, it melts.",
+                        "If she comes, we will go to the cinema.",
+                        "If I have time, I'll help you.",
+                        "She went to the shop because she needed milk.",
+                        "He was tired, so he went to bed early.",
+                        "Although it was cold, we went for a walk.",
+                        "You can choose coffee or tea."
+                    ] },
+                    { day: 18, focus: "读写Part 5 (开放填空) & 动词模式", tasks: "读写Part 5练习。复习动词+ing/不定式。听力Part 2练习。", examples: [
+                        "He enjoys reading books.",
+                        "She wants to go shopping.",
+                        "I look forward to seeing you.",
+                        "They decided to buy a new car.",
+                        "I love playing the piano.",
+                        "He offered to help me.",
+                        "She stopped working at 5 PM.",
+                        "They prefer to eat at home.",
+                        "I finished writing my essay.",
+                        "He started learning English last year."
+                    ] },
+                    { day: 19, focus: "语法：被动语态 (现在/过去) & 职业词汇", tasks: "复习现在和过去简单被动语态。学习20个“工作与职业”词汇。口语Part 1 & 2：综合练习。", examples: [
+                        "This book was written by me.",
+                        "The house was built in 1990.",
+                        "Dinner is being prepared.",
+                        "English is spoken all over the world.",
+                        "The letter was sent yesterday.",
+                        "Many cars are produced in this factory.",
+                        "The new hospital was opened last month.",
+                        "He is a doctor.",
+                        "She works as a teacher.",
+                        "My father is an engineer."
+                    ] },
+                    { day: 20, focus: "模拟测试 (听力+读写)", tasks: "完成一套完整的听力与读写模拟测试。分析错误，重点关注写作。", examples: [
+                        "I need to analyze my mock test results.",
+                        "I made mistakes in the writing section.",
+                        "I misheard information in the listening part.",
+                        "Check your answers against the key.",
+                        "Identify recurring grammar errors.",
+                        "Practice writing more clearly.",
+                        "Listen for specific details in the audio.",
+                        "Improve your time management.",
+                        "What was the main idea?",
+                        "How can I improve my score?"
+                    ] },
+                    { day: 21, focus: "周末复习与调整", tasks: "复习第3周内容，重点复习写作错误。写一篇短文应用新语法。", examples: [
+                        "I wrote an email.",
+                        "I made sentences with the new vocabulary.",
+                        "I did better this time than last time.",
+                        "Review all grammar from this week.",
+                        "Focus on the structure of your writing.",
+                        "Practice using new linking words.",
+                        "Read an article and summarize it.",
+                        "Listen to an English podcast.",
+                        "Speak about your day in English.",
+                        "Relax and prepare for the final week."
+                    ] }
+                ]
+            },
+            {
+                week: 4,
+                title: "第4周：整合、模拟测试与完善",
+                days: [
+                    { day: 22, focus: "综合阅读与写作练习", tasks: "阅读与写作Part 1-3各完成1组。复习所有词汇表。", examples: [
+                        "Please read this short text quickly.",
+                        "Find the main idea of the passage.",
+                        "Choose the correct title.",
+                        "Answer the questions based on the text.",
+                        "Match the sentences to the correct paragraphs.",
+                        "Fill in the gaps with the best word.",
+                        "Write a short message to a friend.",
+                        "Describe what is happening in the pictures.",
+                        "Check your spelling and grammar carefully.",
+                        "Make sure your writing is clear and concise."
+                    ] },
+                    { day: 23, focus: "综合听力练习", tasks: "听力Part 1-5各完成1组。复习所有语法点。", examples: [
+                        "Listen to the recording and write down the answers.",
+                        "Please listen to the conversation and answer the questions.",
+                        "Did you understand all the details?",
+                        "Listen for names, numbers, and places.",
+                        "Identify the speaker's main purpose.",
+                        "Match the people to their descriptions.",
+                        "Pay attention to accents and intonation.",
+                        "Listen for key phrases and expressions.",
+                        "Practice note-taking while listening.",
+                        "Replay difficult sections until you understand."
+                    ] },
+                    { day: 24, focus: "综合口语练习", tasks: "口语Part 1 & 2进行2-3次模拟对话。关注流利度、发音和互动。", examples: [
+                        "Tell me about yourself.",
+                        "What do you like to do at the weekend?",
+                        "Discuss this topic with your partner.",
+                        "Ask your partner a question.",
+                        "Give reasons for your opinions.",
+                        "Make sure you speak clearly.",
+                        "Practice interacting naturally.",
+                        "Record yourself and listen back.",
+                        "Ask for clarification if you don't understand.",
+                        "Maintain eye contact with the examiner."
+                    ] },
+                    { day: 25, focus: "完整模拟测试", tasks: "完成一套完整的KET模拟测试（听说读写）。严格计时。", examples: [
+                        "The exam time is 2 hours and 10 minutes.",
+                        "Please complete it strictly according to the time limit.",
+                        "Simulate a real exam scenario.",
+                        "Do not use any external help.",
+                        "Take short breaks as in the real exam.",
+                        "Complete all sections of the test.",
+                        "Manage your time effectively.",
+                        "Mark your answers clearly.",
+                        "Try to finish all questions.",
+                        "Stay focused during the entire test."
+                    ] },
+                    { day: 26, focus: "模考分析与弱项突破", tasks: "详细分析Day 25模拟测试结果，找出最薄弱的2-3个知识点或题型。针对性练习。", examples: [
+                        "I found that grammar is my weakness.",
+                        "I need to practice numbers in listening more.",
+                        "This time I should focus on writing.",
+                        "Go through every incorrect answer.",
+                        "Understand the reason for each mistake.",
+                        "Create extra exercises for your weak points.",
+                        "Consult your grammar book for specific rules.",
+                        "Practice dictation for listening improvement.",
+                        "Write short paragraphs on challenging topics.",
+                        "Discuss your errors with a study partner."
+                    ] },
+                    { day: 27, focus: "写作与口语专题训练", tasks: "写作Part 6 & 7各写1篇。口语Part 2深入讨论2个话题。", examples: [
+                        "Write a short text about your weekend.",
+                        "Describe your favorite place.",
+                        "Discuss two hobbies.",
+                        "Write an email inviting a friend to a party.",
+                        "Tell a story based on three pictures.",
+                        "Talk about the advantages and disadvantages of online shopping.",
+                        "Describe your ideal holiday.",
+                        "Discuss why learning English is important.",
+                        "Practice presenting your opinions clearly.",
+                        "Ask follow-up questions to your partner."
+                    ] },
+                    { day: 28, focus: "词汇与语法总复习", tasks: "快速浏览所有词汇表和语法点。进行快速问答练习。", examples: [
+                        "Review all high-frequency vocabulary.",
+                        "Quickly go over grammar rules.",
+                        "Test yourself on different question types.",
+                        "Use flashcards for quick revision.",
+                        "Practice verb tenses and prepositions.",
+                        "Read through your grammar notes.",
+                        "Quiz a friend on vocabulary.",
+                        "Write sentences with challenging words.",
+                        "Listen to English songs or podcasts.",
+                        "Consolidate everything you've learned."
+                    ] },
+                    { day: 29, focus: "考前冲刺与心态调整", tasks: "浏览易错点，进行少量轻松练习。确保设备、证件准备就绪。调整心态，保持积极。", examples: [
+                        "Stay relaxed.",
+                        "Believe you are well-prepared.",
+                        "Do light practice, don't overwork.",
+                        "Get a good night's sleep.",
+                        "Eat a healthy breakfast.",
+                        "Pack your bag with essential items.",
+                        "Arrive early at the exam venue.",
+                        "Visualize success.",
+                        "Do some deep breathing exercises.",
+                        "Trust your preparation."
+                    ] },
+                    { day: 30, focus: "考试日", tasks: "保持良好状态，自信应考。", examples: [
+                        "Good luck with your exam!",
+                        "Stay confident.",
+                        "Approach the exam calmly.",
+                        "Read all instructions carefully.",
+                        "Manage your time wisely.",
+                        "Do your best on every section.",
+                        "Don't panic if you don't know an answer.",
+                        "Review your answers if time permits.",
+                        "Breathe deeply and focus.",
+                        "You've worked hard, you can do this!"
+                    ] }
+                ]
+            }
+        ];
+
+        const grammarData = [
+            { title: "时态", content: "一般现在时、现在进行时、一般过去时、过去进行时、现在完成时。" },
+            { title: "情态动词", content: "can/could (能力/请求), have to (义务), should (建议), must/mustn't (义务/禁止)。" },
+            { title: "名词与冠词", content: "可数/不可数名词，a/an/the，量词 (much/many, some/any)。" },
+            { title: "形容词与副词", content: "比较级和最高级，频率副词 (always, often), 方式、时间、地点副词。" },
+            { title: "介词", content: "时间介词 (on/in/at)，地点介词和运动介词。" },
+            { title: "条件句", content: "零条件句 (普遍真理) 和第一条件句 (未来真实可能性)。" }
+        ];
+
+        const skillsData = [
+            { 
+                title: "阅读与写作 (50%)", 
+                content: "共7部分，1小时。重点练习识别短文本主旨（Part 1）、信息匹配（Part 2）、长文理解（Part 3），以及词汇语法填空（Part 4-5）。写作部分（Part 6-7）要求写25-35词的邮件或故事，注意规划、检查语法和拼写。",
+                icon: "📖"
+            },
+            { 
+                title: "听力 (25%)", 
+                content: "共5部分，约30分钟。录音播放两次。练习捕捉关键信息如价格、时间、地点（Part 1-2），理解对话主旨和细节（Part 3-5）。多听A2级别材料，熟悉不同口音和语速。",
+                icon: "🎧"
+            },
+            { 
+                title: "口语 (25%)", 
+                content: "共2部分，8-10分钟。与另一位考生共同进行。Part 1是关于个人信息的问答。Part 2是协作任务，根据提示卡讨论偏好。多与伙伴练习对话，学会提问和回应。",
+                icon: "💬"
+            },
+            { 
+                title: "最终建议", 
+                content: "考前进行完整模拟测试，严格计时。复习错题，找出薄弱环节。考试当天保持冷静，仔细阅读题目要求，合理分配时间。遇到难题不要慌张，先跳过，最后再回来检查。",
+                icon: "⭐"
+            }
+        ];
+
+        const ctx = document.getElementById('examStructureChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['阅读与写作', '听力', '口语'],
+                datasets: [{
+                    data: [50, 25, 25],
+                    backgroundColor: ['#0d9488', '#14b8a6', '#5eead4'],
+                    borderColor: '#fdfcf9',
+                    borderWidth: 4,
+                    hoverOffset: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            font: {
+                                size: 14,
+                                family: "'Noto Sans SC', sans-serif"
+                            },
+                            color: '#3f3f46',
+                            padding: 20
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed !== null) {
+                                    label += context.parsed + '%';
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        const vocabFiltersContainer = document.getElementById('vocab-filters');
+        const vocabListContainer = document.getElementById('vocab-list');
+        const vocabSearchInput = document.getElementById('vocab-search');
+        let activeFilter = Object.keys(vocabularyData)[0];
+
+        function renderVocab() {
+            const searchTerm = vocabSearchInput.value.toLowerCase();
+            vocabListContainer.innerHTML = '';
+            
+            let wordsToShow = [];
+            if (searchTerm) {
+                // Search across all categories
+                Object.values(vocabularyData).flat().forEach(wordObj => {
+                    if (wordObj.word.toLowerCase().includes(searchTerm)) {
+                        wordsToShow.push(wordObj);
+                    }
+                });
+            } else {
+                wordsToShow = vocabularyData[activeFilter];
+            }
+
+            if (wordsToShow.length === 0) {
+                vocabListContainer.innerHTML = `<p class="text-slate-500 col-span-full text-center">未找到匹配的词汇。</p>`;
+                return;
+            }
+
+            wordsToShow.forEach(wordObj => {
+                const card = document.createElement('div');
+                card.className = 'card p-4 rounded-lg shadow-sm text-center flex flex-col items-center';
+                
+                const wordElement = document.createElement('div');
+                wordElement.className = 'font-bold text-lg text-teal-700 mb-2';
+                wordElement.textContent = wordObj.word;
+                card.appendChild(wordElement);
+
+                if (wordObj.examples && wordObj.examples.length > 0) {
+                    const examplesDiv = document.createElement('div');
+                    examplesDiv.className = 'vocab-example w-full';
+                    wordObj.examples.forEach(example => {
+                        const p = document.createElement('p');
+                        p.textContent = example;
+                        examplesDiv.appendChild(p);
+                    });
+                    card.appendChild(examplesDiv);
+                }
+                vocabListContainer.appendChild(card);
+            });
+        }
+
+        Object.keys(vocabularyData).forEach(category => {
+            const button = document.createElement('button');
+            button.textContent = category;
+            button.className = 'btn-secondary px-4 py-2 rounded-full text-sm font-medium';
+            if (category === activeFilter) {
+                button.classList.add('active');
+            }
+            button.addEventListener('click', () => {
+                activeFilter = category;
+                vocabSearchInput.value = '';
+                document.querySelectorAll('#vocab-filters button').forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                renderVocab();
+            });
+            vocabFiltersContainer.appendChild(button);
+        });
+
+        vocabSearchInput.addEventListener('input', () => {
+             if(vocabSearchInput.value) {
+                document.querySelectorAll('#vocab-filters button').forEach(btn => btn.classList.remove('active'));
+             } else if (!document.querySelector('#vocab-filters button.active') && Object.keys(vocabularyData).length > 0) {
+                document.querySelector('#vocab-filters button:first-child').classList.add('active'); // Activate first button if search cleared
+                activeFilter = Object.keys(vocabularyData)[0];
+             }
+             renderVocab();
+        });
+
+        renderVocab();
+
+        const studyPlanContainer = document.getElementById('study-plan-accordion');
+        studyPlanData.forEach(weekData => {
+            const weekDiv = document.createElement('div');
+            weekDiv.className = 'card rounded-xl overflow-hidden shadow-md';
+            
+            const header = document.createElement('div');
+            header.className = 'accordion-header flex justify-between items-center p-5 cursor-pointer bg-teal-50 hover:bg-teal-100 transition';
+            header.innerHTML = `
+                <h3 class="text-lg font-bold text-teal-800">${weekData.title}</h3>
+                <svg class="w-6 h-6 text-teal-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            `;
+
+            const content = document.createElement('div');
+            content.className = 'accordion-content hidden p-5 border-t border-teal-200';
+            
+            const daysGrid = document.createElement('div');
+            daysGrid.className = 'grid md:grid-cols-2 lg:grid-cols-3 gap-4';
+            
+            weekData.days.forEach(dayData => {
+                const dayCard = document.createElement('div');
+                dayCard.className = 'bg-slate-50 p-4 rounded-lg border border-slate-200';
+                dayCard.innerHTML = `
+                    <p class="font-bold text-slate-700">Day ${dayData.day}: ${dayData.focus}</p>
+                    <p class="text-sm text-slate-500 mt-2">${dayData.tasks}</p>
+                `;
+                if (dayData.examples && dayData.examples.length > 0) {
+                    const examplesDiv = document.createElement('div');
+                    examplesDiv.className = 'day-example';
+                    dayData.examples.forEach(example => {
+                        const p = document.createElement('p');
+                        p.textContent = example;
+                        examplesDiv.appendChild(p);
+                    });
+                    dayCard.appendChild(examplesDiv);
+                }
+                daysGrid.appendChild(dayCard);
+            });
+
+            content.appendChild(daysGrid);
+            weekDiv.appendChild(header);
+            weekDiv.appendChild(content);
+            studyPlanContainer.appendChild(weekDiv);
+
+            header.addEventListener('click', () => {
+                header.classList.toggle('open');
+                content.classList.toggle('hidden');
+            });
+        });
+
+        const grammarContainer = document.getElementById('grammar-points');
+        grammarData.forEach(point => {
+            const card = document.createElement('div');
+            card.className = 'card p-6 rounded-xl shadow-md';
+            card.innerHTML = `
+                <h4 class="font-bold text-lg text-slate-800 mb-2">${point.title}</h4>
+                <p class="text-slate-600">${point.content}</p>
+            `;
+            grammarContainer.appendChild(card);
+        });
+
+        const skillsContainer = document.getElementById('skills-tips');
+        skillsData.forEach(skill => {
+            const card = document.createElement('div');
+            card.className = 'card p-6 rounded-xl shadow-md flex items-start gap-4';
+            card.innerHTML = `
+                <div class="text-3xl">${skill.icon}</div>
+                <div>
+                    <h4 class="font-bold text-xl text-slate-800 mb-2">${skill.title}</h4>
+                    <p class="text-slate-600">${skill.content}</p>
+                </div>
+            `;
+            skillsContainer.appendChild(card);
+        });
+        
+        const navLinks = document.querySelectorAll('.nav-link');
+        const sections = document.querySelectorAll('main section');
+
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.4
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    navLinks.forEach(link => {
+                        link.classList.remove('active');
+                        if (link.getAttribute('href').substring(1) === entry.target.id) {
+                            link.classList.add('active');
+                        }
+                    });
+                }
+            });
+        }, observerOptions);
+
+        sections.forEach(section => {
+            observer.observe(section);
+        });
+
+        navLinks.forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+    });
+    </script>
+</body>
+</html>
