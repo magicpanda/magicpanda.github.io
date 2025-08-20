@@ -3,1465 +3,684 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KET A2 Key - 交互式备考仪表盘</title>
+    <title>KET 星际学院备考指南</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
-    <!-- Chosen Palette: Calm Harmony (Warm Neutrals with Soft Blue/Teal accents) -->
-    <!-- Application Structure Plan: A task-oriented SPA with a top navigation bar and five distinct sections: 1. Dashboard/Overview with a visual breakdown of the exam. 2. Interactive Vocabulary Explorer with thematic filtering and search. 3. 30-Day Study Plan presented as a weekly accordion. 4. Grammar Reference with a tabbed/accordion interface. 5. Exam Skills & Tips section. This structure deconstructs the linear report into a user-friendly, non-linear tool, allowing students to easily access specific study materials as needed, which is more effective for daily study and revision than a long, scrollable document. -->
-    <!-- Visualization & Content Choices: 1. Exam Structure -> Goal: Inform -> Viz: Donut Chart -> Interaction: Hover tooltips -> Justification: Visually communicates score weighting better than text/table -> Library: Chart.js. 2. Vocabulary List -> Goal: Organize/Explore -> Method: Thematic filter buttons + dynamic list -> Interaction: Click to filter, type to search -> Justification: Makes a large word list manageable and interactive for study -> Method: Vanilla JS DOM manipulation. 3. 30-Day Plan -> Goal: Organize/Guide -> Method: Weekly Accordion -> Interaction: Click to expand/collapse -> Justification: Prevents information overload and focuses user on a weekly basis -> Method: Vanilla JS. 4. Grammar/Skills -> Goal: Reference -> Method: Tabs/Accordion -> Interaction: Click to show content -> Justification: Standard UI for organizing dense reference material -> Method: Vanilla JS. -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Cosmic Neon -->
+    <!-- Application Structure Plan: A gamified, sci-fi themed dashboard. The core structure (sidebar + main content) is retained for usability, but re-skinned. A new progress/rank system is added to the sidebar to give users a tangible sense of achievement. The 30-day plan is transformed into a "Star Map," making daily tasks feel like missions. This structure enhances engagement for a younger audience by framing learning as an exciting journey rather than a chore. -->
+    <!-- Visualization & Content Choices: 
+        1. Exam Structure -> Goal: Inform -> Viz: Re-skinned Donut Chart (as a "Dashboard Gauge") -> Interaction: Hover -> Justification: The futuristic aesthetic makes the data more visually appealing to the target audience.
+        2. Vocabulary/Grammar -> Goal: Organize -> Method: "Data Log" style cards/accordions with glowing effects -> Interaction: Click-to-reveal -> Justification: Enhances the sci-fi theme and makes information discovery more interactive.
+        3. 30-Day Plan -> Goal: Schedule/Motivate -> Viz: "Star Map" grid of planets/missions -> Interaction: Click to view mission details, which marks the mission as "complete" and updates progress -> Justification: This is the core gamification loop, providing a clear path and rewarding completion.
+        4. Strategies -> Goal: Detail tactics -> Method: "Holographic" tabs -> Interaction: Click to switch -> Justification: A thematic upgrade to a standard UI pattern.
+    -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
+        :root {
+            --glow-color-milo: #00ffff;
+            --glow-color-diandian: #f472b6;
+            --glow-color-both: #34d399;
+            --bg-dark: #0a0f1f;
+            --bg-medium: #101830;
+            --text-neon: #93c5fd;
+            --text-light: #e0e7ff;
+        }
         body {
-            font-family: 'Noto Sans SC', sans-serif;
-            background-color: #fdfcf9;
-            color: #3f3f46;
+            font-family: 'Rajdhani', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            background-image: radial-gradient(circle at 20% 20%, rgba(0, 255, 255, 0.1), transparent 30%),
+                              radial-gradient(circle at 80% 70%, rgba(244, 114, 182, 0.1), transparent 30%);
+        }
+        .font-title {
+            font-family: 'Orbitron', sans-serif;
         }
         .nav-link {
             transition: all 0.3s ease;
-            border-bottom: 2px solid transparent;
+            border: 1px solid transparent;
         }
-        .nav-link.active, .nav-link:hover {
-            color: #0d9488;
-            border-bottom-color: #0d9488;
+        .nav-link.active {
+            background-color: rgba(0, 255, 255, 0.1);
+            color: var(--glow-color-milo);
+            font-weight: 600;
+            border-color: var(--glow-color-milo);
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
         }
-        .section-title {
-            color: #0f766e;
+        .nav-link:hover:not(.active) {
+            background-color: rgba(255, 255, 255, 0.05);
         }
-        .card {
-            background-color: #ffffff;
-            border: 1px solid #f1f5f9;
+        .content-section { display: none; }
+        .content-section.active { display: block; animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .chart-container { position: relative; width: 100%; max-width: 350px; margin: auto; height: auto; max-height: 350px; }
+        .day-block {
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+            border: 1px solid #3b82f6;
+            background: radial-gradient(circle, #1e3a8a, var(--bg-medium));
+            cursor: pointer;
         }
-        .btn-primary {
-            background-color: #14b8a6;
-            color: white;
-            transition: background-color 0.3s ease;
+        .day-block:hover {
+            transform: scale(1.05);
         }
-        .btn-primary:hover {
-            background-color: #0d9488;
+        .day-block.completed-milo {
+            border-color: var(--glow-color-milo);
+            box-shadow: 0 0 15px var(--glow-color-milo);
         }
-        .btn-secondary {
-            background-color: #f1f5f9;
-            color: #334155;
-            transition: background-color 0.3s ease;
+        .day-block.completed-diandian {
+            border-color: var(--glow-color-diandian);
+            box-shadow: 0 0 15px var(--glow-color-diandian);
         }
-        .btn-secondary.active, .btn-secondary:hover {
-            background-color: #ccfbf1;
-            color: #0f766e;
+        .day-block.completed-both {
+            border-color: var(--glow-color-both);
+            background: radial-gradient(circle, #059669, #047857);
+            box-shadow: 0 0 15px var(--glow-color-both);
         }
-        .accordion-header svg {
-            transition: transform 0.3s ease;
+        .modal { transition: opacity 0.3s ease; }
+        .strategy-tab.active {
+            border-color: var(--glow-color-diandian);
+            background-color: rgba(244, 114, 182, 0.1);
+            color: var(--glow-color-diandian);
+            box-shadow: 0 2px 10px rgba(244, 114, 182, 0.3);
         }
-        .accordion-header.open svg {
-            transform: rotate(180deg);
+        .progress-bar { background-color: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); }
+        .progress-bar-inner-milo { background: linear-gradient(90deg, var(--glow-color-milo), #3b82f6); transition: width 0.5s ease-out; }
+        .progress-bar-inner-diandian { background: linear-gradient(90deg, var(--glow-color-diandian), #d946ef); transition: width 0.5s ease-out; }
+        .glass-panel {
+            background: rgba(16, 24, 48, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
         }
-        .chart-container {
-            position: relative;
-            width: 100%;
-            max-width: 380px;
-            margin-left: auto;
-            margin-right: auto;
-            height: 320px;
-            max-height: 400px;
-        }
-        @media (min-width: 768px) {
-            .chart-container {
-                height: 380px;
-            }
-        }
-        .vocab-example {
-            font-size: 0.85rem;
-            color: #64748b;
-            margin-top: 0.5rem;
-            line-height: 1.3;
-            text-align: left;
-            padding-left: 0.5rem;
-            border-left: 2px solid #e2e8f0;
-        }
-        .day-example {
-            margin-top: 0.75rem;
-            padding-left: 1rem;
-            border-left: 3px solid #0d9488;
-        }
-        .day-example p {
-            font-size: 0.9rem;
-            color: #3f3f46;
-            margin-bottom: 0.2rem;
-            line-height: 1.4;
-        }
-        .grammar-example {
-            font-size: 0.85rem;
-            color: #64748b;
-            margin-top: 0.75rem;
-            line-height: 1.3;
-            text-align: left;
-            padding-left: 0.5rem;
-            border-left: 2px solid #e2e8f0;
-        }
-        .grammar-example p {
-            margin-bottom: 0.2rem;
-        }
+        .user-btn { transition: all 0.2s ease-in-out; border: 1px solid transparent; }
+        .user-btn.active-milo { border-color: var(--glow-color-milo); box-shadow: 0 0 10px var(--glow-color-milo); background-color: rgba(0, 255, 255, 0.1); }
+        .user-btn.active-diandian { border-color: var(--glow-color-diandian); box-shadow: 0 0 10px var(--glow-color-diandian); background-color: rgba(244, 114, 182, 0.1); }
     </style>
 </head>
 <body class="antialiased">
 
-    <header class="bg-white/80 backdrop-blur-sm sticky top-0 z-50 shadow-sm">
-        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <div class="flex-shrink-0">
-                    <h1 class="text-2xl font-bold text-teal-700">KET 备考助手</h1>
+    <div class="flex flex-col md:flex-row min-h-screen">
+        <nav class="w-full md:w-72 glass-panel flex-shrink-0">
+            <div class="p-6 text-center">
+                <h1 class="text-2xl font-title text-white">KET 星际学院</h1>
+                <p class="text-sm text-blue-300 mt-1">双人任务控制中心</p>
+            </div>
+            
+            <div class="p-4 space-y-4">
+                <div class="grid grid-cols-2 gap-2">
+                    <button id="user-btn-milo" data-user="米乐" class="user-btn p-2 rounded-lg font-bold text-white active-milo">米乐</button>
+                    <button id="user-btn-diandian" data-user="点点" class="user-btn p-2 rounded-lg font-bold text-white">点点</button>
                 </div>
-                <div class="hidden md:block">
-                    <div class="ml-10 flex items-baseline space-x-4">
-                        <a href="#overview" class="nav-link px-3 py-2 rounded-md text-sm font-medium">考试概览</a>
-                        <a href="#vocabulary" class="nav-link px-3 py-2 rounded-md text-sm font-medium">高频词汇</a>
-                        <a href="#plan" class="nav-link px-3 py-2 rounded-md text-sm font-medium">30天计划</a>
-                        <a href="#grammar" class="nav-link px-3 py-2 rounded-md text-sm font-medium">核心语法</a>
-                        <a href="#skills" class="nav-link px-3 py-2 rounded-md text-sm font-medium">考试技巧</a>
+
+                <div class="text-center p-4 rounded-lg bg-black/20 border border-blue-400/30">
+                    <h3 class="font-title text-lg text-white">当前学员: <span id="current-user-name">米乐</span></h3>
+                    <p id="rank-display" class="text-2xl font-bold text-cyan-300 transition-all duration-300">见习学员</p>
+                </div>
+
+                <div class="w-full space-y-2">
+                    <div>
+                        <div class="flex justify-between text-xs text-blue-200 mb-1">
+                            <span>米乐 进度</span>
+                            <span id="progress-text-milo">0/30</span>
+                        </div>
+                        <div class="progress-bar w-full h-4 rounded-full overflow-hidden">
+                            <div id="progress-bar-inner-milo" class="progress-bar-inner-milo h-full rounded-full" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-xs text-pink-300 mb-1">
+                            <span>点点 进度</span>
+                            <span id="progress-text-diandian">0/30</span>
+                        </div>
+                        <div class="progress-bar w-full h-4 rounded-full overflow-hidden">
+                            <div id="progress-bar-inner-diandian" class="progress-bar-inner-diandian h-full rounded-full" style="width: 0%;"></div>
+                        </div>
                     </div>
                 </div>
             </div>
+
+            <ul class="flex flex-row md:flex-col p-4 space-x-2 md:space-x-0 md:space-y-2">
+                <li><a href="#overview" class="nav-link flex items-center p-3 rounded-lg active"><span>🚀</span><span class="ml-3 hidden md:inline">任务简报</span></a></li>
+                <li><a href="#vocabulary" class="nav-link flex items-center p-3 rounded-lg"><span>🪐</span><span class="ml-3 hidden md:inline">行星词典</span></a></li>
+                <li><a href="#grammar" class="nav-link flex items-center p-3 rounded-lg"><span>⚙️</span><span class="ml-3 hidden md:inline">语法引擎</span></a></li>
+                <li><a href="#strategies" class="nav-link flex items-center p-3 rounded-lg"><span>🎯</span><span class="ml-3 hidden md:inline">战术指令</span></a></li>
+                <li><a href="#plan" class="nav-link flex items-center p-3 rounded-lg"><span>🗺️</span><span class="ml-3 hidden md:inline">星际航图</span></a></li>
+            </ul>
         </nav>
-    </header>
 
-    <main class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-        
-        <section id="overview" class="mb-16 scroll-mt-20">
-            <h2 class="text-3xl font-bold mb-2 section-title">KET (A2 Key) 考试概览</h2>
-            <p class="text-lg text-slate-600 mb-8">KET是一项基础英语语言认证，评估您在日常简单场景中的沟通能力。了解考试结构是成功的第一步。</p>
-            <div class="grid md:grid-cols-2 gap-8 items-center">
-                <div class="card p-6 rounded-xl shadow-lg">
-                    <h3 class="text-xl font-bold text-teal-700 mb-4">分数权重分布</h3>
-                    <p class="text-slate-500 mb-4">阅读与写作部分占据总分的一半，是备考的重中之重。合理分配您的学习精力至关重要。</p>
-                    <div class="chart-container">
-                        <canvas id="examStructureChart"></canvas>
+        <main class="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
+            <div id="overview" class="content-section active">
+                <h2 class="text-3xl font-title text-white">任务简报: KET考试核心解析</h2>
+                <p class="mt-4 text-lg text-blue-200">
+                    欢迎来到星际学院，学员。您的首个任务是了解目标：代号为 KET 的 A2 级英语能力认证。本简报将解析其结构与评分系统，为您的星际远征设定航向。
+                </p>
+                <div class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                    <div class="glass-panel p-6 rounded-xl">
+                        <h3 class="text-xl font-semibold text-center text-cyan-300">能量核心占比</h3>
+                        <div class="chart-container mt-4">
+                            <canvas id="examStructureChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="glass-panel p-6 rounded-xl">
+                        <h3 class="text-xl font-semibold text-cyan-300 mb-4">舰体结构总览</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-black/20 text-blue-300">
+                                    <tr>
+                                        <th class="p-3 font-semibold">模块</th>
+                                        <th class="p-3 font-semibold">耗时</th>
+                                        <th class="p-3 font-semibold">能量占比</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-blue-500/30">
+                                    <tr><td class="p-3">读写模块</td><td class="p-3">60分钟</td><td class="p-3 font-medium text-cyan-300">50%</td></tr>
+                                    <tr><td class="p-3">听力模块</td><td class="p-3">约30分钟</td><td class="p-3 font-medium text-cyan-300">25%</td></tr>
+                                    <tr><td class="p-3">口语模块</td><td class="p-3">8–10分钟</td><td class="p-3 font-medium text-cyan-300">25%</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <p class="mt-4 text-sm text-blue-300">分析显示：读写模块是能量核心，必须优先确保其稳定运行。听力与口语模块为平衡翼，共同决定飞船的通讯效能。</p>
                     </div>
                 </div>
-                <div class="space-y-6">
-                    <div class="card p-6 rounded-xl shadow-md">
-                        <h4 class="font-bold text-lg text-slate-800">阅读与写作</h4>
-                        <p class="text-slate-500">时长: 1小时 | 占比: <span class="font-bold text-teal-600">50%</span></p>
-                        <p class="mt-2 text-sm">评估阅读理解、词汇语法应用和简短写作能力。</p>
-                    </div>
-                    <div class="card p-6 rounded-xl shadow-md">
-                        <h4 class="font-bold text-lg text-slate-800">听力</h4>
-                        <p class="text-slate-500">时长: 約30分钟 | 占比: <span class="font-bold text-teal-600">25%</span></p>
-                        <p class="mt-2 text-sm">理解日常对话与独白中的关键信息。</p>
-                    </div>
-                    <div class="card p-6 rounded-xl shadow-md">
-                        <h4 class="font-bold text-lg text-slate-800">口语</h4>
-                        <p class="text-slate-500">时长: 8-10分钟 | 占比: <span class="font-bold text-teal-600">25%</span></p>
-                        <p class="mt-2 text-sm">面对面互动，进行个人信息交流与讨论。</p>
-                    </div>
+            </div>
+
+            <div id="vocabulary" class="content-section">
+                <h2 class="text-3xl font-title text-white">行星词典</h2>
+                <p class="mt-4 text-lg text-blue-200">
+                    词汇是构建星际通讯的基础。在此数据库中，词汇按其所属的“行星”（主题）分类。点击行星按钮，下载数据并开始解码。
+                </p>
+                <div id="vocab-theme-buttons" class="mt-8 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
+                <div id="vocab-content" class="mt-8 glass-panel p-6 rounded-xl min-h-[200px]">
+                    <p class="text-center text-blue-300">请选择一个行星系开始数据同步。</p>
                 </div>
             </div>
-        </section>
 
-        <section id="vocabulary" class="mb-16 scroll-mt-20">
-            <h2 class="text-3xl font-bold mb-2 section-title">高频词汇浏览器</h2>
-            <p class="text-lg text-slate-600 mb-8">按主题学习词汇比死记硬背更有效。选择一个主题开始，或使用搜索功能快速查找。</p>
-            <div class="flex flex-wrap gap-2 mb-6" id="vocab-filters">
+            <div id="grammar" class="content-section">
+                <h2 class="text-3xl font-title text-white">语法引擎</h2>
+                <p class="mt-4 text-lg text-blue-200">
+                    语法是驱动语言飞船的核心引擎。KET 任务主要测试您对基础引擎组件的操控能力。点击展开下方数据模块，查看核心组件的详细规格。
+                </p>
+                <div id="grammar-content" class="mt-8 space-y-4"></div>
             </div>
-            <div class="mb-6">
-                <input type="text" id="vocab-search" placeholder="搜索词汇 (例如: apple)..." class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition">
-            </div>
-            <div id="vocab-list" class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            </div>
-        </section>
 
-        <section id="plan" class="mb-16 scroll-mt-20">
-            <h2 class="text-3xl font-bold mb-2 section-title">30天加速备考计划</h2>
-            <p class="text-lg text-slate-600 mb-8">这是一个高强度的备考计划，需要您每天投入足够的时间。点击下方的周数，查看每日学习任务。</p>
-            <div id="study-plan-accordion" class="space-y-4">
-            </div>
-        </section>
 
-        <section id="grammar" class="mb-16 scroll-mt-20">
-            <h2 class="text-3xl font-bold mb-2 section-title">核心语法要点</h2>
-            <p class="text-lg text-slate-600 mb-8">扎实的语法是准确表达的基础。这里总结了KET考试要求的核心A2语法主题。</p>
-            <div id="grammar-points" class="grid md:grid-cols-2 gap-6">
-            </div>
-        </section>
 
-        <section id="skills" class="scroll-mt-20">
-            <h2 class="text-3xl font-bold mb-2 section-title">考试技能与最终建议</h2>
-            <p class="text-lg text-slate-600 mb-8">熟悉各题型要求和应试策略，能帮您在考场上更好地发挥。</p>
-            <div id="skills-tips" class="space-y-8">
+            <div id="strategies" class="content-section">
+                <h2 class="text-3xl font-title text-white">战术指令</h2>
+                <p class="mt-4 text-lg text-blue-200">
+                    了解敌方（题型）的构造是胜利的关键。本指令库将为您全息展示各项任务模块的应对策略，助您精准打击，高效得分。
+                </p>
+                <div class="mt-8 border-b border-pink-500/30">
+                    <nav id="strategy-tabs" class="-mb-px flex space-x-6" aria-label="Tabs">
+                    </nav>
+                </div>
+                <div id="strategy-content" class="mt-6"></div>
             </div>
-        </section>
 
-    </main>
-    
-    <footer class="bg-slate-100 mt-16">
-        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-slate-500">
-            <p>祝您 KET A2 Key 考试顺利！</p>
+            <div id="plan" class="content-section">
+                <h2 class="text-3xl font-title text-white">星际航图: 30天远征计划</h2>
+                <p class="mt-4 text-lg text-blue-200">
+                    持续航行是抵达目标星系的唯一途径。这张航图已为您规划好每日的航行任务。点击任意星球，接收当日任务指令，开始您的30天远征！
+                </p>
+                <div id="plan-grid" class="mt-8 grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-7 gap-4"></div>
+            </div>
+        </main>
+    </div>
+
+    <div id="plan-modal" class="modal fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 opacity-0 pointer-events-none z-50">
+        <div class="glass-panel rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto border-2 border-cyan-400">
+            <div class="p-6 border-b border-cyan-400/50 sticky top-0 glass-panel z-10">
+                <h3 id="modal-title" class="text-2xl font-title text-cyan-300"></h3>
+                <button id="modal-close" class="absolute top-4 right-4 text-cyan-300 hover:text-white text-3xl">&times;</button>
+            </div>
+            <div id="modal-body" class="p-6"></div>
         </div>
-    </footer>
-
+    </div>
 
     <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        
-        const vocabularyData = {
-            "食物与饮品": [
-                { word: "apple", examples: ["I like to eat a red apple.", "An apple a day keeps the doctor away.", "Do you want an apple or a banana?"] },
-                { word: "banana", examples: ["Monkeys love bananas.", "She peeled a banana.", "Can I have a banana for breakfast?"] },
-                { word: "bread", examples: ["Please buy some bread.", "I eat bread for breakfast.", "This bread is fresh."] },
-                { word: "cake", examples: ["We had cake for dessert.", "She baked a delicious cake.", "Happy birthday, here's a cake!"] },
-                { word: "cheese", examples: ["I like cheese on my pizza.", "Do you want a cheese sandwich?", "Cheese is made from milk."] },
-                { word: "chicken", examples: ["We had roast chicken for dinner.", "I like fried chicken.", "Chicken is a popular meat."] },
-                { word: "chips", examples: ["Can I have some chips?", "He is eating a bag of chips.", "Chips are crispy."] },
-                { word: "chocolate", examples: ["I love chocolate.", "She bought a bar of chocolate.", "Chocolate is sweet."] },
-                { word: "coffee", examples: ["I drink coffee every morning.", "Would you like a cup of coffee?", "Coffee helps me wake up."] },
-                { word: "drink", examples: ["I need a drink of water.", "What would you like to drink?", "He is drinking juice."] },
-                { word: "egg", examples: ["I eat eggs for breakfast.", "She cracked an egg.", "Eggs are good for protein."] },
-                { word: "fish", examples: ["I like to eat fish.", "The fish lives in the water.", "He caught a big fish."] },
-                { word: "food", examples: ["What's your favorite food?", "We need to buy some food.", "This food is delicious."] },
-                { word: "juice", examples: ["I like orange juice.", "She is drinking apple juice.", "Juice is healthy."] },
-                { word: "milk", examples: ["Drink your milk.", "I put milk in my coffee.", "Milk is white."] },
-                { word: "pizza", examples: ["Let's order a pizza tonight.", "Pizza is my favorite.", "This pizza has a lot of cheese."] },
-                { word: "rice", examples: ["We eat rice with every meal.", "She cooked some rice.", "Rice is a staple food."] },
-                { word: "salad", examples: ["I had a fresh salad for lunch.", "This salad has many vegetables.", "Do you want salad dressing?"] },
-                { word: "sandwich", examples: ["I made a chicken sandwich.", "He packed a sandwich for school.", "This sandwich is big."] },
-                { word: "soup", examples: ["I like hot soup in winter.", "She made vegetable soup.", "This soup is delicious."] },
-                { word: "sugar", examples: ["Do you want sugar in your tea?", "Too much sugar is not good.", "Sugar is sweet."] },
-                { word: "tea", examples: ["I like to drink hot tea.", "Would you like some tea?", "Tea is a popular drink."] },
-                { word: "tomato", examples: ["I love fresh tomatoes.", "She added a tomato to the salad.", "Tomatoes are red."] },
-                { word: "vegetable", examples: ["Eat your vegetables.", "Carrots are a healthy vegetable.", "Vegetables are good for you."] },
-                { word: "water", examples: ["Please give me some water.", "Water is essential for life.", "Drink plenty of water."] }
-            ],
-            "居家生活": [
-                { word: "apartment", examples: ["I live in a small apartment.", "My apartment has two bedrooms.", "The apartment is on the third floor."] },
-                { word: "bath", examples: ["I took a warm bath.", "Do you want a bath or a shower?", "The baby is having a bath."] },
-                { word: "bathroom", examples: ["The bathroom is next to the kitchen.", "I need to use the bathroom.", "The bathroom has a big mirror."] },
-                { word: "bed", examples: ["I sleep in my bed.", "The bed is very comfortable.", "He made his bed."] },
-                { word: "bedroom", examples: ["My bedroom is upstairs.", "The bedroom has a large window.", "She decorated her bedroom."] },
-                { word: "chair", examples: ["Sit on the chair.", "There are four chairs around the table.", "The chair is made of wood."] },
-                { word: "clean", examples: ["Please clean your room.", "The car is very clean.", "I like a clean house."] },
-                { word: "clock", examples: ["What time is it on the clock?", "The clock is on the wall.", "The clock is ticking."] },
-                { word: "cooker", examples: ["The cooker is in the kitchen.", "She is cooking on the cooker.", "The new cooker is electric."] },
-                { word: "cupboard", examples: ["Put the plates in the cupboard.", "The cupboard is full.", "I opened the kitchen cupboard."] },
-                { word: "desk", examples: ["I work at my desk.", "The desk is made of wood.", "There are books on the desk."] },
-                { word: "door", examples: ["Open the door, please.", "The door is closed.", "She knocked on the door."] },
-                { word: "floor", examples: ["The floor is clean.", "Don't drop anything on the floor.", "The house has wooden floors."] },
-                { word: "fridge", examples: ["The milk is in the fridge.", "Please put the food in the fridge.", "The fridge is full."] },
-                { word: "garden", examples: ["We have a beautiful garden.", "He is working in the garden.", "The children are playing in the garden."] },
-                { word: "house", examples: ["I live in a big house.", "Their house is near the park.", "This house has a red roof."] },
-                { word: "kitchen", examples: ["I cook in the kitchen.", "The kitchen is very modern.", "She is in the kitchen."] },
-                { word: "lamp", examples: ["Turn on the lamp.", "The lamp is on the bedside table.", "The room needs a new lamp."] },
-                { word: "living room", examples: ["We watch TV in the living room.", "The living room has a large sofa.", "The living room is cozy."] },
-                { word: "room", examples: ["This is my room.", "The house has five rooms.", "Clean your room."] },
-                { word: "sofa", examples: ["Sit on the sofa.", "The sofa is very soft.", "I bought a new sofa."] },
-                { word: "table", examples: ["Put the books on the table.", "We eat dinner at the table.", "The table is round."] },
-                { word: "wall", examples: ["The picture is on the wall.", "The wall is painted blue.", "He leaned against the wall."] },
-                { word: "window", examples: ["Open the window, please.", "The window is broken.", "The sun shines through the window."] }
-            ],
-            "旅行与交通": [
-                { word: "aeroplane", examples: ["I traveled by aeroplane.", "The aeroplane is flying high.", "The aeroplane landed safely."] },
-                { word: "airport", examples: ["I am going to the airport.", "The airport is very busy.", "My flight is from this airport."] },
-                { word: "arrive", examples: ["What time will you arrive?", "The train arrived late.", "They arrived at the hotel."] },
-                { word: "bicycle", examples: ["I ride my bicycle to school.", "He bought a new bicycle.", "The bicycle has two wheels."] },
-                { word: "bike", examples: ["I ride my bike every day.", "My bike is blue.", "He enjoys riding his bike."] },
-                { word: "boat", examples: ["We went for a boat ride.", "The boat is on the lake.", "He sailed the boat."] },
-                { word: "bus", examples: ["I take the bus to work.", "The bus stop is near my house.", "The bus is full of people."] },
-                { word: "car", examples: ["I drive my car to work.", "He bought a new car.", "The car is red."] },
-                { word: "drive", examples: ["Can you drive a car?", "He drives to the office every day.", "I love to drive on the highway."] },
-                { word: "flight", examples: ["My flight is at 3 PM.", "The flight was delayed.", "She booked a flight to London."] },
-                { word: "journey", examples: ["The journey was long.", "I enjoyed the journey.", "Our journey began early."] },
-                { word: "lorry", examples: ["A big lorry is on the road.", "The lorry carries heavy goods.", "The lorry driver stopped."] },
-                { word: "map", examples: ["Look at the map.", "I need a map to find the way.", "The map shows our location."] },
-                { word: "motorbike", examples: ["He rides a fast motorbike.", "She has a new motorbike.", "Motorbikes are fun to ride."] },
-                { word: "plane", examples: ["I am going by plane.", "The plane is very fast.", "The plane took off."] },
-                { word: "road", examples: ["The road is busy.", "Be careful on the road.", "The new road is smooth."] },
-                { word: "station", examples: ["I am at the train station.", "The bus station is downtown.", "We waited at the station."] },
-                { word: "taxi", examples: ["Let's take a taxi.", "I called a taxi.", "The taxi driver was friendly."] },
-                { word: "train", examples: ["I travel by train.", "The train is fast.", "The train station is busy."] },
-                { word: "travel", examples: ["I love to travel.", "She travels a lot for work.", "Where do you want to travel?"] },
-                { word: "trip", examples: ["We went on a trip to the beach.", "Did you enjoy your trip?", "The trip was short."] },
-                { word: "underground", examples: ["I take the underground to work.", "The underground station is busy.", "The underground trains are fast."] }
-            ],
-            "人物与家庭": [
-                { word: "aunt", examples: ["My aunt lives in a big house.", "I visited my aunt last weekend.", "My aunt is my mother's sister."] },
-                { word: "baby", examples: ["The baby is sleeping.", "She has a cute baby.", "The baby is crying."] },
-                { word: "boy", examples: ["The boy is playing with a ball.", "He is a smart boy.", "There are two boys in the park."] },
-                { word: "brother", examples: ["My brother is older than me.", "I have one brother.", "My brother loves to play games."] },
-                { word: "child", examples: ["The child is happy.", "She has two children.", "A child learns quickly."] },
-                { word: "cousin", examples: ["My cousin lives in another city.", "I played with my cousin.", "She is my favorite cousin."] },
-                { word: "dad", examples: ["My dad is a great cook.", "I love my dad.", "My dad works hard."] },
-                { word: "daughter", examples: ["She has one daughter.", "His daughter is very kind.", "My daughter is a student."] },
-                { word: "family", examples: ["I love my family.", "We are a big family.", "Family is important to me."] },
-                { word: "father", examples: ["My father works in a bank.", "He is a good father.", "Father and son are playing."] },
-                { word: "friend", examples: ["She is my best friend.", "I have many friends.", "My friend helped me with homework."] },
-                { word: "girl", examples: ["The girl is singing.", "She is a beautiful girl.", "There are many girls in the class."] },
-                { word: "grandfather", examples: ["My grandfather tells great stories.", "He visits his grandfather often.", "My grandfather is old."] },
-                { word: "grandmother", examples: ["My grandmother bakes delicious cakes.", "I love my grandmother.", "She lives with her grandmother."] },
-                { word: "man", examples: ["The man is walking fast.", "He is a tall man.", "There is a man at the door."] },
-                { word: "mother", examples: ["My mother cooks dinner.", "I call my mother every day.", "She is a loving mother."] },
-                { word: "parent", examples: ["My parents are supportive.", "Good parents teach their children well.", "She is a single parent."] },
-                { word: "people", examples: ["Many people are here.", "People like to travel.", "These people are friendly."] },
-                { word: "sister", examples: ["My sister is younger than me.", "I have a sister.", "My sister likes to dance."] },
-                { word: "son", examples: ["He has a son.", "His son is a doctor.", "My son is playing outside."] },
-                { word: "teenager", examples: ["She is a teenager.", "Teenagers love social media.", "He is a healthy teenager."] },
-                { word: "uncle", examples: ["My uncle lives in the city.", "I visited my uncle last summer.", "My uncle is my father's brother."] },
-                { word: "woman", examples: ["The woman is reading a book.", "She is a kind woman.", "There is a woman in the garden."] }
-            ],
-            "日常活动": [
-                { word: "ask", examples: ["Can I ask a question?", "She asked for help.", "He asked me to wait."] },
-                { word: "begin", examples: ["Let's begin the lesson.", "The show begins at 8 PM.", "When did you begin learning English?"] },
-                { word: "believe", examples: ["I believe you.", "Do you believe in magic?", "She believes in herself."] },
-                { word: "call", examples: ["Can you call me later?", "She called her friend.", "He made a phone call."] },
-                { word: "check", examples: ["Please check your email.", "I need to check the time.", "Did you check the answer?"] },
-                { word: "choose", examples: ["Which one do you choose?", "She chose the red dress.", "It's difficult to choose."] },
-                { word: "clean", examples: ["Clean your room.", "The car is clean.", "I like a clean house."] },
-                { word: "close", examples: ["Close the door, please.", "The shop closes at 9 PM.", "Close your eyes."] },
-                { word: "come", examples: ["Come here, please.", "She came to my party.", "When will you come home?"] },
-                { word: "cook", examples: ["I like to cook dinner.", "He is a good cook.", "She cooked a delicious meal."] },
-                { word: "cut", examples: ["Can you cut the cake?", "He cut his finger.", "I cut the paper with scissors."] },
-                { word: "dance", examples: ["Let's dance!", "She loves to dance.", "They danced all night."] },
-                { word: "do", examples: ["What do you do?", "I do my homework every day.", "He did a great job."] },
-                { word: "eat", examples: ["I want to eat pizza.", "She eats healthy food.", "Let's eat dinner together."] },
-                { word: "enjoy", examples: ["I enjoy reading books.", "Did you enjoy the movie?", "They enjoy spending time together."] },
-                { word: "finish", examples: ["I finished my work.", "When will you finish?", "The race finished quickly."] },
-                { word: "get", examples: ["I need to get some milk.", "He got a new job.", "Can you get me a glass of water?"] },
-                { word: "give", examples: ["Please give me the book.", "She gave him a present.", "Can I give you a hand?"] },
-                { word: "go", examples: ["Let's go to the park.", "She went home early.", "Where do you want to go?"] },
-                { word: "have", examples: ["I have a cat.", "Do you have any questions?", "We had a good time."] },
-                { word: "help", examples: ["Can you help me?", "He helped his friend.", "Your help is appreciated."] },
-                { word: "know", examples: ["I know the answer.", "Do you know him?", "She knows a lot about history."] },
-                { word: "learn", examples: ["I want to learn English.", "She learns very fast.", "Learning a new language is fun."] },
-                { word: "listen", examples: ["Listen to the music.", "He is listening to the radio.", "Listen carefully."] },
-                { word: "live", examples: ["I live in New York.", "She lives with her parents.", "Where do you live?"] },
-                { word: "look", examples: ["Look at that bird!", "She looked at me.", "He is looking for his keys."] },
-                { word: "make", examples: ["I can make a cake.", "She made a decision.", "Let's make some plans."] },
-                { word: "open", examples: ["Open the door, please.", "The shop opens at 9 AM.", "He opened the box."] },
-                { word: "pay", examples: ["I need to pay the bill.", "He paid for the dinner.", "Can I pay by card?"] },
-                { word: "read", examples: ["I like to read books.", "She is reading a newspaper.", "Have you read this book?"] },
-                { word: "remember", examples: ["I can't remember his name.", "Do you remember me?", "Please remember to call."] },
-                { word: "say", examples: ["What did you say?", "She said hello.", "He always says goodbye."] },
-                { word: "see", examples: ["I can see a bird.", "Did you see the movie?", "I'll see you tomorrow."] },
-                { word: "send", examples: ["Can you send me an email?", "She sent a letter.", "I sent the package."] },
-                { word: "show", examples: ["Can you show me your new phone?", "He showed me the way.", "The map shows the path."] },
-                { word: "sing", examples: ["She loves to sing.", "He is singing a song.", "Let's sing together."] },
-                { word: "sleep", examples: ["I need to sleep.", "He is sleeping soundly.", "Did you sleep well?"] },
-                { word: "speak", examples: ["Can you speak English?", "She speaks very fast.", "I need to speak to you."] },
-                { word: "spend", examples: ["I like to spend time with friends.", "How much money do you spend?", "He spends hours reading."] },
-                { word: "start", examples: ["Let's start the game.", "The class starts at 9 AM.", "When did you start learning?"] },
-                { word: "study", examples: ["I need to study for the exam.", "She studies hard.", "He studies English every day."] },
-                { word: "take", examples: ["Can I take your picture?", "She took a deep breath.", "He took the bus to work."] },
-                { word: "talk", examples: ["Let's talk about it.", "She is talking on the phone.", "They talked for hours."] },
-                { word: "tell", examples: ["Can you tell me a story?", "He told me the truth.", "Tell me about your day."] },
-                { word: "think", examples: ["What do you think?", "I think it's a good idea.", "She thought about it."] },
-                { word: "understand", examples: ["Do you understand?", "I don't understand this.", "He understood the instructions."] },
-                { word: "use", examples: ["Can I use your pen?", "She uses her computer for work.", "This tool is useful."] },
-                { word: "wait", examples: ["Please wait for me.", "I waited for an hour.", "Can you wait a moment?"] },
-                { word: "walk", examples: ["Let's go for a walk.", "She walks to school every day.", "He is walking his dog."] },
-                { word: "want", examples: ["I want a new car.", "What do you want to eat?", "She wants to travel."] },
-                { word: "watch", examples: ["I like to watch movies.", "He is watching TV.", "Watch out for cars!"] },
-                { word: "wear", examples: ["I wear glasses.", "She is wearing a beautiful dress.", "He wears a hat."] },
-                { word: "work", examples: ["I work in an office.", "She works hard.", "He is looking for work."] },
-                { word: "write", examples: ["I need to write an email.", "She wrote a letter.", "Can you write your name?"] }
-            ],
-            "爱好与休闲": [
-                { word: "art", examples: ["I like modern art.", "She is studying art.", "Art is a form of expression."] },
-                { word: "book", examples: ["I am reading a book.", "She bought a new book.", "This book is interesting."] },
-                { word: "camp", examples: ["Let's go camp in the forest.", "We will camp near the lake.", "They camped for a week."] },
-                { word: "cinema", examples: ["Let's go to the cinema.", "The cinema is showing a new film.", "I love going to the cinema."] },
-                { word: "club", examples: ["I joined a sports club.", "They go to the club every Friday.", "The club has many members."] },
-                { word: "computer", examples: ["I use my computer for work.", "She bought a new computer.", "The computer is fast."] },
-                { word: "concert", examples: ["We went to a concert last night.", "The concert was amazing.", "Do you like classical concert?"] },
-                { word: "dance", examples: ["Let's dance!", "She loves to dance.", "They danced all night."] },
-                { word: "drawing", examples: ["She loves drawing.", "He is good at drawing.", "I saw a beautiful drawing."] },
-                { word: "film", examples: ["Let's watch a film.", "This is a great film.", "The film is about history."] },
-                { word: "game", examples: ["Let's play a game.", "He likes computer games.", "The game was exciting."] },
-                { word: "guitar", examples: ["He plays the guitar.", "She is learning to play the guitar.", "The guitar has six strings."] },
-                { word: "hobby", examples: ["What's your hobby?", "My hobby is reading.", "He has many hobbies."] },
-                { word: "music", examples: ["I love listening to music.", "What kind of music do you like?", "She plays music on her phone."] },
-                { word: "museum", examples: ["We visited the museum yesterday.", "The museum has old artifacts.", "I enjoy going to museums."] },
-                { word: "paint", examples: ["She likes to paint pictures.", "He is painting the wall.", "I used red paint."] },
-                { word: "photo", examples: ["Take a photo of me.", "I saw your photo on social media.", "She keeps her photos in an album."] },
-                { word: "play", examples: ["Let's play a game.", "He plays football.", "The children are playing outside."] },
-                { word: "radio", examples: ["I listen to the radio.", "The radio is playing music.", "Turn on the radio."] },
-                { word: "read", examples: ["I like to read books.", "She is reading a newspaper.", "Have you read this book?"] },
-                { word: "sport", examples: ["What's your favorite sport?", "He plays many sports.", "Sport is good for health."] },
-                { word: "swim", examples: ["I like to swim in the pool.", "Can you swim?", "She goes swimming every day."] },
-                { word: "television", examples: ["I watch television every evening.", "The television is big.", "Turn off the television."] },
-                { word: "video", examples: ["Let's watch a video.", "He is making a video.", "The video is funny."] }
-            ],
-            "地点": [
-                { word: "beach", examples: ["We went to the beach.", "The beach is sandy.", "I love walking on the beach."] },
-                { word: "cafe", examples: ["Let's meet at the cafe.", "The cafe serves good coffee.", "She works in a cafe."] },
-                { word: "castle", examples: ["We visited an old castle.", "The castle is beautiful.", "The king lives in a castle."] },
-                { word: "city", examples: ["I live in a big city.", "The city is always busy.", "London is a famous city."] },
-                { word: "country", examples: ["Which country are you from?", "I love my country.", "The country is beautiful."] },
-                { word: "countryside", examples: ["I like to walk in the countryside.", "The countryside is peaceful.", "They live in the countryside."] },
-                { word: "church", examples: ["We go to church every Sunday.", "The church is old.", "The wedding was in the church."] },
-                { word: "cinema", examples: ["Let's go to the cinema.", "The cinema is showing a new film.", "I love going to the cinema."] },
-                { word: "park", examples: ["Let's go to the park.", "The park has many trees.", "Children play in the park."] },
-                { word: "restaurant", examples: ["Let's eat at a restaurant.", "This restaurant has good food.", "I like Italian restaurants."] },
-                { word: "shop", examples: ["I need to go to the shop.", "The shop sells clothes.", "She works in a shop."] },
-                { word: "school", examples: ["I go to school every day.", "My school is big.", "She is a student at this school."] },
-                { word: "museum", examples: ["We visited the museum yesterday.", "The museum has old artifacts.", "I enjoy going to museums."] },
-                { word: "street", examples: ["The street is busy.", "Be careful on the street.", "My house is on this street."] },
-                { word: "town", examples: ["I live in a small town.", "The town is quiet.", "The town hall is old."] },
-                { word: "zoo", examples: ["We went to the zoo.", "The zoo has many animals.", "I saw a lion at the zoo."] }
-            ],
-            "形容词": [
-                { word: "afraid", examples: ["She is afraid of spiders.", "Don't be afraid.", "I am afraid of the dark."] },
-                { word: "amazing", examples: ["This is an amazing view.", "The concert was amazing.", "You did an amazing job."] },
-                { word: "angry", examples: ["He is angry.", "Don't be angry with me.", "She looked very angry."] },
-                { word: "bad", examples: ["This is a bad idea.", "I had a bad dream.", "Don't feel bad."] },
-                { word: "beautiful", examples: ["She is a beautiful girl.", "The flowers are beautiful.", "What a beautiful day!"] },
-                { word: "big", examples: ["I live in a big house.", "He has a big dog.", "The elephant is a big animal."] },
-                { word: "black", examples: ["My car is black.", "She is wearing a black dress.", "The cat is black."] },
-                { word: "blue", examples: ["The sky is blue.", "He has blue eyes.", "I like the color blue."] },
-                { word: "bored", examples: ["I am bored.", "He felt bored during the lesson.", "She was bored at home."] },
-                { word: "boring", examples: ["This film is boring.", "The lesson was boring.", "I hate boring books."] },
-                { word: "bright", examples: ["The sun is very bright.", "The room is bright.", "She has a bright idea."] },
-                { word: "brilliant", examples: ["That's a brilliant idea!", "The concert was brilliant.", "You are brilliant!"] },
-                { word: "cheap", examples: ["This shirt is cheap.", "The food is cheap and tasty.", "I bought a cheap phone."] },
-                { word: "clean", examples: ["My room is clean.", "The car is clean.", "I like a clean house."] },
-                { word: "clear", examples: ["The sky is clear.", "The water is clear.", "Make sure your instructions are clear."] },
-                { word: "clever", examples: ["He is a clever boy.", "She gave a clever answer.", "The dog is very clever."] },
-                { word: "cold", examples: ["It's cold outside.", "I feel cold.", "She likes cold drinks."] },
-                { word: "comfortable", examples: ["This sofa is comfortable.", "I feel comfortable here.", "The shoes are comfortable."] },
-                { word: "cool", examples: ["It's cool today.", "That's a cool idea!", "He looks cool in sunglasses."] },
-                { word: "correct", examples: ["That's the correct answer.", "Please correct your mistakes.", "Is this correct?"] },
-                { word: "crowded", examples: ["The street is crowded.", "The bus was crowded.", "The market was very crowded."] },
-                { word: "dangerous", examples: ["Driving fast is dangerous.", "This road is dangerous.", "Don't go near dangerous animals."] },
-                { word: "dark", examples: ["It's dark outside.", "The room is dark.", "She has dark hair."] },
-                { word: "dead", examples: ["The plant is dead.", "He found a dead bird.", "The battery is dead."] },
-                { word: "different", examples: ["These two cars are different.", "We have different opinions.", "Try something different."] },
-                { word: "difficult", examples: ["The exam was difficult.", "This is a difficult question.", "Learning a new language can be difficult."] },
-                { word: "dirty", examples: ["My hands are dirty.", "The car is dirty.", "Don't touch that dirty surface."] },
-                { word: "easy", examples: ["The test was easy.", "This is an easy question.", "It's easy to learn."] },
-                { word: "excited", examples: ["I am excited about the trip.", "She felt excited.", "The children were excited."] },
-                { word: "exciting", examples: ["This is an exciting game.", "The news is exciting.", "It was an exciting day."] },
-                { word: "expensive", examples: ["This car is expensive.", "The watch is very expensive.", "He bought an expensive gift."] },
-                { word: "famous", examples: ["He is a famous singer.", "The museum is famous.", "London is a famous city."] },
-                { word: "fantastic", examples: ["That's fantastic news!", "The food was fantastic.", "You did a fantastic job."] },
-                { word: "fast", examples: ["He runs very fast.", "The car is fast.", "Fast food is convenient."] },
-                { word: "fat", examples: ["The cat is fat.", "He has a fat stomach.", "Don't eat too much fat."] },
-                { word: "favourite", examples: ["What's your favourite color?", "My favourite food is pizza.", "She is my favourite singer."] },
-                { word: "fine", examples: ["I'm fine, thank you.", "The weather is fine today.", "Everything is fine."] },
-                { word: "friendly", examples: ["She is a friendly person.", "The dog is friendly.", "He has a friendly smile."] },
-                { word: "full", examples: ["The glass is full.", "I am full after dinner.", "The bus is full."] },
-                { word: "funny", examples: ["He told a funny joke.", "The film was very funny.", "She has a funny personality."] },
-                { word: "good", examples: ["This is a good book.", "He is a good student.", "Have a good day!"] },
-                { word: "great", examples: ["That's a great idea!", "We had a great time.", "You did a great job."] },
-                { word: "happy", examples: ["I am happy today.", "She looks happy.", "Happy birthday!"] },
-                { word: "hard", examples: ["The test was hard.", "He works very hard.", "It's a hard problem."] },
-                { word: "healthy", examples: ["Eat healthy food.", "She is a healthy person.", "Exercise keeps you healthy."] },
-                { word: "heavy", examples: ["The box is heavy.", "He lifted a heavy weight.", "The rain was heavy."] },
-                { word: "helpful", examples: ["Thank you, that was very helpful.", "She is a helpful person.", "The instructions are helpful."] },
-                { word: "high", examples: ["The mountain is very high.", "He threw the ball high.", "The bird is flying high."] },
-                { word: "hot", examples: ["It's hot today.", "The soup is hot.", "I like hot weather."] },
-                { word: "huge", examples: ["He lives in a huge house.", "The elephant is huge.", "It was a huge mistake."] },
-                { word: "hungry", examples: ["I am hungry.", "The cat is hungry.", "Are you hungry?"] },
-                { word: "important", examples: ["This is important information.", "Family is important.", "It's important to study."] },
-                { word: "interested", examples: ["I am interested in history.", "She is interested in art.", "Are you interested?"] },
-                { word: "interesting", examples: ["This book is interesting.", "The story is interesting.", "It was an interesting conversation."] },
-                { word: "large", examples: ["We need a large table.", "He lives in a large apartment.", "The dog is large."] },
-                { word: "late", examples: ["I am late for work.", "Don't be late.", "The train was late."] },
-                { word: "lazy", examples: ["He is a lazy student.", "Don't be lazy.", "The cat is lazy."] },
-                { word: "light", examples: ["The room is full of light.", "This box is light.", "Turn on the light."] },
-                { word: "little", examples: ["I have a little dog.", "She ate a little cake.", "He knows a little English."] },
-                { word: "long", examples: ["The road is long.", "She has long hair.", "The film was long."] },
-                { word: "loud", examples: ["The music is too loud.", "He has a loud voice.", "Don't be loud."] },
-                { word: "lovely", examples: ["What a lovely dress!", "We had a lovely time.", "The flowers are lovely."] },
-                { word: "low", examples: ["The shelf is low.", "The price is low.", "He spoke in a low voice."] },
-                { word: "lucky", examples: ["I feel lucky today.", "You are so lucky!", "It was a lucky day."] },
-                { word: "modern", examples: ["I like modern art.", "The house is very modern.", "The city has modern buildings."] },
-                { word: "nervous", examples: ["I feel nervous before exams.", "She was nervous to speak.", "Don't be nervous."] },
-                { word: "new", examples: ["I bought a new phone.", "This is a new idea.", "Happy New Year!"] },
-                { word: "nice", examples: ["Have a nice day!", "She is a nice person.", "The weather is nice."] },
-                { word: "noisy", examples: ["The street is noisy.", "The children are noisy.", "It's a noisy place."] },
-                { word: "old", examples: ["He is an old man.", "This is an old house.", "How old are you?"] },
-                { word: "open", examples: ["The door is open.", "The shop is open.", "Keep your mind open."] },
-                { word: "perfect", examples: ["That's perfect!", "He is a perfect student.", "The weather is perfect."] },
-                { word: "polite", examples: ["He is a polite person.", "Be polite to others.", "She gave a polite smile."] },
-                { word: "popular", examples: ["Football is a popular sport.", "She is a popular singer.", "This song is popular."] },
-                { word: "possible", examples: ["Is it possible to do this?", "It's possible to learn quickly.", "Anything is possible."] },
-                { word: "pretty", examples: ["She is a pretty girl.", "The dress is pretty.", "What a pretty flower!"] },
-                { word: "quick", examples: ["Be quick!", "He is a quick learner.", "Let's have a quick lunch."] },
-                { word: "quiet", examples: ["The room is quiet.", "Please be quiet.", "She spoke in a quiet voice."] },
-                { word: "ready", examples: ["Are you ready?", "I am ready to go.", "Dinner is ready."] },
-                { word: "real", examples: ["This is a real diamond.", "Is it real or fake?", "He told the real story."] },
-                { word: "rich", examples: ["He is a rich man.", "The country is rich in resources.", "She became rich."] },
-                { word: "right", examples: ["That's the right answer.", "Turn right here.", "You are right."] },
-                { word: "sad", examples: ["I feel sad today.", "She looked sad.", "The story was sad."] },
-                { word: "safe", examples: ["Be safe!", "The place is safe.", "Keep your money safe."] },
-                { word: "short", examples: ["He has short hair.", "The story is short.", "The road is short."] },
-                { word: "shy", examples: ["She is a shy girl.", "He feels shy around new people.", "Don't be shy."] },
-                { word: "sick", examples: ["I feel sick.", "She is sick with a cold.", "He called in sick."] },
-                { word: "simple", examples: ["This is a simple question.", "Keep it simple.", "The design is simple."] },
-                { word: "slow", examples: ["The car is slow.", "He is a slow runner.", "Speak slowly, please."] },
-                { word: "small", examples: ["I live in a small apartment.", "He has a small dog.", "The cat is small."] },
-                { word: "smart", examples: ["He is a smart student.", "She has a smart phone.", "That's a smart decision."] },
-                { word: "soft", examples: ["The sofa is soft.", "Her voice is soft.", "The pillow is soft."] },
-                { word: "special", examples: ["This is a special day.", "You are special to me.", "He made a special dinner."] },
-                { word: "strong", examples: ["He is a strong man.", "The coffee is strong.", "She has a strong will."] },
-                { word: "sure", examples: ["Are you sure?", "I'm not sure.", "She is sure of herself."] },
-                { word: "surprised", examples: ["I was surprised to see him.", "She looked surprised.", "He was surprised by the news."] },
-                { word: "sweet", examples: ["The cake is sweet.", "She has a sweet voice.", "He is a sweet person."] },
-                { word: "tall", examples: ["He is a tall man.", "The building is tall.", "She is taller than me."] },
-                { word: "terrible", examples: ["The weather is terrible.", "I had a terrible day.", "That's a terrible idea."] },
-                { word: "thirsty", examples: ["I am thirsty.", "The plant is thirsty.", "Are you thirsty?"] },
-                { word: "tired", examples: ["I am tired.", "She feels tired after work.", "He is very tired."] },
-                { word: "true", examples: ["This is a true story.", "Is it true?", "Tell me the true."] },
-                { word: "unhappy", examples: ["She looks unhappy.", "He was unhappy with the result.", "Why are you unhappy?"] },
-                { word: "useful", examples: ["This tool is useful.", "The book is very useful.", "It's a useful skill."] },
-                { word: "usual", examples: ["This is my usual coffee.", "He arrived at his usual time.", "It's nothing unusual."] },
-                { word: "warm", examples: ["It's warm today.", "The soup is warm.", "She likes warm weather."] },
-                { word: "well", examples: ["I feel well.", "She sings very well.", "He did well on the test."] },
-                { word: "wet", examples: ["The ground is wet.", "My clothes are wet.", "Don't walk on wet paint."] },
-                { word: "wonderful", examples: ["What a wonderful day!", "You did a wonderful job.", "The trip was wonderful."] },
-                { word: "worried", examples: ["I am worried about the exam.", "She looked worried.", "Don't worry."] },
-                { word: "wrong", examples: ["That's the wrong answer.", "You are wrong.", "What went wrong?"] },
-                { word: "young", examples: ["He is a young boy.", "She looks very young.", "The young generation."] }
-            ]
-        };
-
-        const studyPlanData = [
-            {
-                week: 1,
-                title: "第1周：基础与熟悉",
-                days: [
-                    { day: 1, focus: "KET考试概览 & 个人信息词汇", tasks: "了解考试结构与评分。学习20个“人物与家庭”词汇。口语Part 1：回答关于自己的5个问题。", examples: [
-                        "My name is Li Ming.",
-                        "I am from China.",
-                        "I like to read books.",
-                        "I live in a big city.",
-                        "My favorite color is blue.",
-                        "I have a dog named Max.",
-                        "I study English every day.",
-                        "I enjoy playing computer games.",
-                        "My family is very important to me.",
-                        "I often visit my grandparents on weekends."
-                    ],
-                    gameActivity: {
-                        title: "词汇记忆大挑战！",
-                        description: "今天学习了人物与家庭词汇，现在来玩个小游戏：请在30秒内，说出或写出你记住的所有家庭成员的英文单词！看看你能记住多少个？",
-                        type: "text_reveal"
-                    }},
-                    { day: 2, focus: "语法：一般现在时 & 日常活动词汇", tasks: "复习一般现在时用法。学习20个“日常活动”词汇。阅读与写作Part 1：完成2组练习。", examples: [
-                        "He runs every morning.",
-                        "She often studies in the library.",
-                        "We go to the cinema at the weekend.",
-                        "They usually have breakfast at 7 AM.",
-                        "The sun rises in the east.",
-                        "Cats like to sleep a lot.",
-                        "I drink coffee every day.",
-                        "He plays football on Tuesdays.",
-                        "The shop opens at 9 o'clock.",
-                        "Birds sing in the morning."
-                    ],
-                    gameActivity: {
-                        title: "动词变身小能手！",
-                        description: "挑战：用今天学到的5个日常活动动词，分别造一个关于你自己的句子，并确保动词形式正确哦！比如：I often *read* books.",
-                        type: "text_reveal"
-                    }},
-                    { day: 3, focus: "听力Part 1 & 居家生活词汇", tasks: "听力Part 1：完成2组练习。学习20个“居家生活”词汇。口语Part 1：描述自己的家。", examples: [
-                        "There is a bed in my bedroom.",
-                        "The bathroom is next to the kitchen.",
-                        "Our house has a beautiful garden.",
-                        "I usually watch TV in the living room.",
-                        "The fridge is in the kitchen.",
-                        "Please close the door when you leave.",
-                        "My desk is near the window.",
-                        "I like to clean my room on Saturdays.",
-                        "The lamp is on the table.",
-                        "The floor is made of wood."
-                    ],
-                    gameActivity: {
-                        title: "听力寻宝游戏！",
-                        description: "请一位家人或朋友用英文描述你家里的5件物品（比如：It's a big, soft sofa.），你来猜猜是哪件物品！",
-                        type: "text_reveal"
-                    }},
-                    { day: 4, focus: "语法：一般过去时 & 食物与饮品词汇", tasks: "复习一般过去时用法。学习20个“食物与饮品”词汇。阅读与写作Part 4：完成2组练习。", examples: [
-                        "I ate an apple yesterday.",
-                        "We went to Beijing last year.",
-                        "He didn't eat dinner.",
-                        "She bought some bread this morning.",
-                        "They had pizza for lunch.",
-                        "I cooked chicken last night.",
-                        "We drank a lot of water.",
-                        "He visited his aunt last week.",
-                        "The film started at 7 PM.",
-                        "She felt tired after work."
-                    ],
-                    gameActivity: {
-                        title: "过去式侦探！",
-                        description: "回忆你昨天吃了什么，用3个英文句子描述你的早餐、午餐和晚餐，并确保动词都用过去式！",
-                        type: "text_reveal"
-                    }},
-                    { day: 5, focus: "阅读与写作Part 2 & 地点词汇", tasks: "阅读与写作Part 2：完成2组练习。学习20个“地点”词汇。听力Part 2：完成1组练习。", examples: [
-                        "This information matches the third paragraph.",
-                        "Can you find the meaning of this word in the text?",
-                        "Please choose the correct answer.",
-                        "The park is a great place to relax.",
-                        "Let's meet at the cafe.",
-                        "The museum is open until 5 PM.",
-                        "I live in a small town.",
-                        "We walked down the busy street.",
-                        "The shop is closed on Sundays.",
-                        "They saw many animals at the zoo."
-                    ],
-                    gameActivity: {
-                        title: "信息配对大师！",
-                        description: "选择5个今天学到的地点词汇，然后用英文描述每个地点的一个特点，让家人或朋友猜猜是哪个地点！",
-                        type: "text_reveal"
-                    }},
-                    { day: 6, focus: "语法：情态动词(can/could) & 形容词", tasks: "复习情态动词can/could。学习20个“形容词（感受与描述）”词汇。口语Part 1：描述喜欢/不喜欢的事物。", examples: [
-                        "I can speak a little English.",
-                        "Can she play the guitar?",
-                        "Could you help me, please?",
-                        "He is a very kind person.",
-                        "The weather is beautiful today.",
-                        "This book is interesting.",
-                        "I am hungry.",
-                        "She feels happy.",
-                        "The box is heavy.",
-                        "It's an important decision."
-                    ],
-                    gameActivity: {
-                        title: "形容词描绘家！",
-                        description: "挑战：用今天学到的3个形容词，分别描述你身边的人或物，比如：My dog is very *friendly*。",
-                        type: "text_reveal"
-                    }},
-                    { day: 7, focus: "周末复习与休息", tasks: "复习第1周所有词汇和语法。进行简短的听力或阅读练习。识别薄弱环节。", examples: [
-                        "Review all new words and grammar.",
-                        "Which vocabulary am I still unsure about?",
-                        "I should practice listening more.",
-                        "Write down sentences using the new words.",
-                        "Read a short story in English.",
-                        "Watch an English video with subtitles.",
-                        "Test yourself on the past tense verbs.",
-                        "Identify areas where you made mistakes.",
-                        "Plan for the next week's study.",
-                        "Take a short break and relax."
-                    ],
-                    gameActivity: {
-                        title: "周末复习小考官！",
-                        description: "请家人或朋友随机抽取你第一周学过的5个词汇，你来用英文造句。答对有奖励哦！",
-                        type: "text_reveal"
-                    }}
-                ]
-            },
-            {
-                week: 2,
-                title: "第2周：扩展技能与词汇",
-                days: [
-                    { day: 8, focus: "语法：现在进行时(未来) & 交通词汇", tasks: "复习现在进行时表未来。学习20个“旅行与交通”词汇。阅读与写作Part 3练习。", examples: [
-                        "I'm going to Beijing tomorrow.",
-                        "She's coming to see me next week.",
-                        "We are preparing to travel.",
-                        "They are flying to London on Monday.",
-                        "He is taking the bus to work.",
-                        "Are you meeting them tonight?",
-                        "The train is arriving at 10 AM.",
-                        "I'm taking my bike to the park.",
-                        "She's driving to the airport.",
-                        "We are planning a trip to the beach."
-                    ],
-                    gameActivity: {
-                        title: "未来计划小达人！",
-                        description: "挑战：用现在进行时描述你下周的3个计划，比如：I'm *visiting* my grandparents next Sunday。",
-                        type: "text_reveal"
-                    }},
-                    { day: 9, focus: "听力Part 3 & 爱好与休闲词汇", tasks: "听力Part 3练习。学习20个“爱好与休闲”词汇。口语Part 1：谈论爱好。", examples: [
-                        "I like listening to music.",
-                        "What's your favorite hobby?",
-                        "I usually play games at the weekend.",
-                        "She enjoys drawing pictures.",
-                        "He plays the guitar very well.",
-                        "We often go to the cinema.",
-                        "My hobby is reading books.",
-                        "Do you like to swim?",
-                        "They went to a concert last night.",
-                        "I watch television in the evening."
-                    ],
-                    gameActivity: {
-                        title: "爱好猜谜王！",
-                        description: "用英文描述你最喜欢的一个爱好，但不要说出它的名字，让家人或朋友来猜！",
-                        type: "text_reveal"
-                    }},
-                    { day: 10, focus: "语法：比较级/最高级 & 购物词汇", tasks: "复习比较级/最高级。学习购物相关词汇。阅读与写作Part 5练习。", examples: [
-                        "This book is more expensive than that one.",
-                        "He is the tallest student in the class.",
-                        "My bag is smaller than yours.",
-                        "The red dress is prettier.",
-                        "This is the best restaurant in town.",
-                        "She is the most intelligent person I know.",
-                        "The new phone is much faster.",
-                        "This shop has cheaper prices.",
-                        "Is this the biggest size?",
-                        "Learning English is more interesting than math."
-                    ],
-                    gameActivity: {
-                        title: "购物比价小专家！",
-                        description: "想象你要买两件物品，用比较级或最高级来描述它们，比如：This T-shirt is *cheaper* than that one.",
-                        type: "text_reveal"
-                    }},
-                    { day: 11, focus: "阅读与写作Part 6 (邮件) & 动词短语", tasks: "写作Part 6练习。学习10个常用动词短语。听力Part 4练习。", examples: [
-                        "Please send me an email.",
-                        "I like to call my friends.",
-                        "She sent me a postcard.",
-                        "Can you pick up some milk?",
-                        "I need to look for my keys.",
-                        "He turned on the light.",
-                        "Let's go out tonight.",
-                        "They put on their coats.",
-                        "She took off her shoes.",
-                        "We need to get up early tomorrow."
-                    ],
-                    gameActivity: {
-                        title: "邮件写作小助手！",
-                        description: "挑战：给你的朋友写一封简单的英文邮件，邀请他/她参加你的生日派对，并至少使用2个今天学到的动词短语！",
-                        type: "text_reveal"
-                    }},
-                    { day: 12, focus: "语法：可数/不可数名词 & 量词", tasks: "复习名词和量词。学习教育相关词汇。口语Part 2练习。", examples: [
-                        "I have a few books.",
-                        "He drank a lot of milk.",
-                        "There isn't much water here.",
-                        "Do you have any money?",
-                        "We need some chairs for the party.",
-                        "She has many friends.",
-                        "I eat a lot of fruit.",
-                        "How many apples do you want?",
-                        "How much sugar do we need?",
-                        "There are some students in the classroom."
-                    ],
-                    gameActivity: {
-                        title: "量词搭配小能手！",
-                        description: "挑战：说出5个可数名词和5个不可数名词，并为它们各搭配一个正确的量词，比如：a lot of *water*。",
-                        type: "text_reveal"
-                    }},
-                    { day: 13, focus: "模拟测试 (听力+读写)", tasks: "完成一套完整的听力与阅读与写作模拟测试。对答案，分析错误。", examples: [
-                        "I need to complete the listening test.",
-                        "How many did I get wrong in the reading section?",
-                        "What score did I get on this mock exam?",
-                        "Review your answers carefully.",
-                        "Find out why you made mistakes.",
-                        "Pay attention to the time limit.",
-                        "Did you understand all the questions?",
-                        "Circle the correct options.",
-                        "Write down what you heard.",
-                        "Check your spelling and grammar."
-                    ],
-                    gameActivity: {
-                        title: "模拟考小分析师！",
-                        description: "完成模拟测试后，找出你错得最多的3道题，并尝试解释为什么会错，下次如何避免。",
-                        type: "text_reveal"
-                    }},
-                    { day: 14, focus: "周末复习与调整", tasks: "复习第2周内容，重点复习模考错题。", examples: [
-                        "I should review all the grammar points.",
-                        "I need to practice writing more.",
-                        "Which parts did I not do well in?",
-                        "Re-do the exercises you struggled with.",
-                        "Watch English movies to improve listening.",
-                        "Read English newspapers for reading practice.",
-                        "Speak English with a friend.",
-                        "Review your vocabulary flashcards.",
-                        "Take notes on your weak areas.",
-                        "Prepare a study plan for the next week."
-                    ],
-                    gameActivity: {
-                        title: "错题攻克小英雄！",
-                        description: "挑战：从你模拟测试的错题中选择一道，重新做一遍，并用英文解释你现在是如何得到正确答案的。",
-                        type: "text_reveal"
-                    }}
-                ]
-            },
-            {
-                week: 3,
-                title: "第3周：产出性技能与复杂语法",
-                days: [
-                    { day: 15, focus: "语法：现在完成时 & 健康词汇", tasks: "复习现在完成时。学习健康医疗词汇。阅读与写作Part 7练习。", examples: [
-                        "I haven't eaten lunch yet today.",
-                        "She has already finished her homework.",
-                        "They have never been to Japan.",
-                        "He has lived here for five years.",
-                        "Have you ever seen a ghost?",
-                        "I've been to London twice.",
-                        "She hasn't visited her aunt recently.",
-                        "They have just arrived.",
-                        "The baby has grown so much.",
-                        "We have known each other since childhood."
-                    ],
-                    gameActivity: {
-                        title: "故事接龙大王！",
-                        description: "挑战：用现在完成时造3个句子，描述你最近做过的事情，然后请家人或朋友用现在完成时接龙，继续讲故事！",
-                        type: "text_reveal"
-                    }},
-                    { day: 16, focus: "听力Part 5 & 运动词汇", tasks: "听力Part 5练习。学习运动词汇。口语Part 2练习。", examples: [
-                        "He is running.",
-                        "I like playing football.",
-                        "She swims very fast.",
-                        "Do you play any sports?",
-                        "My favorite sport is basketball.",
-                        "We went cycling in the park.",
-                        "He likes to go for a run every morning.",
-                        "The team won the game.",
-                        "She is good at tennis.",
-                        "Swimming is a great exercise."
-                    ],
-                    gameActivity: {
-                        title: "运动词汇连连看！",
-                        description: "挑战：说出5个今天学到的运动词汇，并用英文描述每项运动的一个特点，比如：*Football* is a team sport.",
-                        type: "text_reveal"
-                    }},
-                    { day: 17, focus: "语法：条件句 & 连接词", tasks: "复习零/第一条件句。学习常用连接词。阅读与写作Part 4练习。", examples: [
-                        "If it rains, I will stay at home.",
-                        "If you study, you will pass the exam.",
-                        "If I'm thirsty, I drink water.",
-                        "When you heat ice, it melts.",
-                        "If she comes, we will go to the cinema.",
-                        "If I have time, I'll help you.",
-                        "She went to the shop because she needed milk.",
-                        "He was tired, so he went to bed early.",
-                        "Although it was cold, we went for a walk.",
-                        "You can choose coffee or tea."
-                    ],
-                    gameActivity: {
-                        title: "条件句配对挑战！",
-                        description: "挑战：说出3个“如果...就...”的英文句子，一个关于普遍真理，两个关于未来计划，比如：If I'm hungry, I eat.",
-                        type: "text_reveal"
-                    }},
-                    { day: 18, focus: "读写Part 5 (开放填空) & 动词模式", tasks: "读写Part 5练习。复习动词+ing/不定式。听力Part 2练习。", examples: [
-                        "He enjoys reading books.",
-                        "She wants to go shopping.",
-                        "I look forward to seeing you.",
-                        "They decided to buy a new car.",
-                        "I love playing the piano.",
-                        "He offered to help me.",
-                        "She stopped working at 5 PM.",
-                        "They prefer to eat at home.",
-                        "I finished writing my essay.",
-                        "He started learning English last year."
-                    ],
-                    gameActivity: {
-                        title: "动词填空小高手！",
-                        description: "挑战：说出3个动词，然后用它们分别造一个句子，一个后面跟-ing形式，一个跟不定式，一个跟两者皆可！",
-                        type: "text_reveal"
-                    }},
-                    { day: 19, focus: "语法：被动语态 (现在/过去) & 职业词汇", tasks: "复习现在和过去简单被动语态。学习20个“工作与职业”词汇。口语Part 1 & 2：综合练习。", examples: [
-                        "This book was written by me.",
-                        "The house was built in 1990.",
-                        "Dinner is being prepared.",
-                        "English is spoken all over the world.",
-                        "The letter was sent yesterday.",
-                        "Many cars are produced in this factory.",
-                        "The new hospital was opened last month.",
-                        "He is a doctor.",
-                        "She works as a teacher.",
-                        "My father is an engineer."
-                    ],
-                    gameActivity: {
-                        title: "职业猜猜看！",
-                        description: "挑战：用被动语态描述一个职业的工作内容，让家人或朋友猜猜是什么职业！比如：This person *is paid* to teach students.",
-                        type: "text_reveal"
-                    }},
-                    { day: 20, focus: "模拟测试 (听力+读写)", tasks: "完成一套完整的听力与读写模拟测试。分析错误，重点关注写作。", examples: [
-                        "I need to analyze my mock test results.",
-                        "I made mistakes in the writing section.",
-                        "I misheard information in the listening part.",
-                        "Check your answers against the key.",
-                        "Identify recurring grammar errors.",
-                        "Practice writing more clearly.",
-                        "Listen for specific details in the audio.",
-                        "Improve your time management.",
-                        "What was the main idea?",
-                        "How can I improve my score?"
-                    ],
-                    gameActivity: {
-                        title: "写作大检查！",
-                        description: "挑战：重新阅读你本次模拟测试的写作部分，找出至少3个语法或拼写错误并改正它们。",
-                        type: "text_reveal"
-                    }},
-                    { day: 21, focus: "周末复习与调整", tasks: "复习第3周内容，重点复习写作错误。写一篇短文应用新语法。", examples: [
-                        "I wrote an email.",
-                        "I made sentences with the new vocabulary.",
-                        "I did better this time than last time.",
-                        "Review all grammar from this week.",
-                        "Focus on the structure of your writing.",
-                        "Practice using new linking words.",
-                        "Read an article and summarize it.",
-                        "Listen to an English podcast.",
-                        "Speak about your day in English.",
-                        "Relax and prepare for the final week."
-                    ],
-                    gameActivity: {
-                        title: "语法应用小能手！",
-                        description: "挑战：用本周学到的至少3个新语法点（如现在完成时、被动语态、条件句）写一个关于你周末的简短故事。",
-                        type: "text_reveal"
-                    }}
-                ]
-            },
-            {
-                week: 4,
-                title: "第4周：整合、模拟测试与完善",
-                days: [
-                    { day: 22, focus: "综合阅读与写作练习", tasks: "阅读与写作Part 1-3各完成1组。复习所有词汇表。", examples: [
-                        "Please read this short text quickly.",
-                        "Find the main idea of the passage.",
-                        "Choose the correct title.",
-                        "Answer the questions based on the text.",
-                        "Match the sentences to the correct paragraphs.",
-                        "Fill in the gaps with the best word.",
-                        "Write a short message to a friend.",
-                        "Describe what is happening in the pictures.",
-                        "Check your spelling and grammar carefully.",
-                        "Make sure your writing is clear and concise."
-                    ],
-                    gameActivity: {
-                        title: "阅读速度挑战！",
-                        description: "挑战：选择一篇你读过的英文短文，计时阅读，然后用3个句子总结文章主要内容。下次尝试用更短的时间完成！",
-                        type: "text_reveal"
-                    }},
-                    { day: 23, focus: "综合听力练习", tasks: "听力Part 1-5各完成1组。复习所有语法点。", examples: [
-                        "Listen to the recording and write down the answers.",
-                        "Please listen to the conversation and answer the questions.",
-                        "Did you understand all the details?",
-                        "Listen for names, numbers, and places.",
-                        "Identify the speaker's main purpose.",
-                        "Match the people to their descriptions.",
-                        "Pay attention to accents and intonation.",
-                        "Listen for key phrases and expressions.",
-                        "Practice note-taking while listening.",
-                        "Replay difficult sections until you understand."
-                    ],
-                    gameActivity: {
-                        title: "听力细节捕捉！",
-                        description: "挑战：播放一段英文对话或独白（A2级别），然后尝试写下其中提到的所有数字、时间和地点信息。",
-                        type: "text_reveal"
-                    }},
-                    { day: 24, focus: "综合口语练习", tasks: "口语Part 1 & 2进行2-3次模拟对话。关注流利度、发音和互动。", examples: [
-                        "Tell me about yourself.",
-                        "What do you like to do at the weekend?",
-                        "Discuss this topic with your partner.",
-                        "Ask your partner a question.",
-                        "Give reasons for your opinions.",
-                        "Make sure you speak clearly.",
-                        "Practice interacting naturally.",
-                        "Record yourself and listen back.",
-                        "Ask for clarification if you don't understand.",
-                        "Maintain eye contact with the examiner."
-                    ],
-                    gameActivity: {
-                        title: "口语情景模拟！",
-                        description: "挑战：选择一个你感兴趣的话题（比如：你最喜欢的运动），用英文和家人或朋友进行一次5分钟的对话，尝试提问和回应。",
-                        type: "text_reveal"
-                    }},
-                    { day: 25, focus: "完整模拟测试", tasks: "完成一套完整的KET模拟测试（听说读写）。严格计时。", examples: [
-                        "The exam time is 2 hours and 10 minutes.",
-                        "Please complete it strictly according to the time limit.",
-                        "Simulate a real exam scenario.",
-                        "Do not use any external help.",
-                        "Take short breaks as in the real exam.",
-                        "Complete all sections of the test.",
-                        "Manage your time effectively.",
-                        "Mark your answers clearly.",
-                        "Try to finish all questions.",
-                        "Stay focused during the entire test."
-                    ],
-                    gameActivity: {
-                        title: "完整模考体验！",
-                        description: "今天没有额外的挑战，请专注于完成完整的模拟测试，体验真实的考试压力和节奏。",
-                        type: "text_reveal"
-                    }},
-                    { day: 26, focus: "模考分析与弱项突破", tasks: "详细分析Day 25模拟测试结果，找出最薄弱的2-3个知识点或题型。针对性练习。", examples: [
-                        "I found that grammar is my weakness.",
-                        "I need to practice numbers in listening more.",
-                        "This time I should focus on writing.",
-                        "Go through every incorrect answer.",
-                        "Understand the reason for each mistake.",
-                        "Create extra exercises for your weak points.",
-                        "Consult your grammar book for specific rules.",
-                        "Practice dictation for listening improvement.",
-                        "Write short paragraphs on challenging topics.",
-                        "Discuss your errors with a study partner."
-                    ],
-                    gameActivity: {
-                        title: "弱项突破大作战！",
-                        description: "挑战：从你模拟测试中错得最多的题型里，选择5道类似题目进行练习，看看你是否已经掌握了！",
-                        type: "text_reveal"
-                    }},
-                    { day: 27, focus: "写作与口语专题训练", tasks: "写作Part 6 & 7：各写1篇。口语Part 2：深入讨论2个话题。", examples: [
-                        "Write a short text about your weekend.",
-                        "Describe your favorite place.",
-                        "Discuss two hobbies.",
-                        "Write an email inviting a friend to a party.",
-                        "Tell a story based on three pictures.",
-                        "Talk about the advantages and disadvantages of online shopping.",
-                        "Describe your ideal holiday.",
-                        "Discuss why learning English is important.",
-                        "Practice presenting your opinions clearly.",
-                        "Ask follow-up questions to your partner."
-                    ],
-                    gameActivity: {
-                        title: "写作口语双重奏！",
-                        description: "挑战：选择一个你感兴趣的话题（比如：你最喜欢的节日），先用英文写一段描述，然后尝试用口语流利地描述出来！",
-                        type: "text_reveal"
-                    }},
-                    { day: 28, focus: "词汇与语法总复习", tasks: "快速浏览所有词汇表和语法点。进行快速问答练习。", examples: [
-                        "Review all high-frequency vocabulary.",
-                        "Quickly go over grammar rules.",
-                        "Test yourself on different question types.",
-                        "Use flashcards for quick revision.",
-                        "Practice verb tenses and prepositions.",
-                        "Read through your grammar notes.",
-                        "Quiz a friend on vocabulary.",
-                        "Write sentences with challenging words.",
-                        "Listen to English songs or podcasts.",
-                        "Consolidate everything you've learned."
-                    ],
-                    gameActivity: {
-                        title: "词汇语法速记赛！",
-                        description: "挑战：请家人或朋友用中文说一个词或一个句子，你快速用英文说出对应的词或句子！计时看看你反应有多快！",
-                        type: "text_reveal"
-                    }},
-                    { day: 29, focus: "考前冲刺与心态调整", tasks: "浏览易错点，进行少量轻松练习。确保设备、证件准备就绪。调整心态，保持积极。", examples: [
-                        "Stay relaxed.",
-                        "Believe you are well-prepared.",
-                        "Do light practice, don't overwork.",
-                        "Get a good night's sleep.",
-                        "Eat a healthy breakfast.",
-                        "Pack your bag with essential items.",
-                        "Arrive early at the exam venue.",
-                        "Visualize success.",
-                        "Do some deep breathing exercises.",
-                        "Trust your preparation."
-                    ],
-                    gameActivity: {
-                        title: "考前心理按摩！",
-                        description: "挑战：对着镜子用英文说3句鼓励自己的话，比如：I am ready for the KET exam! I can do it!",
-                        type: "text_reveal"
-                    }},
-                    { day: 30, focus: "考试日", tasks: "保持良好状态，自信应考。", examples: [
-                        "Good luck with your exam!",
-                        "Stay confident.",
-                        "Approach the exam calmly.",
-                        "Read all instructions carefully.",
-                        "Manage your time wisely.",
-                        "Do your best on every section.",
-                        "Don't panic if you don't know an answer.",
-                        "Review your answers if time permits.",
-                        "Breathe deeply and focus.",
-                        "You've worked hard, you can do this!"
-                    ],
-                    gameActivity: {
-                        title: "考试日能量补充！",
-                        description: "今天最重要的挑战是：吃一顿美味的早餐，然后带着自信和微笑去考试！祝你成功！",
-                        type: "text_reveal"
-                    }}
-                ]
-            }
-        ];
-
-        const grammarData = [
-            {
-                title: "时态",
-                content: "一般现在时、现在进行时、一般过去时、过去进行时、现在完成时。",
-                examples: [
-                    "She <b>walks</b> to school every day. (一般现在时)",
-                    "I <b>am studying</b> English now. (现在进行时)",
-                    "They <b>played</b> football yesterday. (一般过去时)",
-                    "He <b>was sleeping</b> when I called. (过去进行时)",
-                    "I <b>have finished</b> my homework. (现在完成时)",
-                    "We <b>are going</b> to the cinema tomorrow. (现在进行时表未来)",
-                    "The sun <b>rises</b> in the east. (一般现在时)",
-                    "They <b>were watching</b> TV all evening. (过去进行时)",
-                    "She <b>has lived</b> in London for five years. (现在完成时)",
-                    "What <b>do</b> you <b>do</b> on weekends? (一般现在时)"
-                ]
-            },
-            {
-                title: "情态动词",
-                content: "can/could (能力/请求), have to (义务), should (建议), must/mustn't (义务/禁止)。",
-                examples: [
-                    "I <b>can</b> swim very well. (能力)",
-                    "<b>Could</b> you please help me? (请求)",
-                    "You <b>have to</b> wear a uniform at school. (义务)",
-                    "You <b>should</b> study hard for the exam. (建议)",
-                    "You <b>must</b> be quiet in the library. (义务)",
-                    "You <b>mustn't</b> use your phone here. (禁止)",
-                    "He <b>can</b> play the guitar. (能力)",
-                    "We <b>could</b> go to the park later. (可能性)",
-                    "I <b>have to</b> leave early tomorrow. (义务)",
-                    "She <b>should</b> eat more vegetables. (建议)"
-                ]
-            },
-            {
-                title: "名词与冠词",
-                content: "可数/不可数名词，a/an/the，量词 (much/many, some/any)。",
-                examples: [
-                    "I have <b>a</b> cat and <b>a</b> dog. (可数名词，不定冠词)",
-                    "Please buy <b>some</b> milk. (不可数名词，量词)",
-                    "There are <b>many</b> books on <b>the</b> table. (可数名词，量词，定冠词)",
-                    "I don't have <b>much</b> time. (不可数名词，量词)",
-                    "Do you have <b>any</b> questions? (可数/不可数名词，量词)",
-                    "She needs <b>an</b> apple. (可数名词，不定冠词)",
-                    "I saw <b>the</b> Eiffel Tower in Paris. (定冠词)",
-                    "We need <b>a lot of</b> water. (量词)",
-                    "There is <b>little</b> sugar left. (不可数名词，量词)",
-                    "He ate <b>a piece of</b> cake. (量词)"
-                ]
-            },
-            {
-                title: "形容词与副词",
-                content: "比较级和最高级，频率副词 (always, often), 方式、时间、地点副词。",
-                examples: [
-                    "She is <b>taller</b> than her brother. (比较级)",
-                    "This is <b>the best</b> film I've ever seen. (最高级)",
-                    "He <b>always</b> wakes up early. (频率副词)",
-                    "She sings <b>beautifully</b>. (方式副词)",
-                    "I will see you <b>tomorrow</b>. (时间副词)",
-                    "The book is <b>on the table</b>. (地点副词)",
-                    "He runs <b>faster</b> than me. (比较级副词)",
-                    "This is <b>the most interesting</b> book. (最高级)",
-                    "They <b>often</b> go to the cinema. (频率副词)",
-                    "He drives <b>carefully</b>. (方式副词)"
-                ]
-            },
-            {
-                title: "介词",
-                content: "时间介词 (on/in/at)，地点介词和运动介词。",
-                examples: [
-                    "I was born <b>in</b> July. (时间介词)",
-                    "Let's meet <b>at</b> 3 o'clock. (时间介词)",
-                    "The book is <b>on</b> the desk. (地点介词)",
-                    "She walked <b>into</b> the room. (运动介词)",
-                    "He lives <b>in</b> London. (地点介词)",
-                    "The party is <b>on</b> Saturday. (时间介词)",
-                    "The cat is <b>under</b> the chair. (地点介词)",
-                    "They drove <b>across</b> the bridge. (运动介词)",
-                    "I get up <b>at</b> 7 AM. (时间介词)",
-                    "She sat <b>next to</b> him. (地点介词)"
-                ]
-            },
-            {
-                title: "条件句",
-                content: "零条件句 (普遍真理) 和第一条件句 (未来真实可能性)。",
-                examples: [
-                    "If you <b>heat</b> ice, it <b>melts</b>. (零条件句)",
-                    "If it <b>rains</b> tomorrow, I <b>will stay</b> at home. (第一条件句)",
-                    "When you <b>mix</b> red and blue, you <b>get</b> purple. (零条件句)",
-                    "If I <b>find</b> your keys, I <b>will call</b> you. (第一条件句)",
-                    "If you <b>don't water</b> plants, they <b>die</b>. (零条件句)",
-                    "If she <b>studies</b> hard, she <b>will pass</b> the exam. (第一条件句)",
-                    "If I <b>am</b> tired, I <b>go</b> to bed early. (零条件句)",
-                    "If he <b>comes</b>, we <b>will have</b> a party. (第一条件句)",
-                    "When the sun <b>sets</b>, it <b>gets</b> dark. (零条件句)",
-                    "If you <b>need</b> help, just <b>ask</b> me. (第一条件句)"
-                ]
-            }
-        ];
-
-        const skillsData = [
-            { 
-                title: "阅读与写作 (50%)", 
-                content: "共7部分，1小时。重点练习识别短文本主旨（Part 1）、信息匹配（Part 2）、长文理解（Part 3），以及词汇语法填空（Part 4-5）。写作部分（Part 6-7）要求写25-35词的邮件或故事，注意规划、检查语法和拼写。",
-                icon: "📖"
-            },
-            { 
-                title: "听力 (25%)", 
-                content: "共5部分，约30分钟。录音播放两次。练习捕捉关键信息如价格、时间、地点（Part 1-2），理解对话主旨和细节（Part 3-5）。多听A2级别材料，熟悉不同口音和语速。",
-                icon: "🎧"
-            },
-            { 
-                title: "口语 (25%)", 
-                content: "共2部分，8-10分钟。与另一位考生共同进行。Part 1是关于个人信息的问答。Part 2是协作任务，根据提示卡讨论偏好。多与伙伴练习对话，学会提问和回应。",
-                icon: "💬"
-            },
-            { 
-                title: "最终建议", 
-                content: "考前进行完整模拟测试，严格计时。复习错题，找出薄弱环节。考试当天保持冷静，仔细阅读题目要求，合理分配时间。遇到难题不要慌张，先跳过，最后再回来检查。",
-                icon: "⭐"
-            }
-        ];
-
-        const ctx = document.getElementById('examStructureChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: ['阅读与写作', '听力', '口语'],
-                datasets: [{
-                    data: [50, 25, 25],
-                    backgroundColor: ['#0d9488', '#14b8a6', '#5eead4'],
-                    borderColor: '#fdfcf9',
-                    borderWidth: 4,
-                    hoverOffset: 8
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            font: {
-                                size: 14,
-                                family: "'Noto Sans SC', sans-serif"
-                            },
-                            color: '#3f3f46',
-                            padding: 20
-                        }
+        document.addEventListener('DOMContentLoaded', () => {
+            const data = {
+                vocabulary: [
+                    { theme: '个人信息与家庭', dialogue: { speakerA: "Hi, what's your name?", speakerB: "I'm Li Hua. I live with my family, my mother and father." }, words: [ { word: 'name', def: '名字', ex: 'Could you spell your name, please?<br>My name is famous in my country.' }, { word: 'age', def: '年龄', ex: 'He is the same age as me.<br>What age is your brother?' }, { word: 'family', def: '家庭', ex: 'There are four people in my family.<br>I love spending time with my family.' }, { word: 'address', def: '地址', ex: "What's your new address?<br>Please write your full name and address." }, { word: 'phone number', def: '电话号码', ex: 'My phone number has changed.<br>Can I call you on this phone number?' }, { word: 'country', def: '国家', ex: 'Which country are you from?<br>Spain is a beautiful country.' }, { word: 'job', def: '工作', ex: 'She is looking for a new job.<br>What is your job?' }, { word: 'student', def: '学生', ex: 'He is a student at a language school.<br>The students are doing an exam.' }, { word: 'mother', def: '母亲', ex: 'My mother works in a hospital.<br>She looks like her mother.' }, { word: 'father', def: '父亲', ex: 'My father teaches maths.<br>I have the same eyes as my father.' }, { word: 'brother', def: '兄弟', ex: 'My younger brother is very funny.<br>Do you have any brothers or sisters?' }, { word: 'sister', def: '姐妹', ex: 'My older sister lives in London.<br>She has one sister.' }, { word: 'live', def: '居住', ex: 'Where do you live?<br>I live in a small town.' }, { word: 'hobby', def: '爱好', ex: 'My main hobby is photography.<br>Tell me about your hobbies.' }, { word: 'parent', def: '父母', ex: 'I live with my parents.<br>You should ask your parents.' }, { word: 'child/children', def: '孩子', ex: 'They have two children.<br>The children are playing in the park.' }, { word: 'friend', def: '朋友', ex: 'I’m going to meet a friend this evening.<br>She is my best friend.' }, { word: 'teacher', def: '老师', ex: 'The teacher wrote the answer on the board.<br>Our English teacher is very kind.' }, { word: 'classmate', def: '同学', ex: 'She is my best friend and classmate.<br>Do you know your new classmates?' }, { word: 'email address', def: '邮箱地址', ex: 'Can you give me your email address?<br>My email address has changed.' } ] },
+                    { theme: '食物与饮料', dialogue: { speakerA: "What would you like for lunch?", speakerB: "I'd like some chicken and rice, and a glass of water, please." }, words: [ { word: 'apple', def: '苹果', ex: 'I would like an apple, please.<br>An apple a day keeps the doctor away.' }, { word: 'bread', def: '面包', ex: 'Do you want some bread with your soup?<br>This bread is very fresh.' }, { word: 'water', def: '水', ex: 'Could I have a glass of water?<br>It’s important to drink a lot of water.' }, { word: 'banana', def: '香蕉', ex: 'Bananas are my favourite fruit.<br>I had a banana for breakfast.' }, { word: 'cheese', def: '奶酪', ex: 'I like cheese sandwiches.<br>This pasta has a lot of cheese on it.' }, { word: 'chicken', def: '鸡肉', ex: 'We are having roast chicken for dinner.<br>I don’t like chicken.' }, { word: 'coffee', def: '咖啡', ex: 'Do you prefer coffee or tea?<br>I need a coffee to wake me up.' }, { word: 'egg', def: '鸡蛋', ex: 'How do you like your eggs?<br>I had a fried egg for breakfast.' }, { word: 'lunch', def: '午餐', ex: 'We have lunch at 1 o’clock.<br>What did you have for lunch?' }, { word: 'milk', def: '牛奶', ex: 'I always put milk in my coffee.<br>The baby is drinking some milk.' }, { word: 'rice', def: '米饭', ex: 'This dish is served with rice.<br>I prefer rice to noodles.' }, { word: 'tea', def: '茶', ex: 'Would you like another cup of tea?<br>I drink tea with milk.' }, { word: 'fruit', def: '水果', ex: 'You should eat five portions of fruit a day.<br>What’s your favourite fruit?' }, { word: 'vegetable', def: '蔬菜', ex: 'Is a tomato a fruit or a vegetable?<br>I like all kinds of vegetables.' }, { word: 'drink', def: '喝/饮料', ex: 'What would you like to drink?<br>My favourite drink is orange juice.' }, { word: 'eat', def: '吃', ex: 'What time shall we eat?<br>I’m hungry, let’s eat.' }, { word: 'cake', def: '蛋糕', ex: 'Who wants a piece of cake?<br>My mother made a beautiful birthday cake.' }, { word: 'chocolate', def: '巧克力', ex: 'I bought you some chocolates.<br>I don’t eat much chocolate.' }, { word: 'juice', def: '果汁', ex: 'I’d like a glass of orange juice.<br>Do you want apple juice or orange juice?' }, { word: 'fish', def: '鱼肉', ex: 'I don’t eat fish.<br>We had fish and chips for dinner.' }, { word: 'meat', def: '肉', ex: 'He doesn’t eat meat.<br>What kind of meat is this?' }, { word: 'pasta', def: '意大利面', ex: 'Pasta is my favourite food.<br>Let’s have pasta for dinner tonight.' }, { word: 'soup', def: '汤', ex: 'Would you like a bowl of soup?<br>This soup is very hot.' } ] },
+                    { theme: '日常生活与作息', dialogue: { speakerA: "What time do you get up on the weekend?", speakerB: "I get up late, then I do my homework and meet friends." }, words: [ { word: 'get up', def: '起床', ex: 'I get up early on weekdays.<br>What time do you usually get up?' }, { word: 'homework', def: '作业', ex: 'Have you done your homework?<br>I have a lot of homework to do.' }, { word: 'weekend', def: '周末', ex: "I'm going to the cinema at the weekend.<br>What do you do at the weekend?" }, { word: 'breakfast', def: '早餐', ex: 'I never eat breakfast.<br>I had toast for breakfast.' }, { word: 'dinner', def: '晚餐', ex: 'What time is dinner?<br>We had a lovely dinner at the restaurant.' }, { word: 'go to bed', def: '上床睡觉', ex: 'I was very tired so I went to bed early.<br>I usually go to bed at about 11 o’clock.' }, { word: 'have a shower', def: '洗澡', ex: 'I always have a shower in the morning.<br>I’m going to have a shower.' }, { word: 'listen to music', def: '听音乐', ex: 'I like listening to music in the car.<br>What kind of music do you listen to?' }, { word: 'meet friends', def: '见朋友', ex: 'I’m going to meet some friends after work.<br>I like meeting friends at the weekend.' }, { word: 'watch TV', def: '看电视', ex: 'I don’t watch TV very often.<br>What’s on TV tonight?' }, { word: 'work', def: '工作', ex: 'I have to work late tonight.<br>My father works in an office.' }, { word: 'clean', def: '打扫', ex: 'I clean my room every Saturday.<br>You need to clean your shoes.' }, { word: 'cook', def: '做饭', ex: 'Who is cooking dinner tonight?<br>I’m learning how to cook.' }, { word: 'study', def: '学习', ex: 'You need to study for the exam.<br>I’m studying English.' }, { word: 'sleep', def: '睡觉', ex: 'I couldn’t sleep last night.<br>I need to get some sleep.' }, { word: 'wake up', def: '醒来', ex: 'I wake up at 6 am every morning.<br>The noise woke me up.' }, { word: 'go shopping', def: '去购物', ex: 'We usually go shopping on Saturdays.<br>I need to go shopping for some new clothes.' }, { word: 'take the bus', def: '乘公交车', ex: 'I take the bus to school.<br>It’s cheaper to take the bus.' }, { word: 'drive', def: '开车', ex: 'My father drives me to school.<br>I’m learning to drive.' }, { word: 'walk', def: '走路', ex: 'I walk to the park.<br>We can walk to the station from here.' } ] },
+                    { theme: '兴趣与休闲', dialogue: { speakerA: "Do you like sport?", speakerB: "Yes, I love to swim. I also like to read a good book." }, words: [ { word: 'cinema', def: '电影院', ex: 'The cinema is opposite the supermarket.<br>Let’s go to the cinema tonight.' }, { word: 'music', def: '音乐', ex: 'What kind of music do you like?<br>I like listening to pop music.' }, { word: 'sport', def: '运动', ex: 'My favourite sport is tennis.<br>Do you play any sport?' }, { word: 'book', def: '书', ex: 'I’m reading a really good book.<br>I bought a book about animals.' }, { word: 'camera', def: '相机', ex: 'I got a new camera for my birthday.<br>This camera takes great photos.' }, { word: 'computer game', def: '电脑游戏', ex: 'My brother loves playing computer games.<br>This is a new computer game.' }, { word: 'dance', def: '跳舞', ex: 'Do you want to dance?<br>She is a good dancer.' }, { word: 'draw', def: '画画', ex: 'Can you draw me a picture of a horse?<br>I like drawing in my free time.' }, { word: 'guitar', def: '吉他', ex: 'My dad taught me how to play the guitar.<br>He is a great guitar player.' }, { word: 'read', def: '阅读', ex: 'I like reading newspapers.<br>I read a book every week.' }, { word: 'swim', def: '游泳', ex: 'The sea is warm enough to swim in.<br>I go swimming twice a week.' }, { word: 'paint', def: '绘画', ex: 'She likes to paint landscapes.<br>This is a beautiful painting.' }, { word: 'sing', def: '唱歌', ex: 'He sings in a band.<br>She has a beautiful singing voice.' }, { word: 'holiday', def: '假期', ex: 'We are going to Spain for our holiday.<br>I need a holiday!' }, { word: 'party', def: '派对', ex: 'Are you coming to my birthday party?<br>The party was great fun.' }, { word: 'football', def: '足球', ex: 'Do you want to play football?<br>I watch football on TV.' }, { word: 'basketball', def: '篮球', ex: 'He is a famous basketball player.<br>Let’s play basketball.' }, { word: 'tennis', def: '网球', ex: 'I have a tennis lesson on Friday.<br>Do you want to play tennis?' }, { word: 'movie/film', def: '电影', ex: 'What’s your favourite film?<br>I saw a great movie last night.' }, { word: 'photo', def: '照片', ex: 'Can I take a photo of you?<br>I have a lot of photos on my phone.' } ] },
+                    { theme: '衣物与配饰', dialogue: { speakerA: "I like your new T-shirt!", speakerB: "Thanks! I bought these shoes to go with it." }, words: [ { word: 'T-shirt', def: 'T恤', ex: 'He was wearing a white T-shirt and jeans.<br>I need to buy some new T-shirts.' }, { word: 'shoes', def: '鞋子', ex: 'I need some new shoes for running.<br>Take off your shoes.' }, { word: 'hat', def: '帽子', ex: 'Where did you get that hat?<br>It’s sunny, you should wear a hat.' }, { word: 'dress', def: '连衣裙', ex: 'I bought a new dress for the party.<br>That’s a beautiful dress.' }, { word: 'glasses', def: '眼镜', ex: 'I can’t find my glasses.<br>I wear glasses for reading.' }, { word: 'jacket', def: '夹克', ex: 'You should wear a jacket, it’s cold.<br>I like your new jacket.' }, { word: 'jeans', def: '牛仔裤', ex: 'I live in jeans.<br>I bought a new pair of jeans.' }, { word: 'shirt', def: '衬衫', ex: 'You have to wear a shirt and tie at work.<br>I need to iron my shirt.' }, { word: 'skirt', def: '裙子', ex: 'She was wearing a long blue skirt.<br>I prefer skirts to trousers.' }, { word: 'watch', def: '手表', ex: 'My watch has stopped.<br>What time is it by your watch?' }, { word: 'coat', def: '外套', ex: 'Take your coat, it might rain.<br>My coat is very warm.' }, { word: 'socks', def: '袜子', ex: 'I have a hole in my socks.<br>I can’t find my other sock.' }, { word: 'trousers', def: '裤子', ex: 'I need to buy a new pair of trousers.<br>These trousers are too long.' }, { word: 'wear', def: '穿', ex: 'What are you going to wear to the party?<br>I have nothing to wear.' }, { word: 'sweater', def: '毛衣', ex: 'My grandmother made me this sweater.<br>It’s cold, I’ll wear a sweater.' }, { word: 'shorts', def: '短裤', ex: 'I wear shorts in the summer.<br>He was wearing shorts and a T-shirt.' }, { word: 'scarf', def: '围巾', ex: 'It’s cold, so I’m wearing a scarf.<br>That’s a nice scarf.' }, { word: 'gloves', def: '手套', ex: 'I need some new gloves.<br>I can’t find my gloves.' }, { word: 'bag', def: '包', ex: 'My school bag is very heavy.<br>Don’t forget your bag.' } ] },
+                    { theme: '地点与建筑', dialogue: { speakerA: "Excuse me, where is the library?", speakerB: "It's next to the park, opposite the supermarket." }, words: [ { word: 'school', def: '学校', ex: 'What time do you finish school?<br>I go to a big school.' }, { word: 'park', def: '公园', ex: 'Let’s go for a walk in the park.<br>The park is very beautiful.' }, { word: 'library', def: '图书馆', ex: 'I need to return these books to the library.<br>I like studying in the library.' }, { word: 'bank', def: '银行', ex: 'Is there a bank near here?<br>I need to go to the bank.' }, { word: 'hospital', def: '医院', ex: 'My sister is a nurse in a hospital.<br>I was in hospital for a week.' }, { word: 'hotel', def: '酒店', ex: 'The hotel is very close to the beach.<br>We stayed in a five-star hotel.' }, { word: 'museum', def: '博物馆', ex: 'The museum is free to enter.<br>I like visiting museums.' }, { word: 'restaurant', def: '餐馆', ex: 'We went to a restaurant for dinner.<br>This is a very good restaurant.' }, { word: 'station', def: '车站', ex: 'The train station is in the city centre.<br>I’ll meet you at the station.' }, { word: 'supermarket', def: '超市', ex: 'I’m going to the supermarket this afternoon.<br>The supermarket is open 24 hours.' }, { word: 'cafe', def: '咖啡馆', ex: 'Let’s meet at the cafe at 4 o’clock.<br>I like the coffee in this cafe.' }, { word: 'shop', def: '商店', ex: 'The shops close at 6 pm.<br>I bought this in a shop in town.' }, { word: 'post office', def: '邮局', ex: 'I need to go to the post office to send a letter.<br>Is there a post office near here?' }, { word: 'theatre', def: '剧院', ex: 'I’m going to the theatre tonight.<br>We saw a play at the theatre.' }, { word: 'market', def: '市场', ex: 'The market sells fresh fruit and vegetables.<br>I bought this at the market.' }, { word: 'zoo', def: '动物园', ex: 'We saw the lions at the zoo.<br>I love going to the zoo.' } ] },
+                    { theme: '旅行与假期', dialogue: { speakerA: "I'm going on holiday! I have my ticket and passport.", speakerB: "Great! Are you going to the beach by plane?" }, words: [ { word: 'airport', def: '机场', ex: 'What time do we need to be at the airport?<br>The airport is very busy.' }, { word: 'holiday', def: '假期', ex: 'Where did you go for your last holiday?<br>I’m going on holiday next week.' }, { word: 'ticket', def: '票', ex: 'Have you bought your train ticket?<br>A ticket to London, please.' }, { word: 'beach', def: '海滩', ex: 'I love spending the day on the beach.<br>Let’s go to the beach.' }, { word: 'bus', def: '公交车', ex: 'The bus to the city centre is every 15 minutes.<br>I missed the bus.' }, { word: 'car', def: '汽车', ex: 'It’s quicker to go by car.<br>Where did you park the car?' }, { word: 'passport', def: '护照', ex: 'Don’t forget your passport!<br>I need to renew my passport.' }, { word: 'plane', def: '飞机', ex: 'The plane was delayed by an hour.<br>I’ve never been on a plane.' }, { word: 'train', def: '火车', ex: 'We took the train from London to Paris.<br>The train is late.' }, { word: 'visit', def: '参观/拜访', ex: 'We are going to visit our cousins in Australia.<br>I’m visiting a friend this weekend.' }, { word: 'map', def: '地图', ex: 'I need a map of the city.<br>Can you show me on the map?' }, { word: 'suitcase', def: '手提箱', ex: 'My suitcase is very heavy.<br>I need to pack my suitcase.' }, { word: 'travel', def: '旅行', ex: 'I love to travel to different countries.<br>I travel to work by train.' }, { word: 'journey', def: '旅程', ex: 'How long is the journey?<br>Have a safe journey!' }, { word: 'tourist', def: '游客', ex: 'There are a lot of tourists in the summer.<br>This is a popular tourist destination.' } ] },
+                    { theme: '健康与身体', dialogue: { speakerA: "I don't feel well. My head hurts.", speakerB: "You should see a doctor. You look tired." }, words: [ { word: 'doctor', def: '医生', ex: 'You should make an appointment with the doctor.<br>I need to see a doctor.' }, { word: 'head', def: '头', ex: 'I’ve got a bad head today.<br>I hit my head on the door.' }, { word: 'tired', def: '疲劳的', ex: 'I was too tired to go out.<br>I feel very tired.' }, { word: 'arm', def: '手臂', ex: 'My arm hurts.<br>He has a broken arm.' }, { word: 'ear', def: '耳朵', ex: 'I have a pain in my ear.<br>I can’t hear out of my left ear.' }, { word: 'eye', def: '眼睛', ex: 'My eyes are tired from using the computer.<br>She has blue eyes.' }, { word: 'foot / feet', def: '脚', ex: 'I’ve been on my feet all day.<br>My feet are wet.' }, { word: 'ill', def: '生病的', ex: 'I was ill last week.<br>She is very ill.' }, { word: 'leg', def: '腿', ex: 'He broke his leg skiing.<br>My legs are tired.' }, { word: 'well', def: '健康的', ex: 'I don’t feel very well today.<br>I hope you get well soon.' }, { word: 'toothache', def: '牙痛', ex: 'I have a terrible toothache.<br>I need to go to the dentist.' }, { word: 'stomach-ache', def: '胃痛', ex: 'I ate too much and now I have a stomach-ache.<br>I have a bad stomach-ache.' }, { word: 'feel', def: '感觉', ex: 'How are you feeling?<br>I feel sick.' }, { word: 'hurt', def: '疼痛', ex: 'Tell me where it hurts.<br>My back hurts.' }, { word: 'nose', def: '鼻子', ex: 'My nose is cold.<br>I have a runny nose.' }, { word: 'mouth', def: '嘴', ex: 'Don’t talk with your mouth full.<br>Open your mouth.' }, { word: 'hand', def: '手', ex: 'Wash your hands before you eat.<br>Can you give me a hand?' }, { word: 'hair', def: '头发', ex: 'She has long brown hair.<br>I need to get my hair cut.' }, { word: 'cold', def: '感冒', ex: 'I think I have a cold.<br>She caught a cold.' } ] },
+                    { theme: '天气', dialogue: { speakerA: "What's the weather like? Is it cold?", speakerB: "No, it's a warm and sunny day!" }, words: [ { word: 'sunny', def: '晴朗的', ex: 'I hope it’s sunny tomorrow.<br>It was a sunny day.' }, { word: 'rainy', def: '下雨的', ex: 'It was a rainy day so we stayed inside.<br>I don’t like rainy weather.' }, { word: 'cold', def: '寒冷的', ex: 'It gets very cold here in winter.<br>I’m cold, can you close the window?' }, { word: 'cloudy', def: '多云的', ex: 'The sky is very cloudy.<br>It will be cloudy tomorrow.' }, { word: 'hot', def: '炎热的', ex: 'It was too hot to work.<br>I’m hot, can I open the window?' }, { word: 'snow', def: '雪', ex: 'It started to snow heavily.<br>I love the snow.' }, { word: 'windy', def: '有风的', ex: 'It was a cold and windy day.<br>It’s too windy to go out.' }, { word: 'weather forecast', def: '天气预报', ex: 'What is the weather forecast for tomorrow?<br>The weather forecast is for rain.' }, { word: 'warm', def: '温暖的', ex: 'I like warm weather.<br>It’s warm today.' }, { word: 'degree', def: '度', ex: 'It was 30 degrees yesterday.<br>The temperature is 25 degrees.' }, { word: 'fog', def: '雾', ex: 'The airport was closed because of fog.<br>It’s a foggy day.' }, { word: 'ice', def: '冰', ex: 'The roads are covered in ice.<br>I’d like some ice in my drink.' }, { word: 'storm', def: '暴风雨', ex: 'There was a big storm last night.<br>The storm caused a lot of damage.' }, { word: 'umbrella', def: '雨伞', ex: 'You should take an umbrella.<br>I’ve lost my umbrella.' }, { word: 'temperature', def: '温度', ex: 'What’s the temperature today?<br>The temperature has dropped.' }, { word: 'sky', def: '天空', ex: 'The sky is blue.<br>There are no clouds in the sky.' } ] },
+                    { theme: '通讯与科技', dialogue: { speakerA: "Can I send you an email with the photo?", speakerB: "Sure, or just send me a text message on my phone." }, words: [ { word: 'phone', def: '电话', ex: 'I’ll call you on your mobile phone.<br>Can I use your phone?' }, { word: 'email', def: '电子邮件', ex: 'Please send me the information by email.<br>I’ll send you an email.' }, { word: 'computer', def: '电脑', ex: 'I spend too much time on my computer.<br>My computer is broken.' }, { word: 'internet', def: '互联网', ex: 'I found the hotel on the internet.<br>I use the internet for my homework.' }, { word: 'message', def: '信息', ex: 'Did you get my message?<br>I’ll send you a message.' }, { word: 'photo', def: '照片', ex: 'I’d like to see your holiday photos.<br>This is a photo of my family.' }, { word: 'website', def: '网站', ex: 'The company has a new website.<br>I found a useful website.' }, { word: 'video', def: '视频', ex: 'I’ll send you the video.<br>We watched a funny video.' }, { word: 'text', def: '短信', ex: 'I’ll text you the address.<br>I got a text from my friend.' }, { word: 'laptop', def: '笔记本电脑', ex: 'I always take my laptop when I travel.<br>My laptop is very slow.' }, { word: 'password', def: '密码', ex: 'I’ve forgotten my password.<br>You need a password to log in.' }, { word: 'call', def: '打电话', ex: 'I need to make a phone call.<br>I’ll call you later.' }, { word: 'keyboard', def: '键盘', ex: 'My keyboard is broken.<br>I need a new keyboard.' }, { word: 'mouse', def: '鼠标', ex: 'I need a new mouse for my computer.<br>The mouse is not working.' }, { word: 'screen', def: '屏幕', ex: 'The screen is too small.<br>I have a big screen.' }, { word: 'app', def: '应用程序', ex: 'There’s an app for that.<br>I downloaded a new app.' } ] },
+                    { theme: '教育与学校', dialogue: { speakerA: "What is your favourite subject?", speakerB: "I like my English lesson. The teacher is great." }, words: [ { word: 'teacher', def: '老师', ex: 'Who is your favourite teacher?<br>My teacher is very nice.' }, { word: 'student', def: '学生', ex: 'She is a very good student.<br>There are 20 students in my class.' }, { word: 'classroom', def: '教室', ex: 'The students are in the classroom.<br>The classroom is on the second floor.' }, { word: 'book', def: '书', ex: 'This is a book about animals.<br>Please open your book to page 10.' }, { word: 'exam', def: '考试', ex: 'I have to study for my exam.<br>The exam was very difficult.' }, { word: 'subject', def: '科目', ex: 'What is your best subject at school?<br>My favourite subject is history.' }, { word: 'learn', def: '学习', ex: 'I’m learning to drive.<br>I want to learn how to play the piano.' }, { word: 'desk', def: '课桌', ex: 'The teacher’s desk is at the front of the room.<br>My books are on my desk.' }, { word: 'pen', def: '钢笔', ex: 'Do you have a pen I can borrow?<br>I can’t find my pen.' }, { word: 'lesson', def: '课', ex: 'My piano lesson is on Wednesday.<br>The lesson starts at 9 am.' }, { word: 'pencil', def: '铅笔', ex: 'This pencil needs sharpening.<br>Can I borrow a pencil?' }, { word: 'question', def: '问题', ex: 'Can I ask a question?<br>I don’t understand the question.' }, { word: 'answer', def: '回答', ex: 'I don’t know the answer.<br>What is the answer to question 2?' }, { word: 'board', def: '写字板', ex: 'The teacher is writing on the board.<br>Look at the board.' }, { word: 'uniform', def: '校服', ex: 'We have to wear a school uniform.<br>I don’t like my school uniform.' } ] },
+                    { theme: '购物与金钱', dialogue: { speakerA: "How much does this cost?", speakerB: "It's five pounds. It's cheap! Do you want to buy it?" }, words: [ { word: 'buy', def: '买', ex: 'Where did you buy that dress?<br>I need to buy some milk.' }, { word: 'shop', def: '商店', ex: 'I’m going to the shops.<br>This shop is very expensive.' }, { word: 'money', def: '钱', ex: 'I don’t have enough money to buy it.<br>How much money do you have?' }, { word: 'price', def: '价格', ex: 'The price of petrol has gone up.<br>What is the price of this T-shirt?' }, { word: 'cost', def: '花费', ex: 'How much does it cost?<br>It costs ten pounds.' }, { word: 'cheap', def: '便宜的', ex: 'The tickets are very cheap.<br>This is a cheap restaurant.' }, { word: 'expensive', def: '昂贵的', ex: 'That’s a very expensive car.<br>This shop is too expensive.' }, { word: 'pay', def: '支付', ex: 'Can I pay by credit card?<br>I have to pay for the tickets.' }, { word: 'sell', def: '卖', ex: 'Are you selling your car?<br>They sell fruit and vegetables.' }, { word: 'cash', def: '现金', ex: 'I need to get some cash from the bank.<br>Do you have any cash?' }, { word: 'credit card', def: '信用卡', ex: 'I paid with my credit card.<br>Do you take credit cards?' }, { word: 'pound', def: '英镑', ex: 'It costs five pounds.<br>I have 20 pounds.' }, { word: 'dollar', def: '美元', ex: 'The ticket is ten dollars.<br>I need to change some dollars.' }, { word: 'euro', def: '欧元', ex: 'How many euros is that?<br>The price is in euros.' }, { word: 'receipt', def: '收据', ex: 'Do you need a receipt?<br>I’ve lost the receipt.' }, { word: 'change', def: '零钱', ex: 'Here is your change.<br>I don’t have any change.' } ] },
+                    { theme: '动物与自然', dialogue: { speakerA: "Look at that beautiful bird in the tree!", speakerB: "And there's a cat watching it from under the tree." }, words: [ { word: 'animal', def: '动物', ex: 'What’s your favourite animal?<br>The zoo has many different animals.' }, { word: 'cat', def: '猫', ex: 'We have two cats.<br>The cat is sleeping.' }, { word: 'dog', def: '狗', ex: 'I have a dog called Max.<br>I’m afraid of dogs.' }, { word: 'bird', def: '鸟', ex: 'I saw a beautiful bird in the garden.<br>I can hear the birds singing.' }, { word: 'fish', def: '鱼', ex: 'There are no fish in this river.<br>I like eating fish.' }, { word: 'tree', def: '树', ex: 'There is a big tree in front of our house.<br>The leaves on the trees are beautiful.' }, { word: 'flower', def: '花', ex: 'He gave me some flowers.<br>The garden is full of flowers.' }, { word: 'river', def: '河', ex: 'We walked along the river.<br>The river is very long.' }, { word: 'horse', def: '马', ex: 'I’m learning to ride a horse.<br>She has a beautiful horse.' }, { word: 'mountain', def: '山', ex: 'We are going to the mountains for our holiday.<br>The view from the mountain is amazing.' }, { word: 'sea', def: '海', ex: 'I love swimming in the sea.<br>The sea is very calm today.' }, { word: 'farm', def: '农场', ex: 'My grandparents live on a farm.<br>There are many animals on the farm.' }, { word: 'forest', def: '森林', ex: 'We went for a walk in the forest.<br>The forest is very dark.' }, { word: 'moon', def: '月亮', ex: 'The moon is very bright tonight.<br>I can see the moon.' }, { word: 'sun', def: '太阳', ex: 'The sun is shining.<br>The sun is very hot today.' }, { word: 'star', def: '星星', ex: 'You can see a lot of stars at night.<br>I saw a shooting star.' } ] },
+                    { theme: '外貌与性格', dialogue: { speakerA: "My new friend is very tall and kind.", speakerB: "He sounds nice! Is he funny too?" }, words: [ { word: 'tall', def: '高的', ex: 'My brother is taller than me.<br>He is a tall man.' }, { word: 'short', def: '矮的/短的', ex: 'She has short dark hair.<br>He is short and fat.' }, { word: 'long', def: '长的', ex: 'I have to wait for a long time.<br>She has long hair.' }, { word: 'beautiful', def: '漂亮的', ex: 'What a beautiful dress!<br>She is a beautiful woman.' }, { word: 'friendly', def: '友好的', ex: 'The people in this town are very friendly.<br>He is a very friendly person.' }, { word: 'kind', def: '和善的', ex: 'Your mother is very kind.<br>Thank you, that’s very kind of you.' }, { word: 'happy', def: '开心的', ex: 'I was very happy to see her.<br>You look happy.' }, { word: 'sad', def: '悲伤的', ex: 'Why do you look so sad?<br>It’s a sad story.' }, { word: 'old', def: '老的/旧的', ex: 'How old is your car?<br>My grandmother is very old.' }, { word: 'young', def: '年轻的', ex: 'She is a very young teacher.<br>He is too young to drive.' }, { word: 'funny', def: '有趣的', ex: 'He told us a funny story.<br>He is a very funny guy.' }, { word: 'clever', def: '聪明的', ex: 'She is a very clever student.<br>That’s a clever idea.' }, { word: 'nice', def: '好的', ex: 'Have a nice day!<br>He is a nice person.' }, { word: 'quiet', def: '安静的', ex: 'Please be quiet.<br>It’s very quiet here.' }, { word: 'noisy', def: '吵闹的', ex: 'The children are very noisy.<br>This is a noisy street.' }, { word: 'strong', def: '强壮的', ex: 'He is very strong.<br>You need to be strong.' } ] }
+                ],
+                grammar: [
+                    { title: '动词时态 (Verb Tenses)', content: `<ul>
+                        <li class="mt-2"><b>一般现在时:</b> 描述习惯和事实。 <i>He works in a bank. / The sun rises in the east. / Do you like coffee? / She doesn't play tennis.</i></li>
+                        <li class="mt-2"><b>现在进行时:</b> 描述当前动作或未来安排。 <i>I am reading a book now. / Look! It is raining. / What are you doing? / I'm meeting Sarah tomorrow.</i></li>
+                        <li class="mt-2"><b>一般过去时:</b> 描述过去完成的动作。 <i>We visited Paris last year. / I saw a great film yesterday. / Did you go to the party? / He didn't come to school.</i></li>
+                        <li class="mt-2"><b>现在完成时:</b> 描述过往经历或对现在有影响的过去动作。 <i>Have you ever been to London? / I've lost my keys. / She has just finished her homework.</i></li>
+                        <li class="mt-2"><b>将来时 (will & be going to):</b> 表达预测和计划。 <i>I think it will rain. / I'll help you with that bag. / We are going to watch a movie tonight. / Are you going to buy a new car?</i></li>
+                    </ul>` },
+                    { title: '情态动词 (Modals)', content: `用于表达能力、许可、建议、必须等。<ul>
+                        <li class="mt-2"><b>can/could:</b> <i>I can swim. / Can you open the window? / Could you help me, please?</i></li>
+                        <li class="mt-2"><b>should:</b> <i>You should see a doctor. / You shouldn't eat so much chocolate.</i></li>
+                        <li class="mt-2"><b>must/have to:</b> <i>You must finish your homework. / I have to get up early tomorrow. / Do you have to wear a uniform?</i></li>
+                        <li class="mt-2"><b>may/might:</b> <i>May I use your phone? / It might rain later.</i></li>
+                    </ul>` },
+                    { title: '名词与冠词 (Nouns & Articles)', content: `区分可数与不可数名词，并正确使用 a/an, the, some/any。<ul>
+                        <li class="mt-2"><b>可数:</b> <i>I have a brother and two sisters. / There are some books on the table.</i></li>
+                        <li class="mt-2"><b>不可数:</b> <i>I need some information. / There isn't any milk in the fridge. / Can I have some water?</i></li>
+                        <li class="mt-2"><b>冠词:</b> <i>She is a doctor. / I saw an interesting film. / The sun is very hot today.</i></li>
+                    </ul>` },
+                    { title: '形容词与副词 (Adjectives & Adverbs)', content: `掌握比较级和最高级形式，以及副词的用法。<ul>
+                        <li class="mt-2"><b>比较级:</b> <i>This car is bigger than my car. / She is more intelligent than her brother.</i></li>
+                        <li class="mt-2"><b>最高级:</b> <i>She is the tallest student in the class. / This is the most expensive hotel in town.</i></li>
+                        <li class="mt-2"><b>副词:</b> <i>He drives very carefully. / She speaks English fluently. / Please speak quietly.</i></li>
+                    </ul>` },
+                    { title: '介词 (Prepositions)', content: `掌握常用的时间和地点介词。<ul>
+                        <li class="mt-2"><b>时间:</b> <i>The meeting is at 5 o'clock. / My birthday is in May. / The party is on Monday.</i></li>
+                        <li class="mt-2"><b>地点:</b> <i>The bank is next to the supermarket. / The cat is under the table. / He lives in London. / I'll meet you at the cinema.</i></li>
+                        <li class="mt-2"><b>方向:</b> <i>We walked from the hotel to the station. / The book fell off the shelf.</i></li>
+                    </ul>` }
+                ],
+                strategies: {
+                    reading: {
+                        title: '阅读',
+                        content: `<h4>Part 1: 多项选择</h4><p>策略：先读懂短文的核心功能（警告、邀请还是说明？），再对比选项。</p>
+                                  <div class="mt-2 p-3 bg-black/20 border border-cyan-500/30 rounded-lg">
+                                    <h5 class="font-semibold text-cyan-400">真题示例 (Part 1)</h5>
+                                    <p class="mt-2 text-sm border-t border-cyan-500/20 pt-2">
+                                      <strong>[On a library notice board]</strong><br>
+                                      Please return all books to the desk before you leave. Do not put them back on the shelves yourself.
+                                    </p>
+                                    <p class="mt-2 text-sm"><strong>What should you do with your books?</strong><br>
+                                      A. Leave them on the table.<br>
+                                      B. Take them to the staff.<br>
+                                      C. Find the correct place for them.
+                                    </p>
+                                  </div>
+                                  <h4 class="mt-4">Part 2: 匹配题</h4><p>策略：先读问题，带着问题快速扫描三篇短文，定位答案。</p>
+                                  <h4 class="mt-4">Part 3: 多项选择</h4><p>策略：先读问题划出关键词，然后阅读文章，重点关注相关段落。</p>
+                                  <h4 class="mt-4">Part 4: 词汇选择填空</h4><p>策略：仔细阅读上下文，理解语境后，将选项代入判断。</p>
+                                  <div class="mt-2 p-3 bg-black/20 border border-cyan-500/30 rounded-lg">
+                                    <h5 class="font-semibold text-cyan-400">真题示例 (Part 4)</h5>
+                                    <p class="mt-2 text-sm">Most people know that exercise is good for them. It can help you to _______ stronger and healthier.</p>
+                                    <p class="mt-2 text-sm">
+                                      A. become<br>
+                                      B. turn<br>
+                                      C. go
+                                    </p>
+                                  </div>
+                                  <h4 class="mt-4">Part 5: 开放式填空</h4><p>策略：通读全文，空格处通常是介词、冠词、代词或助动词等语法词。</p>
+                                  <div class="mt-2 p-3 bg-black/20 border border-cyan-500/30 rounded-lg">
+                                    <h5 class="font-semibold text-cyan-400">真题示例 (Part 5)</h5>
+                                    <p class="mt-2 text-sm">Hi Sam,<br>Thanks for your email. I'm glad you can come to my party. It's _______ my house on Saturday at 7pm.</p>
+                                  </div>`
                     },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                let label = context.label || '';
-                                if (label) {
-                                    label += ': ';
+                    writing: {
+                        title: '写作',
+                        content: `<h4>Part 6: 指导性写作 (邮件/便条)</h4><p>策略：确保回应全部三个提示要点。使用简单的开头结尾，篇幅在30-40词为佳。</p>
+                                  <div class="mt-2 p-3 bg-black/20 border border-cyan-500/30 rounded-lg">
+                                    <h5 class="font-semibold text-cyan-400">真题示例 (Part 6)</h5>
+                                    <p class="mt-2 text-sm">
+                                      You are on holiday. Write an email to your English friend, Alex. In your email:<br>
+                                      - Say where you are.<br>
+                                      - Explain what you did yesterday.<br>
+                                      - Ask Alex about their holiday plans.
+                                    </p>
+                                  </div>
+                                  <h4 class="mt-4">Part 7: 看图故事</h4><p>策略：故事主体使用过去时态。按顺序描述图片，并使用 "First, Then, Finally" 等连接词。</p>
+                                  <div class="mt-2 p-3 bg-black/20 border border-cyan-500/30 rounded-lg">
+                                    <h5 class="font-semibold text-cyan-400">真题示例 (Part 7)</h5>
+                                    <p class="mt-2 text-sm">
+                                      Look at the three pictures. Write a story about what you see. (at least 35 words)<br>
+                                      <strong>Picture 1:</strong> A boy and a girl are in a park, flying a kite.<br>
+                                      <strong>Picture 2:</strong> The kite is stuck in a tall tree.<br>
+                                      <strong>Picture 3:</strong> A man helps them get the kite down. They are all happy.
+                                    </p>
+                                  </div>`
+                    },
+                    listening: {
+                        title: '听力',
+                        content: `<h4>通用策略</h4><p>利用播放前的间隙快速读题，预测对话主题。第一遍听大意，第二遍核对细节。</p>
+                                  <h4 class="mt-4">Part 1: 图片选择题</h4><p>策略：注意录音中通常会提及三张图片的元素作为干扰项，必须仔细辨别。</p>
+                                  <div class="mt-2 p-3 bg-black/20 border border-cyan-500/30 rounded-lg">
+                                    <h5 class="font-semibold text-cyan-400">真题示例 (Part 1)</h5>
+                                    <p class="mt-2 text-sm">
+                                      <strong>Question:</strong> Where did the boy leave his phone?<br>
+                                      <strong>[You hear a boy say: "I can't find my phone! I had it in the kitchen, but then I took it to the living room to watch TV. Oh wait, I remember, I put it on the table in the garden."]</strong><br>
+                                      <strong>[You see three pictures: A. A kitchen, B. A living room, C. A garden]</strong>
+                                    </p>
+                                  </div>
+                                  <h4 class="mt-4">Part 2: 填空题</h4><p>策略：录音信息与空格顺序一致，注意听关键词预判答案何时出现。</p>
+                                  <div class="mt-2 p-3 bg-black/20 border border-cyan-500/30 rounded-lg">
+                                    <h5 class="font-semibold text-cyan-400">真题示例 (Part 2)</h5>
+                                    <p class="mt-2 text-sm">
+                                      <strong>[You read on the paper: "School Trip Information. Date of trip: _______"]</strong><br>
+                                      <strong>[You hear a teacher say: "The trip will be on the tenth of May."]</strong><br>
+                                      <strong>Answer: 10th May / May 10th</strong>
+                                    </p>
+                                  </div>`
+                    },
+                    speaking: {
+                        title: '口语',
+                        content: `<h4>Part 1: 个人问答</h4><p>策略：切忌用单个词回答。应给出完整的句子，并尝试补充原因或例子。</p>
+                                  <div class="mt-2 p-3 bg-black/20 border border-cyan-500/30 rounded-lg">
+                                    <h5 class="font-semibold text-cyan-400">真题示例 (Part 1)</h5>
+                                    <p class="mt-2 text-sm">
+                                      - What's your name?<br>
+                                      - Where do you live?<br>
+                                      - What do you like doing at the weekend?<br>
+                                      - Tell me something about your family.
+                                    </p>
+                                  </div>
+                                  <h4 class="mt-4">Part 2: 合作任务</h4><p>策略：重在互动。主动向搭档提问 (What do you think?)，并回应对方的观点。</p>
+                                  <div class="mt-2 p-3 bg-black/20 border border-cyan-500/30 rounded-lg">
+                                    <h5 class="font-semibold text-cyan-400">真题示例 (Part 2)</h5>
+                                    <p class="mt-2 text-sm">
+                                      <strong>[Examiner gives you and your partner some pictures of different hobbies, e.g., playing football, reading, painting, playing computer games, listening to music.]</strong><br>
+                                      <strong>Examiner says:</strong> "Here are some pictures of different hobbies. Talk together about which hobbies you like and why."
+                                    </p>
+                                  </div>`
+                    }
+                },
+                plan: [
+                    { day: 1, task: '入门与自我介绍', vocab: '个人信息与家庭', grammar: "一般现在时 & 'be'", practice: '口语 Part 1: 回答关于你自己的问题 (name, country, job/student)', tip: '用完整的句子回答，例如 "My name is..." 而不是只说名字。', answer: 'Q: What’s your name? A: My name is Wang Ming.<br>Q: Where are you from? A: I am from China.<br>Q: Are you a student? A: Yes, I am. I study at No.1 Middle School.' },
+                    { day: 2, task: '日常生活', vocab: '日常生活与作息', grammar: '频度副词', practice: '阅读 Part 1: 阅读一则关于游泳池开放时间的通知', tip: '注意通知中的关键词，如 "closed", "open", "every day"。', answer: '示例问题: When is the pool closed? 答案可能在通知中写着 "Closed on Mondays".' },
+                    { day: 3, task: '兴趣爱好', vocab: '兴趣与休闲', grammar: 'like/love/hate + doing', practice: '口语 Part 1: 讨论你的爱好', tip: '使用 "I like/love..." 并加上原因，例如 "because it is fun"。', answer: 'Q: What do you like doing in your free time? A: I love playing computer games with my friends because it is very exciting.' },
+                    { day: 4, task: '校园生活', vocab: '教育与学校', grammar: '一般现在时提问与否定', practice: '听力 Part 2: 听一段关于学校俱乐部的介绍并填空', tip: '听前预测空格里可能是什么类型的信息，如地点、时间或活动名称。', answer: '示例: Club name: Art Club. Meets in: Room _____. Time: 4 pm. 听力中会直接给出房间号，如 "Room 201".' },
+                    { day: 5, task: '周末计划', vocab: '衣物与配饰', grammar: '现在进行时表将来', practice: '写作 Part 6: 写邮件给朋友，邀请他参加派对', tip: '邮件需包含三个要点：1. 邀请参加派对 2.告知时间地点 3.询问他能否到来。', answer: 'Hi Tom, I am having a party on Saturday at my house. It starts at 7 pm. Can you come? Hope to see you! Best, [Your Name]' },
+                    { day: 6, task: '描述地点', vocab: '地点与建筑', grammar: 'there is/are & 地点介词', practice: '阅读 Part 2: 阅读三段关于不同公园的描述，匹配信息', tip: '先读问题，例如 "Which park has a lake?"，然后快速在三段描述中寻找 "lake" 这个词。', answer: '匹配题答案取决于具体文章，练习的重点是快速定位信息的技巧。' },
+                    { day: 7, task: '第一周复习', vocab: '复习本周所有词汇', grammar: '复习本周所有语法', practice: '完成一套阅读1-3部分练习', tip: '严格计时，检查错误，找出是词汇问题还是理解问题。', answer: '请参考标准答案批改，并重点分析错题原因。' },
+                    { day: 8, task: '讲述过去的故事', vocab: '旅行与假期', grammar: '一般过去时 (规则动词)', practice: '写作 Part 7: 看图写一个关于昨天去公园的故事', tip: '三张图：1. 到达公园 2. 开始野餐 3. 开始下雨。用 "First, then, suddenly" 连接。', answer: 'Yesterday, my family and I went to the park. First, we found a nice place and put our blanket on the grass. Then, we started to eat our sandwiches. Suddenly, it started to rain, so we quickly packed everything and went home.' },
+                    { day: 9, task: '难忘的旅行', vocab: '旅行与假期', grammar: '一般过去时 (不规则动词)', practice: '听力 Part 3: 听一段关于假期旅行的对话', tip: '听前阅读问题，例如 "Where did Sarah go?"，然后带着问题去听。', answer: '听力练习需要对照具体题目和录音，关键是根据问题关键词定位并理解对话中的关键信息。' },
+                    { day: 10, task: '购物体验', vocab: '购物与金钱', grammar: 'some/any & 可数/不可数', practice: '阅读 Part 5: 填空完成一封关于购物的邮件', tip: '空格处很可能是冠词(a/an/the)或代词(it/them)。', answer: 'I went to the new shop yesterday. It was great! I bought ___ new T-shirt. (答案: a)' },
+                    { day: 11, task: '谈论健康', vocab: '健康与身体', grammar: '情态动词 (should, must)', practice: '口语 Part 2: 和同伴讨论保持健康的方法', tip: '使用 "I think we should..." 来提建议，并用 "What do you think?" 询问同伴。', answer: 'A: I think we should eat more fruit to be healthy. What do you think? B: I agree. And we should do sports every day.' },
+                    { day: 12, task: '科技与生活', vocab: '通讯与科技', grammar: '一般过去时疑问句', practice: '听力 Part 4: 听五段关于使用手机的独白', tip: '每段录音前快速阅读问题，抓住核心意思。', answer: '听力练习需要对照具体题目和录音，关键是抓住每段录音的核心大意。' },
+                    { day: 13, task: '描述人物', vocab: '外貌与性格', grammar: '形容词与副词', practice: '阅读 Part 3: 阅读一篇关于一位著名演员的文章', tip: '问题可能会问关于他的外貌或他为什么出名，回原文定位答案。', answer: '阅读 Part 3 练习需要对照具体文章，关键是理解问题并回到文章中找到支持答案的句子。' },
+                    { day: 14, task: '第二周复习', vocab: '复习本周所有词汇', grammar: '复习本周所有语法', practice: '听力1-5部分练习', tip: '注意辨别听力中的干扰信息，例如题目问现在，但录音提到了过去。', answer: '请参考标准答案批改，并重点分析错题原因。' },
+                    { day: 15, task: '比较事物', vocab: '食物与饮料', grammar: '形容词比较级', practice: '口语 Part 2: 讨论你更喜欢城市还是乡村', tip: '使用 "I think... is more... than..." 句型。', answer: 'A: I prefer the city because it is more exciting than the countryside. B: Really? I think the countryside is more beautiful.' },
+                    { day: 16, task: '最高级的表达', vocab: '动物与自然', grammar: '形容词最高级', practice: '阅读 Part 4: 词汇填空', tip: '注意固定搭配，如 "become famous"。', answer: '阅读 Part 4 示例答案: A. become' },
+                    { day: 17, task: '谈论经历', vocab: '复习动词不规则形式', grammar: '现在完成时', practice: '口语 Part 1: 回答关于个人经历的问题', tip: '考官可能会问 "Have you ever been to...?"', answer: 'Q: "Have you ever been to another country?" A: "Yes, I have. I went to Japan last year. It was very interesting."' },
+                    { day: 18, task: '预测未来', vocab: '天气', grammar: '将来时 (will & be going to)', practice: '听力 Part 5: 听五个人谈论他们的周末计划', tip: '在听之前，快速阅读左边的名字和右边的活动选项，尝试预测。', answer: '听力练习需要对照具体题目和录音，关键是听清每个人物和他们所做事情的对应关系。' },
+                    { day: 19, task: '综合写作练习', vocab: '复习写作词汇', grammar: '复习时态', practice: '写作 Part 6 & 7', tip: '严格按照字数要求，Part 6 至少25词，Part 7 至少35词。', answer: '请参考写作部分的范例，并尝试写出自己的版本，确保包含所有要点。' },
+                    { day: 20, task: '综合口语练习', vocab: '复习口语词汇', grammar: '复习疑问句', practice: '口语 Part 1 & 2', tip: '找一个朋友一起练习，模拟真实的考试场景。', answer: '请与同伴练习，互相提问并回答，重点练习互动和表达流利度。' },
+                    { day: 21, task: '第三周复习', vocab: '复习所有高频词汇', grammar: '复习所有核心语法', practice: '阅读4-7部分练习', tip: '重点检查语法填空(Part 5)和写作任务(Part 6&7)。', answer: '请参考标准答案批改，并重点分析错题原因。' },
+                    { day: 22, task: '模拟测试一', vocab: '-', grammar: '-', practice: '完成一套完整的阅读与写作模拟题', tip: '严格计时60分钟，感受考试节奏。', answer: '请使用剑桥官方模拟题进行测试，并对照答案进行批改。' },
+                    { day: 23, task: '模拟测试分析', vocab: '整理错题词汇', grammar: '整理错题语法点', practice: '分析阅读写作试卷', tip: '找出失分原因，是词汇、语法还是策略问题？', answer: '建立错题本，记录错误并写下正确答案和原因。' },
+                    { day: 24, task: '模拟测试二', vocab: '-', grammar: '-', practice: '完成一套完整的听力与口语模拟', tip: '听力严格计时，口语与同伴练习。', answer: '请使用剑桥官方模拟题进行测试，并对照答案进行批改。' },
+                    { day: 25, task: '模拟测试分析', vocab: '查漏补缺', grammar: '巩固薄弱语法', practice: '分析听力口语表现', tip: '听力是否漏听关键信息？口语互动是否流畅？', answer: '重听错误的听力部分，分析口语录音，找出可以改进的地方。' },
+                    { day: 26, task: '全面复习', vocab: '复习词汇主题清单', grammar: '复习语法笔记', practice: '复习各题型策略', tip: '回顾所有笔记和错题。', answer: '这是巩固记忆的关键一天，确保覆盖所有知识点。' },
+                    { day: 27, task: '模拟测试三', vocab: '-', grammar: '-', practice: '完成第二套完整的模拟试卷', tip: '重点应用前几天总结的策略。', answer: '请使用剑桥官方模拟题进行测试，并对照答案进行批改。' },
+                    { day: 28, task: '考前强化', vocab: '背诵写作/口语常用句型', grammar: '-', practice: '-', tip: '如 "I think...", "Let\'s meet at...", "It was a sunny day."', answer: '将常用句型写下来并大声朗读，形成肌肉记忆。' },
+                    { day: 29, task: '最后检查', vocab: '复习错题本', grammar: '-', practice: '-', tip: '浏览一遍所有记录的错误，加深印象。', answer: '重点看那些你反复犯错的地方。' },
+                    { day: 30, task: '调整状态', vocab: '放松心态', grammar: '-', practice: '熟悉考试流程', tip: '准备好考试所需物品，保证充足睡眠。', answer: '祝你考试顺利！Good luck!' }
+                ]
+            };
+
+            let playerData = {
+                '米乐': { progress: new Set() },
+                '点点': { progress: new Set() }
+            };
+            let currentUser = '米乐';
+
+            const totalMissions = 30;
+            const ranks = ["见习学员", "初级飞行员", "高级领航员", "星际舰长", "宇宙探险家"];
+
+            const navLinks = document.querySelectorAll('.nav-link');
+            const contentSections = document.querySelectorAll('.content-section');
+            const rankDisplay = document.getElementById('rank-display');
+            const currentUserName = document.getElementById('current-user-name');
+            
+            const userBtnMilo = document.getElementById('user-btn-milo');
+            const userBtnDiandian = document.getElementById('user-btn-diandian');
+
+            function updateUIForCurrentUser() {
+                // Update user buttons
+                userBtnMilo.classList.toggle('active-milo', currentUser === '米乐');
+                userBtnDiandian.classList.toggle('active-diandian', currentUser === '点点');
+
+                // Update progress for both players
+                ['米乐', '点点'].forEach(player => {
+                    const completedCount = playerData[player].progress.size;
+                    const progressPercentage = (completedCount / totalMissions) * 100;
+                    const playerLoweCase = player === '米乐' ? 'milo' : 'diandian';
+                    document.getElementById(`progress-text-${playerLoweCase}`).textContent = `${completedCount}/${totalMissions}`;
+                    document.getElementById(`progress-bar-inner-${playerLoweCase}`).style.width = `${progressPercentage}%`;
+                });
+
+                // Update rank display for current user
+                const currentProgress = playerData[currentUser].progress.size;
+                const currentPercentage = (currentProgress / totalMissions) * 100;
+                let rankIndex = Math.floor(currentPercentage / 25);
+                if (currentProgress === totalMissions) rankIndex = ranks.length - 1;
+                
+                currentUserName.textContent = currentUser;
+                rankDisplay.textContent = ranks[rankIndex];
+                rankDisplay.style.color = currentUser === '米乐' ? 'var(--glow-color-milo)' : 'var(--glow-color-diandian)';
+
+                // Update plan grid visuals
+                document.querySelectorAll('.day-block').forEach(block => {
+                    const day = parseInt(block.dataset.day);
+                    const miloCompleted = playerData['米乐'].progress.has(day);
+                    const diandianCompleted = playerData['点点'].progress.has(day);
+
+                    block.classList.remove('completed-milo', 'completed-diandian', 'completed-both');
+
+                    if (miloCompleted && diandianCompleted) {
+                        block.classList.add('completed-both');
+                    } else if (miloCompleted) {
+                        block.classList.add('completed-milo');
+                    } else if (diandianCompleted) {
+                        block.classList.add('completed-diandian');
+                    }
+                });
+            }
+
+            function switchUser(newUser) {
+                currentUser = newUser;
+                updateUIForCurrentUser();
+            }
+            
+            userBtnMilo.addEventListener('click', () => switchUser('米乐'));
+            userBtnDiandian.addEventListener('click', () => switchUser('点点'));
+
+            function updateView(hash) {
+                const targetHash = hash || '#overview';
+                navLinks.forEach(link => {
+                    link.classList.toggle('active', link.getAttribute('href') === targetHash);
+                });
+                contentSections.forEach(section => {
+                    section.classList.toggle('active', `#${section.id}` === targetHash);
+                });
+            }
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetHash = e.currentTarget.getAttribute('href');
+                    history.pushState(null, null, targetHash);
+                    updateView(targetHash);
+                });
+            });
+
+            window.addEventListener('popstate', () => {
+                updateView(window.location.hash);
+            });
+            
+            function initOverview() {
+                Chart.defaults.font.family = "'Rajdhani', sans-serif";
+                Chart.defaults.color = '#e0e7ff';
+                const ctx = document.getElementById('examStructureChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['读写模块', '听力模块', '口语模块'],
+                        datasets: [{
+                            data: [50, 25, 25],
+                            backgroundColor: ['#f472b6', '#60a5fa', '#00ffff'],
+                            borderColor: ['#101830'],
+                            borderWidth: 5,
+                            hoverOffset: 10
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    padding: 20,
+                                    boxWidth: 15,
+                                    font: { size: 14 }
                                 }
-                                if (context.parsed !== null) {
-                                    label += context.parsed + '%';
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `${context.label}: ${context.raw}%`;
+                                    }
                                 }
-                                return label;
                             }
-                        }
-                    }
-                }
-            }
-        });
-
-        const vocabFiltersContainer = document.getElementById('vocab-filters');
-        const vocabListContainer = document.getElementById('vocab-list');
-        const vocabSearchInput = document.getElementById('vocab-search');
-        let activeFilter = Object.keys(vocabularyData)[0];
-
-        function renderVocab() {
-            const searchTerm = vocabSearchInput.value.toLowerCase();
-            vocabListContainer.innerHTML = '';
-            
-            let wordsToShow = [];
-            if (searchTerm) {
-                // Search across all categories
-                Object.values(vocabularyData).flat().forEach(wordObj => {
-                    if (wordObj.word.toLowerCase().includes(searchTerm)) {
-                        wordsToShow.push(wordObj);
+                        },
+                        cutout: '65%'
                     }
                 });
-            } else {
-                wordsToShow = vocabularyData[activeFilter];
             }
 
-            if (wordsToShow.length === 0) {
-                vocabListContainer.innerHTML = `<p class="text-slate-500 col-span-full text-center">未找到匹配的词汇。</p>`;
-                return;
-            }
-
-            wordsToShow.forEach(wordObj => {
-                const card = document.createElement('div');
-                card.className = 'card p-4 rounded-lg shadow-sm text-center flex flex-col items-center';
-                
-                const wordElement = document.createElement('div');
-                wordElement.className = 'font-bold text-lg text-teal-700 mb-2';
-                wordElement.textContent = wordObj.word;
-                card.appendChild(wordElement);
-
-                if (wordObj.examples && wordObj.examples.length > 0) {
-                    const examplesDiv = document.createElement('div');
-                    examplesDiv.className = 'vocab-example w-full';
-                    wordObj.examples.forEach(example => {
-                        const p = document.createElement('p');
-                        p.textContent = example;
-                        examplesDiv.appendChild(p);
+            function initVocabulary() {
+                const buttonsContainer = document.getElementById('vocab-theme-buttons');
+                const contentContainer = document.getElementById('vocab-content');
+                data.vocabulary.forEach((item) => {
+                    const button = document.createElement('button');
+                    button.className = 'p-3 bg-black/20 text-blue-300 rounded-lg border border-blue-500/50 hover:bg-blue-500/20 hover:text-cyan-300 hover:border-cyan-400 transition-all text-sm font-semibold';
+                    button.textContent = item.theme;
+                    button.addEventListener('click', () => {
+                        document.querySelectorAll('#vocab-theme-buttons button').forEach(btn => btn.classList.remove('bg-blue-500/20', 'text-cyan-300', 'border-cyan-400'));
+                        button.classList.add('bg-blue-500/20', 'text-cyan-300', 'border-cyan-400');
+                        contentContainer.innerHTML = `
+                            <div class="mb-6 p-4 border border-pink-500/50 rounded-lg bg-black/20">
+                                <p class="text-pink-300 font-semibold">A: <span class="text-blue-100 font-normal">${item.dialogue.speakerA}</span></p>
+                                <p class="text-cyan-300 font-semibold">B: <span class="text-blue-100 font-normal">${item.dialogue.speakerB}</span></p>
+                            </div>
+                            <h3 class="text-xl font-semibold text-cyan-300 mb-4">${item.theme} - 词汇列表</h3>
+                            <ul class="space-y-3 text-blue-100">
+                                ${item.words.map(w => `
+                                    <li>
+                                        <p class="font-semibold">${w.word} <span class="text-sm font-normal text-blue-300">- ${w.def}</span></p>
+                                        <p class="text-blue-200 italic pl-4">e.g. ${w.ex}</p>
+                                    </li>
+                                `).join('')}
+                            </ul>`;
                     });
-                    card.appendChild(examplesDiv);
-                }
-                vocabListContainer.appendChild(card);
-            });
-        }
-
-        Object.keys(vocabularyData).forEach(category => {
-            const button = document.createElement('button');
-            button.textContent = category;
-            button.className = 'btn-secondary px-4 py-2 rounded-full text-sm font-medium';
-            if (category === activeFilter) {
-                button.classList.add('active');
+                    buttonsContainer.appendChild(button);
+                });
             }
-            button.addEventListener('click', () => {
-                activeFilter = category;
-                vocabSearchInput.value = '';
-                document.querySelectorAll('#vocab-filters button').forEach(btn => btn.classList.remove('active'));
-                button.classList.add('active');
-                renderVocab();
-            });
-            vocabFiltersContainer.appendChild(button);
-        });
 
-        vocabSearchInput.addEventListener('input', () => {
-             if(vocabSearchInput.value) {
-                document.querySelectorAll('#vocab-filters button').forEach(btn => btn.classList.remove('active'));
-             } else if (!document.querySelector('#vocab-filters button.active') && Object.keys(vocabularyData).length > 0) {
-                document.querySelector('#vocab-filters button:first-child').classList.add('active'); // Activate first button if search cleared
-                activeFilter = Object.keys(vocabularyData)[0];
-             }
-             renderVocab();
-        });
-
-        renderVocab();
-
-        const studyPlanContainer = document.getElementById('study-plan-accordion');
-        studyPlanData.forEach(weekData => {
-            const weekDiv = document.createElement('div');
-            weekDiv.className = 'card rounded-xl overflow-hidden shadow-md';
-            
-            const header = document.createElement('div');
-            header.className = 'accordion-header flex justify-between items-center p-5 cursor-pointer bg-teal-50 hover:bg-teal-100 transition';
-            header.innerHTML = `
-                <h3 class="text-lg font-bold text-teal-800">${weekData.title}</h3>
-                <svg class="w-6 h-6 text-teal-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-            `;
-
-            const content = document.createElement('div');
-            content.className = 'accordion-content hidden p-5 border-t border-teal-200';
-            
-            const daysGrid = document.createElement('div');
-            daysGrid.className = 'grid md:grid-cols-2 lg:grid-cols-3 gap-4';
-            
-            weekData.days.forEach(dayData => {
-                const dayCard = document.createElement('div');
-                dayCard.className = 'bg-slate-50 p-4 rounded-lg border border-slate-200';
-                dayCard.innerHTML = `
-                    <p class="font-bold text-slate-700">Day ${dayData.day}: ${dayData.focus}</p>
-                    <p class="text-sm text-slate-500 mt-2">${dayData.tasks}</p>
-                `;
-                if (dayData.examples && dayData.examples.length > 0) {
-                    const examplesDiv = document.createElement('div');
-                    examplesDiv.className = 'day-example';
-                    dayData.examples.forEach(example => {
-                        const p = document.createElement('p');
-                        p.textContent = example;
-                        examplesDiv.appendChild(p);
-                    });
-                    dayCard.appendChild(examplesDiv);
-                }
-                
-                // Add game activity section
-                if (dayData.gameActivity) {
-                    const gameActivityDiv = document.createElement('div');
-                    gameActivityDiv.className = 'mt-4 pt-4 border-t border-slate-200';
-                    gameActivityDiv.innerHTML = `
-                        <button class="btn-primary px-4 py-2 rounded-lg text-sm" data-game-day="${dayData.day}">开始每日挑战！</button>
-                        <div id="game-challenge-${dayData.day}" class="hidden mt-3 p-3 bg-teal-50 rounded-lg text-teal-800 text-sm">
-                            <!-- Game description will be inserted here -->
+            function initGrammar() {
+                const container = document.getElementById('grammar-content');
+                container.innerHTML = data.grammar.map(item => `
+                    <details class="glass-panel rounded-lg overflow-hidden">
+                        <summary class="p-4 font-semibold text-cyan-300 cursor-pointer hover:bg-black/20">${item.title}</summary>
+                        <div class="p-4 border-t border-cyan-400/30 bg-black/20 text-blue-200">
+                            ${item.content}
                         </div>
-                    `;
-                    dayCard.appendChild(gameActivityDiv);
-                }
-
-                daysGrid.appendChild(dayCard);
-            });
-
-            content.appendChild(daysGrid);
-            weekDiv.appendChild(header);
-            weekDiv.appendChild(content);
-            studyPlanContainer.appendChild(weekDiv);
-
-            header.addEventListener('click', () => {
-                header.classList.toggle('open');
-                content.classList.toggle('hidden');
-            });
-        });
-
-        // Add event listeners for game activities after all elements are rendered
-        studyPlanData.forEach(weekData => {
-            weekData.days.forEach(dayData => {
-                if (dayData.gameActivity) {
-                    const gameButton = document.querySelector(`[data-game-day="${dayData.day}"]`);
-                    const gameContentDiv = document.getElementById(`game-challenge-${dayData.day}`);
-
-                    if (gameButton && gameContentDiv) {
-                        gameButton.addEventListener('click', () => {
-                            gameContentDiv.innerHTML = `<p class="font-semibold">${dayData.gameActivity.title}</p><p>${dayData.gameActivity.description}</p>`;
-                            gameContentDiv.classList.remove('hidden');
-                            gameButton.textContent = "挑战已开始！"; // Change button text
-                            gameButton.disabled = true; // Disable button after starting
-                            gameButton.classList.remove('btn-primary');
-                            gameButton.classList.add('bg-gray-300', 'text-gray-600', 'cursor-not-allowed');
-                        });
-                    }
-                }
-            });
-        });
-
-
-        const grammarContainer = document.getElementById('grammar-points');
-        grammarData.forEach(point => {
-            const card = document.createElement('div');
-            card.className = 'card p-6 rounded-xl shadow-md';
-            card.innerHTML = `
-                <h4 class="font-bold text-lg text-slate-800 mb-2">${point.title}</h4>
-                <p class="text-slate-600">${point.content}</p>
-            `;
-            if (point.examples && point.examples.length > 0) {
-                const examplesDiv = document.createElement('div');
-                examplesDiv.className = 'grammar-example w-full';
-                point.examples.forEach(example => {
-                    const p = document.createElement('p');
-                    p.innerHTML = example; /* Use innerHTML to render HTML tags */
-                    examplesDiv.appendChild(p);
-                });
-                card.appendChild(examplesDiv);
+                    </details>
+                `).join('');
             }
-            grammarContainer.appendChild(card);
-        });
 
-        const skillsContainer = document.getElementById('skills-tips');
-        skillsData.forEach(skill => {
-            const card = document.createElement('div');
-            card.className = 'card p-6 rounded-xl shadow-md flex items-start gap-4';
-            card.innerHTML = `
-                <div class="text-3xl">${skill.icon}</div>
-                <div>
-                    <h4 class="font-bold text-xl text-slate-800 mb-2">${skill.title}</h4>
-                    <p class="text-slate-600">${skill.content}</p>
-                </div>
-            `;
-            skillsContainer.appendChild(card);
-        });
-        
-        const navLinks = document.querySelectorAll('.nav-link');
-        const sections = document.querySelectorAll('main section');
+            function initStrategies() {
+                const tabsContainer = document.getElementById('strategy-tabs');
+                const contentContainer = document.getElementById('strategy-content');
+                const strategies = Object.keys(data.strategies);
 
-        const observerOptions = {
-            root: null,
-            rootMargin: '0px',
-            threshold: 0.4
-        };
+                tabsContainer.innerHTML = strategies.map((key, index) => `
+                    <button data-target="${key}" class="strategy-tab whitespace-nowrap py-3 px-2 border-b-2 font-semibold text-sm ${index === 0 ? 'active' : 'border-transparent text-pink-300 hover:text-pink-200 hover:border-pink-400/50'}">
+                        ${data.strategies[key].title}模块
+                    </button>
+                `).join('');
 
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    navLinks.forEach(link => {
-                        link.classList.remove('active');
-                        if (link.getAttribute('href').substring(1) === entry.target.id) {
-                            link.classList.add('active');
-                        }
-                    });
+                function updateStrategyContent(key) {
+                    contentContainer.innerHTML = `<div class="glass-panel p-6 rounded-xl text-blue-200">${data.strategies[key].content.replace(/<h4>/g, '<h4 class="mt-4 text-lg font-semibold text-pink-300">')}</div>`;
                 }
-            });
-        }, observerOptions);
 
-        sections.forEach(section => {
-            observer.observe(section);
-        });
-
-        navLinks.forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
+                tabsContainer.addEventListener('click', e => {
+                    if (e.target.matches('.strategy-tab')) {
+                        const targetKey = e.target.dataset.target;
+                        tabsContainer.querySelectorAll('.strategy-tab').forEach(tab => tab.classList.remove('active'));
+                        e.target.classList.add('active');
+                        updateStrategyContent(targetKey);
+                    }
                 });
-            });
-        });
 
-    });
+                updateStrategyContent(strategies[0]);
+            }
+
+            function initPlan() {
+                const grid = document.getElementById('plan-grid');
+                const modal = document.getElementById('plan-modal');
+                const modalTitle = document.getElementById('modal-title');
+                const modalBody = document.getElementById('modal-body');
+                const modalClose = document.getElementById('modal-close');
+
+                data.plan.forEach(day => {
+                    const block = document.createElement('div');
+                    block.className = 'day-block flex flex-col items-center justify-center p-4 rounded-full aspect-square';
+                    block.dataset.day = day.day;
+                    block.innerHTML = `
+                        <div class="font-bold text-xl font-title text-cyan-300">Day ${day.day}</div>
+                        <p class="text-xs text-blue-200 mt-1 text-center">${day.task}</p>
+                        <div class="day-status text-green-400 text-xs mt-1 hidden">已完成</div>
+                    `;
+                    block.addEventListener('click', () => {
+                        modalTitle.textContent = `任务 ${day.day}: ${day.task}`;
+                        modalBody.innerHTML = `
+                            <div class="space-y-4 text-blue-100">
+                                <p><strong>🪐 词汇星球:</strong> ${day.vocab}</p>
+                                <p><strong>⚙️ 引擎校准:</strong> ${day.grammar}</p>
+                                <p><strong>🎯 实战模拟:</strong> ${day.practice}</p>
+                                <div class="mt-4 p-4 bg-cyan-900/50 border-l-4 border-cyan-400 text-cyan-200 rounded-r-lg">
+                                    <p><strong>💡 战术提示:</strong> ${day.tip}</p>
+                                </div>
+                                <div class="mt-4 p-4 bg-black/20 border border-green-500/50 rounded-lg">
+                                    <h4 class="font-semibold text-green-400">解密答案</h4>
+                                    <p class="mt-2 pt-2 border-t border-green-500/20 text-green-200">${day.answer}</p>
+                                </div>
+                            </div>
+                        `;
+                        modal.classList.remove('opacity-0', 'pointer-events-none');
+                        
+                        playerData[currentUser].progress.add(day.day);
+                        updateUIForCurrentUser();
+                    });
+                    grid.appendChild(block);
+                });
+
+                function closeModal() {
+                    modal.classList.add('opacity-0', 'pointer-events-none');
+                }
+                modalClose.addEventListener('click', closeModal);
+                modal.addEventListener('click', e => {
+                    if (e.target === modal) {
+                        closeModal();
+                    }
+                });
+            }
+
+            initOverview();
+            initVocabulary();
+            initGrammar();
+            initStrategies();
+            initPlan();
+            updateView(window.location.hash);
+            updateUIForCurrentUser();
+        });
     </script>
 </body>
 </html>
