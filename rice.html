@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>交互式胫腓骨骨折术后康复指南</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Harmony Neutrals -->
+    <!-- Application Structure Plan: The application is designed as a timeline-centric SPA. A main horizontal timeline navigator allows users to select a recovery phase (1-4). Clicking a phase dynamically updates the main content area below. This content is organized into user-friendly tabs: "Goals", "Exercises", "Precautions", and "The Why". This structure transforms the dense report into a guided, step-by-step journey, preventing information overload and enhancing user engagement by allowing them to focus on their current stage. A donut chart provides visual feedback on overall progress. This task-oriented, non-linear exploration path is superior to a simple text document for a patient's needs. -->
+    <!-- Visualization & Content Choices: Report Info: Four-stage recovery plan -> Goal: Organize, Inform, Change -> Viz/Presentation: Interactive timeline (HTML/CSS/JS), tabbed content sections (HTML/CSS/JS), exercise cards (HTML/Tailwind), and a progress donut chart (Chart.js/Canvas). -> Interaction: Clicking timeline updates all content and the chart; clicking tabs switches content view within a phase. -> Justification: This multi-layered interactive approach breaks down complex information, improves navigation, and provides motivational feedback, making the recovery process feel more manageable and clear. -> Library/Method: Chart.js for the canvas-based chart. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #FDFBF8;
+            color: #4A4A4A;
+        }
+        .timeline-item, .sub-phase-item {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .timeline-item.active {
+            background-color: #4A90E2;
+            color: white;
+            transform: translateY(-4px);
+            box-shadow: 0 4px 15px rgba(74, 144, 226, 0.3);
+        }
+        .timeline-item.active .timeline-phase, .timeline-item.active .text-gray-500 {
+            color: white;
+        }
+        .timeline-item:not(.active):hover {
+            background-color: #E9F2FC;
+            transform: translateY(-2px);
+        }
+        .tab-item.active {
+            border-color: #4A90E2;
+            color: #4A90E2;
+            font-weight: 500;
+        }
+        .sub-phase-item.active {
+            background-color: #e0eaf6;
+            color: #3b82f6;
+            font-weight: 500;
+        }
+        .content-card {
+            background-color: #FFFFFF;
+            border: 1px solid #EAEAEA;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 300px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 300px;
+        }
+        .diagram-container {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 12px;
+            background-color: #f9fafb;
+        }
+        .diagram-container svg {
+            width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-5xl">
+
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2">胫腓骨下端骨折术后康复指南-Alice</h1>
+            <p class="text-md text-gray-500">一个交互式的分阶段康复伙伴</p>
+        </header>
+
+        <main>
+            <section id="timeline-nav" class="mb-8">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div id="phase-1-nav" class="timeline-item active flex flex-col items-center justify-center p-4 rounded-lg border border-gray-200 bg-white shadow-sm">
+                        <span class="timeline-phase text-sm font-semibold text-gray-400">第一阶段</span>
+                        <span class="font-bold text-lg">保护愈合</span>
+                        <span class="text-xs text-gray-500">0-6 周</span>
+                    </div>
+                    <div id="phase-2-nav" class="timeline-item flex flex-col items-center justify-center p-4 rounded-lg border border-gray-200 bg-white shadow-sm">
+                        <span class="timeline-phase text-sm font-semibold text-gray-400">第二阶段</span>
+                        <span class="font-bold text-lg">启动负重</span>
+                        <span class="text-xs text-gray-500">6-12 周</span>
+                    </div>
+                    <div id="phase-3-nav" class="timeline-item flex flex-col items-center justify-center p-4 rounded-lg border border-gray-200 bg-white shadow-sm">
+                        <span class="timeline-phase text-sm font-semibold text-gray-400">第三阶段</span>
+                        <span class="font-bold text-lg">功能强化</span>
+                        <span class="text-xs text-gray-500">12-20 周</span>
+                    </div>
+                    <div id="phase-4-nav" class="timeline-item flex flex-col items-center justify-center p-4 rounded-lg border border-gray-200 bg-white shadow-sm">
+                        <span class="timeline-phase text-sm font-semibold text-gray-400">第四阶段</span>
+                        <span class="font-bold text-lg">回归运动</span>
+                        <span class="text-xs text-gray-500">20+ 周</span>
+                    </div>
+                </div>
+            </section>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-2">
+                    <section id="content-display">
+                        <div id="sub-phase-nav-container" class="mb-4"></div>
+                        <div id="tabs-container" class="flex border-b border-gray-200 mb-6">
+                            <div id="tab-goals" class="tab-item active py-2 px-4 border-b-2">🎯 主要目标</div>
+                            <div id="tab-exercises" class="tab-item py-2 px-4 border-b-2 border-transparent">🏋️ 康复训练</div>
+                            <div id="tab-precautions" class="tab-item py-2 px-4 border-b-2 border-transparent">⚠️ 注意事项</div>
+                            <div id="tab-rationale" class="tab-item py-2 px-4 border-b-2 border-transparent">🧠 科学原理</div>
+                        </div>
+                        <div id="tab-content" class="space-y-4">
+                        </div>
+                    </section>
+                </div>
+                <div class="lg:col-span-1">
+                    <div class="content-card text-center">
+                        <h3 class="text-lg font-semibold mb-4 text-gray-700">康复总览</h3>
+                        <div class="chart-container">
+                            <canvas id="progressChart"></canvas>
+                        </div>
+                        <p id="chart-text" class="mt-4 text-sm text-gray-600"></p>
+                    </div>
+                     <div class="content-card bg-yellow-50 border-yellow-200">
+                        <h3 class="text-lg font-semibold text-yellow-800 mb-2">重要声明</h3>
+                        <p class="text-sm text-yellow-700">本指南仅为教育资源，不能替代您的医生或物理治疗师的专业意见。所有康复活动都必须在获得医疗团队批准后进行。</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const rehabData = {
+            phase1: {
+                title: "第一阶段：保护性愈合期",
+                subPhases: {
+                    'days1_3': {
+                        duration: "第1-3天",
+                        title: "急性炎症控制期",
+                        goals: ["最大化控制术后疼痛与肿胀", "严防深静脉血栓（DVT）和感染", "保护手术切口，确保其清洁干燥"],
+                        exercises: [
+                            { name: "踝泵练习", desc: "清醒时每小时进行20-30次。这是此阶段最重要的练习，能有效预防血栓。", icon: "🔄", diagram: "anklePump" },
+                            { name: "足趾活动", desc: "主动屈伸和分开所有脚趾，维持足部小关节灵活，促进末梢循环。", icon: "꼼" },
+                            { name: "冰敷与抬高 (R.I.C.E.)", desc: "全天候抬高患肢，确保脚踝高于心脏。每2-3小时冰敷15-20分钟。", icon: "🧊", diagram: "rice" }
+                        ],
+                        precautions: ["**绝对免负重**：患脚严禁接触地面或承受任何重量。", "**伤口护理**：保持敷料绝对清洁干燥，严禁浸水。", "**警惕并发症**：密切观察感染、DVT的迹象，如异常红肿、剧痛、发热等。"],
+                        rationale: "这是术后的“黄金72小时”。身体正经历剧烈炎症反应，所有措施都围绕着“控制”和“预防”展开。通过极致的抬高和冰敷来创造最佳愈合环境，通过高频次的踝泵练习主动对抗血栓风险。"
+                    },
+                    'days4_7': {
+                        duration: "第4-7天",
+                        title: "早期激活与伤口观察期",
+                        goals: ["维持肿胀控制", "引入大腿肌肉的早期激活", "密切观察伤口愈合情况"],
+                        exercises: [
+                            { name: "股四头肌等长收缩", desc: "平躺时绷紧大腿前侧肌肉，感觉膝盖后方压向床面，保持5-10秒。每日多组。", icon: "🦵", diagram: "quadSet" },
+                            { name: "持续基础练习", desc: "继续坚持每小时的踝泵和足趾活动，这是整个第一阶段的基础。", icon: "🔄" },
+                            { name: "健侧肢体训练", desc: "在不影响患肢的情况下，进行健侧腿的抬高和上肢力量训练，为使用拐杖提供支持。", icon: "🏋️‍♀️" }
+                        ],
+                        precautions: ["**仍然绝对免负重**：骨骼愈合尚未开始，任何负重都极其危险。", "**伤口观察**：观察敷料是否有异常渗液。通常在术后3-7天首次更换敷料，请遵医嘱。", "**正确使用双拐**：所有移动都必须使用双拐，确保患脚悬空。"],
+                        rationale: "炎症高峰期已过，重点转向对抗因制动导致的肌肉萎缩。股四头肌等长收缩可以在不移动关节的情况下，重新建立大脑与肌肉的神经连接，为后续的站立和行走进行最基础的神经系统准备。"
+                    },
+                    'days8_14': {
+                        duration: "第8-14天 (第2周)",
+                        title: "拆线期与肌肉维持",
+                        goals: ["顺利完成拆线，促进切口愈合", "加强大腿及臀部肌肉的等长收缩", "维持全身其他部位的肌肉力量"],
+                        exercises: [
+                            { name: "臀肌等长收缩", desc: "用力夹紧臀部肌肉，保持5-10秒后放松。每日多组。这对于使用拐杖时的骨盆稳定至关重要。", icon: "💪" },
+                            { name: "强化股四头肌收缩", desc: "增加股四头肌收缩的强度和频率，确保每次收缩都清晰有力。", icon: "⚡️" },
+                            { name: "上肢力量强化", desc: "使用弹力带或小哑铃进行坐姿划船、弯举等，增强上肢力量，让使用双拐更轻松。", icon: "🔥" }
+                        ],
+                        precautions: ["**拆线后护理**：拆线后，遵医嘱保持切口清洁干燥。在伤口完全愈合前，仍严禁将患肢浸泡在水中。", "**营养支持**：确保摄入富含蛋白质、钙和维生素D的饮食，为骨骼修复提供原料。", "**戒烟**：吸烟会严重阻碍骨骼愈合，是导致不愈合和感染的主要风险因素之一。"],
+                        rationale: "拆线是此阶段的里程碑事件。此时，身体开始在骨折处形成非常脆弱的软骨痂。康复的重点是在持续保护的基础上，更积极地对抗全身性的功能衰退，为未来数周的制动期储备体能。"
+                    },
+                    'weeks3_4': {
+                        duration: "第3-4周",
+                        title: "软骨痂形成期",
+                        goals: ["在绝对保护下，为软骨痂的形成创造稳定环境", "最大化全身非负重训练", "学习和理解下一阶段的康复计划"],
+                        exercises: [
+                            { name: "核心训练", desc: "在床上进行腹部卷腹、仰卧抬腿（健侧）等练习，加强核心肌群。", icon: "🧘" },
+                            { name: "坐姿膝伸展", desc: "坐在床边，在不负重的前提下，主动伸直和弯曲膝关节，维持膝关节活动度。", icon: "🦵" },
+                            { name: "心理准备", desc: "仔细阅读第二阶段方案，理解“体重秤法”如何操作，与医生沟通，减少对负重的恐惧。", icon: "📚" }
+                        ],
+                        precautions: ["**免负重是铁律**：软骨痂非常脆弱，无法承受任何剪切力或压力。任何尝试性的触地都可能导致灾难性后果。", "**避免长时间下垂**：限制患肢下垂时间，以防水肿加剧。", "**坚持基础练习**：不要因为感觉良好而忽视了踝泵等基础但至关重要的练习。"],
+                        rationale: "骨折端正在形成软骨痂，它像胶水一样连接了骨折两端，但极易受损。此阶段的目标是“在绝对保护下，维持全身功能”。通过强化全身其他部位，避免因长期制动导致整体健康水平下降。"
+                    },
+                    'weeks5_6': {
+                        duration: "第5-6周",
+                        title: "硬骨痂巩固与准备期",
+                        goals: ["为即将到来的负重阶段做好万全准备", "确保上肢力量足以应对部分负重行走", "在医生指导下，为过渡到下一阶段做准备"],
+                        exercises: [
+                            { name: "模拟负重", desc: "在严格免负重的前提下，可以穿上保护靴，感受其重量和包裹感，为之后的使用做适应。", icon: "👢" },
+                            { name: "双拐行走练习", desc: "在安全的环境下，练习使用双拐进行短距离移动，熟练掌握技巧，确保平稳和安全。", icon: "🚶‍♂️", diagram: "crutches" },
+                            { name: "复查与评估", desc: "通常在第6周左右会进行X光复查，医生将根据骨痂生长情况决定何时可以开始负重。", icon: "엑" }
+                        ],
+                        precautions: ["**等待医生指令**：在得到医生的明确许可和X光片确认前，绝对不能自行开始负重。", "**注意保护靴穿戴**：如果开始使用保护靴，确保其松紧适宜，没有压迫点。", "**保持耐心**：这是黎明前的黑暗，是整个康复过程中最考验耐心的阶段之一。"],
+                        rationale: "软骨痂开始钙化，逐渐转变为更坚固的硬骨痂。虽然仍不能负重，但身体正在为这一重大转变做准备。此阶段的重点是确保患者在技能上（熟练使用双拐）和心理上都为进入第二阶段做好了准备。"
+                    }
+                }
+            },
+            phase2: { title: "第二阶段：恢复活动与启动负重", goals: ["在保护下逐步增加负重，刺激骨骼愈合", "恢复踝关节主动活动度", "激活并加强小腿和足部肌肉", "开始步态再教育"], exercises: [{ name: "渐进式负重", desc: "在医生指导和保护靴内，使用体重秤法从25%体重开始，逐步增加至完全负重。", icon: "⚖️" }, { name: "踝关节写字母", desc: "脱掉保护靴后，用大脚趾在空中写A-Z，恢复关节活动度。", icon: "✍️" }, { name: "毛巾拉伸", desc: "坐位用毛巾轻柔拉伸小腿后侧肌肉。", icon: "🧘" }, { name: "弹力带抗阻训练", desc: "当等长收缩无痛后，用弹力带进行踝关节四个方向的抗阻训练。", icon: "⚡️" }], precautions: ["**负重必须遵医嘱**：严格按照医生允许的负重比例进行。", "**穿戴保护靴行走**：站立和行走时必须穿戴保护靴。", "**避免高冲击和扭转**：禁止跑、跳或任何扭转动作。", "**以无痛为原则**：所有活动不应引起明显疼痛或肿胀加剧。"], rationale: "此阶段是应用“沃尔夫定律”，即可控的压力会刺激骨骼变得更强壮。渐进式负重是力学和神经系统的双重挑战，旨在安全地重建身体对患肢的信任。关节活动度练习则是一场对抗关节纤维化的赛跑。" },
+            phase3: { title: "第三阶段：建立功能性力量与稳定性", goals: ["实现正常、无痛的步态，消除跛行", "增强全身功能性力量（如下蹲、弓箭步）", "发展高级平衡和本体感觉", "提高肌肉耐力和心血管健康"], exercises: [{ name: "单腿提踵", desc: "从双腿提踵进阶到单腿，可在台阶边缘进行以增加活动范围。", icon: "📈" }, { name: "下蹲与弓箭步", desc: "进行标准下蹲和多方向的弓箭步，训练整个下肢动力链。", icon: "🏋️" }, { name: "单腿站立平衡", desc: "从平地睁眼开始，逐步进阶到在软垫上或闭眼进行。", icon: "🤸" }, { name: "跑步机行走/倒走", desc: "利用跑步机进行步态纠正，倒走有助于改善踝关节背屈。", icon: "🚶" }], precautions: ["**注重动作质量**：宁愿做得少而精，也不要草率完成。", "**循序渐进**：系统地增加难度，避免强度突增。", "**疼痛管理**：运动中或运动后的钝痛是可接受的，但尖锐疼痛是停止信号。"], rationale: "此阶段重点是纠正因长期保护而形成的跛行习惯，这是一个“大脑问题”而非“腿的问题”。通过有意识的训练重塑正确的运动模式。平衡训练则是为踝关节的操作系统进行“软件升级”，恢复其对意外情况的快速反应能力。" },
+            phase4: { title: "第四阶段：高级体能与回归运动", goals: ["发展爆发力与反应力量", "提高敏捷性与多向控制能力", "安全、渐进地回归跑步和跳跃", "达到客观的回归运动标准"], exercises: [{ name: "跳跃训练", desc: "从双脚原地跳开始，逐步进阶到跳箱和单脚跳，重点练习轻柔落地。", icon: "🚀" }, { name: "敏捷梯训练", desc: "提高脚步移动速度、协调性和多向移动能力。", icon: "梯" }, { name: "跑/走结合计划", desc: "从“慢跑1分钟，步行2分钟”开始，遵循10%原则，逐步增加跑量。", icon: "🏃" }, { name: "专项运动模拟", desc: "在受控环境下，练习特定运动的动作，如切入、转身等。", icon: "🏀" }], precautions: ["**严防“过急过量”**：此阶段的挫折多源于急于求成。", "**保证充分恢复**：高强度训练日之间必须安排休息。", "**做好热身与放松**：活动前后进行充分的热身和拉伸。"], rationale: "最后阶段的核心是重建运动员与自己身体之间的信任。结构化的增强式训练不仅锻炼生理机能，更在心理上为高强度活动“脱敏”。回归运动不是终点，而是终身伤害预防的起点，目标是打造一个比伤前更强壮、更高效的身体。" }
+        };
+
+        let currentPhase = 'phase1';
+        let currentSubPhase = 'days1_3';
+        let currentTab = 'goals';
+        let progressChart;
+
+        const navItems = document.querySelectorAll('.timeline-item');
+        const tabItems = document.querySelectorAll('.tab-item');
+        const tabContentEl = document.getElementById('tab-content');
+        const chartTextEl = document.getElementById('chart-text');
+        const subPhaseNavContainer = document.getElementById('sub-phase-nav-container');
+        const tabsContainer = document.getElementById('tabs-container');
+
+        function generateDiagram(type) {
+            let svgHtml = '';
+            switch (type) {
+                case 'rice':
+                    svgHtml = `
+                        <svg viewBox="0 0 200 100" class="diagram-container">
+                            <title>示意图：正确的患肢抬高 (R.I.C.E.)</title>
+                            <text x="100" y="12" font-size="8" text-anchor="middle" fill="#4A4A4A">正确的患肢抬高 (R.I.C.E.)</text>
+                            <line x1="60" y1="30" x2="190" y2="30" stroke="#9ca3af" stroke-width="1" stroke-dasharray="2,2"/>
+                            <text x="55" y="32" font-size="6" text-anchor="end" fill="#6b7280">心脏水平</text>
+                            <path d="M 20 90 Q 40 70, 60 90 L 130 90 L 135 70 L 180 70 L 185 40 L 195 40" fill="none" stroke="#d1d5db" stroke-width="4" stroke-linecap="round"/>
+                            <text x="10" y="90" font-size="6" fill="#4A4A4A">身体</text>
+                            <rect x="140" y="50" width="30" height="10" rx="2" fill="#f3f4f6"/>
+                            <rect x="145" y="60" width="40" height="10" rx="2" fill="#e5e7eb"/>
+                            <rect x="150" y="70" width="45" height="10" rx="2" fill="#d1d5db"/>
+                            <text x="175" y="88" font-size="6" text-anchor="middle" fill="#4A4A4A">多个枕头支撑</text>
+                            <text x="190" y="35" font-size="10">🦶</text>
+                            <text x="170" y="45" font-size="10">🧊</text>
+                        </svg>`;
+                    break;
+                case 'anklePump':
+                    svgHtml = `
+                        <svg viewBox="0 0 200 60" class="diagram-container">
+                            <title>示意图：踝泵练习</title>
+                            <text x="100" y="12" font-size="8" text-anchor="middle" fill="#4A4A4A">踝泵练习</text>
+                            <path id="leg-path" d="M 20 35 H 150" stroke="#d1d5db" stroke-width="10" stroke-linecap="round"/>
+                            <path id="foot-path" d="M 150 35 L 170 25 L 170 45 Z" fill="#e5e7eb">
+                                <animateTransform attributeName="transform" type="rotate" values="15 150 35; -15 150 35; 15 150 35" dur="3s" repeatCount="indefinite"/>
+                            </path>
+                            <text x="100" y="55" font-size="6" text-anchor="middle" fill="#6b7280">缓慢、有控制地勾脚和绷脚</text>
+                        </svg>`;
+                    break;
+                case 'quadSet':
+                    svgHtml = `
+                        <svg viewBox="0 0 200 80" class="diagram-container">
+                            <title>示意图：股四头肌等长收缩</title>
+                            <text x="100" y="12" font-size="8" text-anchor="middle" fill="#4A4A4A">股四头肌等长收缩</text>
+                            <rect x="20" y="30" width="100" height="20" rx="5" fill="#e5e7eb"/>
+                            <text x="70" y="25" font-size="6" text-anchor="middle">大腿肌肉</text>
+                            <circle cx="120" cy="40" r="10" fill="#d1d5db"/>
+                            <text x="120" y="25" font-size="6" text-anchor="middle">膝盖</text>
+                            <rect x="130" y="32" width="50" height="16" rx="5" fill="#e5e7eb"/>
+                            <path d="M 70 55 V 65" stroke="#3b82f6" stroke-width="2" marker-end="url(#arrowhead)">
+                                <animate attributeName="opacity" values="0;1;0" dur="2s" repeatCount="indefinite"/>
+                            </path>
+                            <text x="70" y="75" font-size="7" text-anchor="middle" fill="#3b82f6">
+                                <tspan>向下用力</tspan>
+                                <animate attributeName="opacity" values="0;1;0" dur="2s" repeatCount="indefinite"/>
+                            </text>
+                            <defs><marker id="arrowhead" markerWidth="5" markerHeight="3.5" refX="0" refY="1.75" orient="auto"><polygon points="0 0, 5 1.75, 0 3.5" fill="#3b82f6"/></marker></defs>
+                        </svg>`;
+                    break;
+                case 'crutches':
+                    svgHtml = `
+                        <svg viewBox="0 0 200 100" class="diagram-container">
+                            <title>示意图：正确使用双拐 (免负重)</title>
+                            <text x="100" y="12" font-size="8" text-anchor="middle" fill="#4A4A4A">正确使用双拐 (免负重)</text>
+                            <circle cx="100" cy="30" r="8" fill="#d1d5db"/>
+                            <rect x="98" y="38" width="4" height="30" fill="#d1d5db"/>
+                            <rect id="crutch1" x="70" y="40" width="4" height="50" fill="#9ca3af"/>
+                            <rect id="crutch2" x="126" y="40" width="4" height="50" fill="#9ca3af"/>
+                            <rect id="good-leg" x="105" y="68" width="4" height="22" fill="#d1d5db"/>
+                            <path id="bad-leg" d="M 91 68 L 88 80 L 92 80" fill="none" stroke="#d1d5db" stroke-width="4" stroke-linecap="round"/>
+                            <text x="100" y="98" font-size="6" text-anchor="middle" fill="#6b7280">1.双拐先向前 -> 2.患腿跟上(不触地) -> 3.健侧腿迈过</text>
+                             <style>
+                                @keyframes walk-cycle {
+                                    0% { transform: translate(0, 0); }
+                                    25% { transform: translate(20px, 0); }
+                                    50% { transform: translate(20px, 0); }
+                                    75% { transform: translate(0, 0); }
+                                    100% { transform: translate(0, 0); }
+                                }
+                                #crutch1, #crutch2, #bad-leg { animation: walk-cycle 4s infinite; }
+                                #good-leg { animation: walk-cycle 4s infinite; animation-delay: 1s; }
+                            </style>
+                        </svg>`;
+                    break;
+                default:
+                    return '';
+            }
+            return `<div class="bg-white p-2 rounded">${svgHtml}</div>`;
+        }
+
+        function updateContent() {
+            const phaseData = rehabData[currentPhase];
+            let dataToShow = phaseData;
+
+            if (phaseData && phaseData.subPhases && currentPhase === 'phase1') {
+                dataToShow = phaseData.subPhases[currentSubPhase];
+            }
+
+            if (!dataToShow) {
+                console.error("Could not find data for phase:", currentPhase, "subphase:", currentSubPhase);
+                tabContentEl.innerHTML = `<div class="content-card"><p class="text-red-500">无法加载康复数据，请刷新页面或联系技术支持。</p></div>`;
+                return;
+            }
+
+            let html = '';
+
+            switch (currentTab) {
+                case 'goals':
+                    html = `<div class="content-card">
+                                <h3 class="text-xl font-semibold mb-3 text-gray-800">${dataToShow.title}：主要目标</h3>
+                                <ul class="list-disc list-inside space-y-2 text-gray-600">
+                                    ${dataToShow.goals.map(goal => `<li>${goal}</li>`).join('')}
+                                </ul>
+                            </div>`;
+                    break;
+                case 'exercises':
+                    html = dataToShow.exercises.map(ex => `
+                        <div class="content-card">
+                            <div class="flex items-start">
+                                <div class="text-3xl mr-4">${ex.icon}</div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-800">${ex.name}</h4>
+                                    <p class="text-sm text-gray-600">${ex.desc}</p>
+                                </div>
+                            </div>
+                            ${ex.diagram ? generateDiagram(ex.diagram) : ''}
+                        </div>
+                    `).join('');
+                    break;
+                case 'precautions':
+                     html = `<div class="content-card bg-red-50 border-red-200">
+                                <h3 class="text-xl font-semibold mb-3 text-red-800">关键注意事项</h3>
+                                <ul class="list-disc list-inside space-y-2 text-red-700">
+                                    ${dataToShow.precautions.map(p => `<li>${p}</li>`).join('')}
+                                </ul>
+                            </div>`;
+                    break;
+                case 'rationale':
+                    html = `<div class="content-card">
+                                <h3 class="text-xl font-semibold mb-3 text-gray-800">背后的科学原理</h3>
+                                <p class="text-gray-600 leading-relaxed">${dataToShow.rationale}</p>
+                            </div>`;
+                    break;
+            }
+            tabContentEl.innerHTML = html;
+        }
+        
+        function updateSubNav() {
+            if (currentPhase === 'phase1') {
+                const subPhases = rehabData.phase1.subPhases;
+                subPhaseNavContainer.innerHTML = `
+                    <div class="flex justify-center bg-gray-100 rounded-lg p-1 space-x-1 flex-wrap">
+                        ${Object.keys(subPhases).map(key => `
+                            <button data-subphase="${key}" class="sub-phase-item flex-grow text-center py-2 px-3 rounded-md text-sm ${currentSubPhase === key ? 'active' : ''}">
+                                ${subPhases[key].duration}
+                            </button>
+                        `).join('')}
+                    </div>`;
+                subPhaseNavContainer.style.display = 'block';
+            } else {
+                subPhaseNavContainer.style.display = 'none';
+            }
+        }
+
+        function updateActiveStates() {
+            navItems.forEach(item => {
+                item.classList.toggle('active', item.id.startsWith(currentPhase));
+            });
+            tabItems.forEach(item => {
+                item.classList.toggle('active', item.id.endsWith(currentTab));
+            });
+        }
+        
+        function updateChart() {
+            const phaseNumber = parseInt(currentPhase.replace('phase', ''));
+            let progress = (phaseNumber - 1) * 25;
+            const mainPhaseData = rehabData[currentPhase];
+
+            if (!mainPhaseData) return;
+
+            if (currentPhase === 'phase1') {
+                const subPhaseKeys = Object.keys(rehabData.phase1.subPhases);
+                const subPhaseIndex = subPhaseKeys.indexOf(currentSubPhase);
+                if (subPhaseIndex !== -1) {
+                    progress += ((subPhaseIndex + 1) / subPhaseKeys.length) * 25;
+                }
+            } else if (phaseNumber > 1) {
+                progress = (phaseNumber - 1) * 25 + 25;
+            }
+            
+            const remaining = 100 - progress;
+
+            if(progressChart) {
+                progressChart.data.datasets[0].data = [progress, remaining];
+                progressChart.update();
+            }
+
+            let titleText = mainPhaseData.title;
+            if (mainPhaseData.subPhases && mainPhaseData.subPhases[currentSubPhase]) {
+                titleText += ` - ${mainPhaseData.subPhases[currentSubPhase].title}`;
+            }
+            
+            chartTextEl.textContent = `当前阶段: ${titleText}。康复旅程已完成约 ${Math.round(progress)}%。`;
+        }
+
+        function handleNavClick(e) {
+            const target = e.target.closest('.timeline-item');
+            if (target) {
+                const parts = target.id.split('-');
+                currentPhase = parts[0] + parts[1];
+                if (currentPhase === 'phase1') {
+                    currentSubPhase = 'days1_3';
+                }
+                updateAll();
+            }
+        }
+
+        function handleTabClick(e) {
+            const target = e.target.closest('.tab-item');
+            if (target) {
+                currentTab = target.id.split('-')[1];
+                updateActiveStates();
+                updateContent();
+            }
+        }
+        
+        function handleSubPhaseClick(e) {
+            const target = e.target.closest('.sub-phase-item');
+            if (target && target.dataset.subphase) {
+                currentSubPhase = target.dataset.subphase;
+                updateAll();
+            }
+        }
+
+        function updateAll() {
+            updateActiveStates();
+            updateSubNav();
+            updateContent();
+            updateChart();
+        }
+
+        function initChart() {
+            const ctx = document.getElementById('progressChart').getContext('2d');
+            progressChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['已完成', '未完成'],
+                    datasets: [{
+                        data: [0, 100],
+                        backgroundColor: ['#4A90E2', '#EAEAEA'],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: { legend: { display: false }, tooltip: { enabled: false }, title: { display: false } }
+                }
+            });
+        }
+
+        document.getElementById('timeline-nav').addEventListener('click', handleNavClick);
+        tabsContainer.addEventListener('click', handleTabClick);
+        subPhaseNavContainer.addEventListener('click', handleSubPhaseClick);
+
+        window.onload = () => {
+            initChart();
+            updateAll();
+        };
+    </script>
+</body>
+</html>
