@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0a0a1a">
+    <title>8BitsLife - 用比特规划你的人生</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/family.css">
+    <link rel="stylesheet" href="css/monthly.css">
+    <link rel="stylesheet" href="css/timeline.css">
+    <link rel="stylesheet" href="css/goals.css">
+    <link rel="stylesheet" href="css/checkin.css">
+    <link rel="stylesheet" href="css/game.css">
+    <link rel="stylesheet" href="css/achievements.css">
+    <link rel="stylesheet" href="css/analytics.css">
+    <link rel="stylesheet" href="css/cloud.css">
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <span class="logo">🎮</span>
+            <span class="brand-text">8BitsLife</span>
+        </div>
+        <div class="nav-links">
+            <a href="#checkin" class="nav-link active" data-section="checkin">打卡</a>
+            <a href="#monthly" class="nav-link" data-section="monthly">月度规划</a>
+            <a href="#goals" class="nav-link" data-section="goals">目标</a>
+            <a href="#achievements" class="nav-link" data-section="achievements">成就</a>
+            <a href="#settings" class="nav-link nav-link-icon" data-section="settings" title="设置">⚙️</a>
+        </div>
+        <div class="nav-user">
+            <div class="member-switcher" id="member-switcher"></div>
+            <span class="coins">🪙 <span id="coin-count">0</span></span>
+            <span class="level">Lv.<span id="user-level">1</span></span>
+        </div>
+    </nav>
+
+    <!-- 移动端底部导航 -->
+    <nav class="bottom-nav">
+        <a href="#checkin" class="bottom-nav-item active" data-section="checkin">
+            <span class="nav-icon">✅</span>
+            <span>打卡</span>
+        </a>
+        <a href="#monthly" class="bottom-nav-item" data-section="monthly">
+            <span class="nav-icon">�</span>
+            <span>月度</span>
+        </a>
+        <a href="#goals" class="bottom-nav-item" data-section="goals">
+            <span class="nav-icon">🎯</span>
+            <span>目标</span>
+        </a>
+        <a href="#game" class="bottom-nav-item" data-section="game" style="display:none;">
+            <span class="nav-icon">🎮</span>
+            <span>模拟</span>
+        </a>
+        <a href="#achievements" class="bottom-nav-item" data-section="achievements">
+            <span class="nav-icon">🏆</span>
+            <span>成就</span>
+        </a>
+        <a href="#settings" class="bottom-nav-item" data-section="settings">
+            <span class="nav-icon">⚙️</span>
+            <span>设置</span>
+        </a>
+    </nav>
+
+    <!-- 主内容区 -->
+    <main class="main-content">
+        <!-- 欢迎面板 -->
+        <section id="welcome" class="section welcome-section">
+            <div class="welcome-hero">
+                <h1>用 <span class="highlight">8个比特</span> 规划你的人生</h1>
+                <p class="subtitle">不需要宏大的人生规划，只要每月几件小事，日积月累</p>
+                <button class="btn-primary btn-start" id="btn-start">开始规划 →</button>
+            </div>
+            <div class="welcome-stats">
+                <div class="stat-card">
+                    <span class="stat-icon">🎯</span>
+                    <span class="stat-value" id="total-goals">0</span>
+                    <span class="stat-label">目标</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon">✅</span>
+                    <span class="stat-value" id="completed-goals">0</span>
+                    <span class="stat-label">已完成</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon">🏆</span>
+                    <span class="stat-value" id="total-achievements">0</span>
+                    <span class="stat-label">成就</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon">🔥</span>
+                    <span class="stat-value" id="streak-days">0</span>
+                    <span class="stat-label">连续天数</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 打卡模块 -->
+        <section id="checkin" class="section checkin-section hidden">
+            <div class="section-header">
+                <h2>✅ 每日打卡</h2>
+                <p>把大目标拆成小习惯，每天进步一点点</p>
+            </div>
+            <!-- 激励横幅 -->
+            <div id="motivation-banner-container"></div>
+            <!-- 家庭排行榜 -->
+            <div id="family-leaderboard-container"></div>
+            <div id="checkin-content"></div>
+        </section>
+
+        <!-- 月度规划模块 -->
+        <section id="monthly" class="section monthly-section hidden">
+            <div class="section-header">
+                <h2>📅 未来 12 个月</h2>
+                <p>每月只关注几件重要的事，日积月累成就改变</p>
+            </div>
+            <div id="monthly-plan-content"></div>
+        </section>
+
+        <!-- 时间线模块（人生设置） -->
+        <section id="timeline" class="section timeline-section hidden">
+            <div class="section-header">
+                <h2>⚙️ 人生设置</h2>
+                <p>规划人生大阶段的方向（可选）</p>
+            </div>
+            <div class="timeline-layout">
+                <div class="timeline-main">
+                    <div class="timeline-container">
+                        <div class="timeline-track" id="timeline-track"></div>
+                    </div>
+                </div>
+                <aside class="card-palette">
+                    <h3>📋 事件卡片库</h3>
+                    <div class="palette-categories">
+                        <button class="cat-btn active" data-category="all">全部</button>
+                        <button class="cat-btn" data-category="study">学习</button>
+                        <button class="cat-btn" data-category="work">工作</button>
+                        <button class="cat-btn" data-category="life">生活</button>
+                        <button class="cat-btn" data-category="entertainment">娱乐</button>
+                        <button class="cat-btn" data-category="health">健康</button>
+                    </div>
+                    <div class="palette-cards" id="palette-cards"></div>
+                    <button class="btn-secondary" id="btn-add-card">+ 自定义卡片</button>
+                </aside>
+            </div>
+        </section>
+
+        <!-- 设置页面（统一入口：模拟/数据/人生设置/家庭/管理） -->
+        <section id="settings" class="section more-section hidden">
+            <div class="section-header">
+                <h2>⚙️ 设置</h2>
+                <p>管理家庭、查看数据、调整规划</p>
+            </div>
+
+            <div class="settings-group-title">家庭</div>
+            <div class="more-list">
+                <a href="#" class="more-item" id="btn-settings-add-member">
+                    <span class="more-icon">👨‍👩‍👧‍👦</span>
+                    <div class="more-info">
+                        <div class="more-name">家庭成员</div>
+                        <div class="more-desc">添加和管理家庭成员</div>
+                    </div>
+                    <span class="more-arrow">›</span>
+                </a>
+                <a href="#" class="more-item" id="btn-settings-cloud-sync">
+                    <span class="more-icon">☁️</span>
+                    <div class="more-info">
+                        <div class="more-name">云同步</div>
+                        <div class="more-desc" id="cloud-sync-summary">未启用 · 启用后家庭成员可跨设备同步</div>
+                    </div>
+                    <span class="more-arrow">›</span>
+                </a>
+            </div>
+
+            <div class="settings-group-title">扩展功能</div>
+            <div class="more-list">
+                <a href="#analytics" class="more-item" data-section="analytics">
+                    <span class="more-icon">📊</span>
+                    <div class="more-info">
+                        <div class="more-name">数据分析</div>
+                        <div class="more-desc">查看打卡热力图、成长曲线、AI 建议</div>
+                    </div>
+                    <span class="more-arrow">›</span>
+                </a>
+                <a href="#game" class="more-item" data-section="game">
+                    <span class="more-icon">🎮</span>
+                    <div class="more-info">
+                        <div class="more-name">人生模拟</div>
+                        <div class="more-desc">虚拟角色和随机事件，体验人生</div>
+                    </div>
+                    <span class="more-arrow">›</span>
+                </a>
+                <a href="#timeline" class="more-item" data-section="timeline">
+                    <span class="more-icon">�</span>
+                    <div class="more-info">
+                        <div class="more-name">人生设置</div>
+                        <div class="more-desc">规划人生大阶段的方向（可选）</div>
+                    </div>
+                    <span class="more-arrow">›</span>
+                </a>
+            </div>
+
+            <div class="settings-group-title">关于</div>
+            <div class="more-list">
+                <div class="more-item" style="cursor:default;">
+                    <span class="more-icon">💡</span>
+                    <div class="more-info">
+                        <div class="more-name">8BitsLife</div>
+                        <div class="more-desc">把大目标拆成每月几件小事，日积月累成就改变</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 云同步设置页面 -->
+        <section id="cloud-sync" class="section more-section hidden">
+            <div class="section-header">
+                <h2>☁️ 云同步</h2>
+                <p>使用 Firebase 同步家庭数据到多个设备</p>
+            </div>
+            <button class="detail-back-btn" id="btn-back-from-cloud">← 返回设置</button>
+            <div id="cloud-sync-settings"></div>
+        </section>
+
+        <!-- 目标管理模块 -->
+        <section id="goals" class="section goals-section hidden">
+            <div class="section-header">
+                <h2>🎯 目标管理</h2>
+                <p>跟踪和管理你的人生目标</p>
+            </div>
+            <div id="goals-list-panel">
+                <div class="goals-toolbar">
+                    <div class="goals-filters">
+                        <button class="goals-filter-btn active" data-filter="all">全部</button>
+                        <button class="goals-filter-btn" data-filter="active">进行中</button>
+                        <button class="goals-filter-btn" data-filter="completed">已完成</button>
+                        <button class="goals-filter-btn" data-filter="paused">暂停</button>
+                    </div>
+                    <div class="goals-sort-group">
+                        <select id="goals-sort">
+                            <option value="newest">最新</option>
+                            <option value="progress">进度</option>
+                            <option value="priority">优先级</option>
+                        </select>
+                        <button class="btn-primary" id="btn-add-goal-page" style="padding:0.4rem 0.8rem;font-size:0.8rem;">+ 新目标</button>
+                    </div>
+                </div>
+                <div class="goals-list" id="goals-list"></div>
+            </div>
+            <div id="goal-detail-panel" class="goal-detail-panel hidden">
+                <button class="detail-back-btn" id="btn-back-to-goals">← 返回列表</button>
+                <div id="goal-detail-content"></div>
+            </div>
+        </section>
+
+        <!-- 人生模拟游戏模块 -->
+        <section id="game" class="section game-section hidden">
+            <div class="section-header">
+                <h2>🎮 人生模拟</h2>
+                <p>创建虚拟角色，体验人生随机事件</p>
+            </div>
+            <div class="game-container">
+                <div class="character-panel">
+                    <div class="character-avatar" id="character-avatar">
+                        <div class="avatar-placeholder">👤</div>
+                    </div>
+                    <div class="character-name" id="character-name">未命名角色</div>
+                    <div class="character-age">年龄: <span id="character-age">0</span>岁</div>
+                    <button class="btn-secondary" id="btn-create-character">创建角色</button>
+                </div>
+                <div class="attributes-panel">
+                    <h3>属性值</h3>
+                    <div class="attribute">
+                        <span class="attr-label">❤️ 健康</span>
+                        <div class="attr-bar"><div class="attr-fill health" id="attr-health" style="width:50%"></div></div>
+                        <span class="attr-value" id="val-health">50</span>
+                    </div>
+                    <div class="attribute">
+                        <span class="attr-label">💰 财富</span>
+                        <div class="attr-bar"><div class="attr-fill wealth" id="attr-wealth" style="width:30%"></div></div>
+                        <span class="attr-value" id="val-wealth">30</span>
+                    </div>
+                    <div class="attribute">
+                        <span class="attr-label">😊 幸福</span>
+                        <div class="attr-bar"><div class="attr-fill happiness" id="attr-happiness" style="width:60%"></div></div>
+                        <span class="attr-value" id="val-happiness">60</span>
+                    </div>
+                    <div class="attribute">
+                        <span class="attr-label">🧠 智慧</span>
+                        <div class="attr-bar"><div class="attr-fill wisdom" id="attr-wisdom" style="width:40%"></div></div>
+                        <span class="attr-value" id="val-wisdom">40</span>
+                    </div>
+                    <div class="attribute">
+                        <span class="attr-label">👥 社交</span>
+                        <div class="attr-bar"><div class="attr-fill social" id="attr-social" style="width:45%"></div></div>
+                        <span class="attr-value" id="val-social">45</span>
+                    </div>
+                </div>
+                <div class="event-panel">
+                    <h3>📢 事件日志</h3>
+                    <div class="event-log" id="event-log">
+                        <div class="event-item">欢迎来到人生模拟！</div>
+                    </div>
+                    <button class="btn-primary" id="btn-advance-time">⏩ 推进时间</button>
+                    <button class="btn-secondary" id="btn-random-event">🎲 随机事件</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 成就系统模块 -->
+        <section id="achievements" class="section achievements-section hidden">
+            <div class="section-header">
+                <h2>🏆 成就系统</h2>
+                <p>完成目标，解锁徽章</p>
+            </div>
+            <div class="achievements-container">
+                <div class="achievements-grid" id="achievements-grid"></div>
+            </div>
+        </section>
+
+        <!-- 数据分析模块 -->
+        <section id="analytics" class="section analytics-section hidden">
+            <div class="section-header">
+                <h2>📊 数据分析</h2>
+                <p>可视化你的人生规划数据</p>
+            </div>
+            <div class="analytics-container">
+                <div class="chart-card">
+                    <h3>🔥 时间分配热力图</h3>
+                    <div class="heatmap" id="heatmap"></div>
+                </div>
+                <div class="chart-card">
+                    <h3>📈 成长曲线</h3>
+                    <canvas id="growth-chart" width="600" height="300"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>🎯 目标完成率</h3>
+                    <div class="completion-ring" id="completion-ring">
+                        <svg viewBox="0 0 200 200">
+                            <circle cx="100" cy="100" r="80" class="ring-bg"/>
+                            <circle cx="100" cy="100" r="80" class="ring-fill" id="ring-fill"/>
+                            <text x="100" y="105" class="ring-text" id="ring-text">0%</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="chart-card ai-card">
+                    <h3>🤖 AI 建议助手</h3>
+                    <div class="ai-suggestions" id="ai-suggestions">
+                        <p class="ai-placeholder">完成一些目标后，AI助手将为你提供个性化建议...</p>
+                    </div>
+                    <button class="btn-secondary" id="btn-get-suggestions">获取建议</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ===== 弹窗集合 ===== -->
+
+    <!-- 目标设定弹窗 -->
+    <div class="modal" id="goal-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">设定目标</h3>
+                <button class="modal-close" id="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>目标名称</label>
+                    <input type="text" id="goal-name" placeholder="例如：2年内学会钢琴">
+                </div>
+                <div class="form-group">
+                    <label>目标描述</label>
+                    <textarea id="goal-desc" placeholder="详细描述你的目标..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>优先级</label>
+                    <select id="goal-priority">
+                        <option value="high">🔴 高优先级</option>
+                        <option value="medium" selected>🟡 中优先级</option>
+                        <option value="low">🟢 低优先级</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>预计时长（月）</label>
+                    <input type="number" id="goal-duration" min="1" max="120" value="6">
+                </div>
+                <div class="form-group">
+                    <label>完成进度</label>
+                    <input type="range" id="goal-progress" min="0" max="100" value="0">
+                    <span id="progress-value">0%</span>
+                </div>
+                <div class="form-group">
+                    <label>子任务</label>
+                    <div id="subtasks-list"></div>
+                    <button class="btn-small" id="btn-add-subtask">+ 添加子任务</button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="btn-cancel-goal">取消</button>
+                <button class="btn-primary" id="btn-save-goal">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 创建角色弹窗 -->
+    <div class="modal" id="character-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>创建角色</h3>
+                <button class="modal-close" id="char-modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>角色名称</label>
+                    <input type="text" id="char-name-input" placeholder="给你的角色起个名字">
+                </div>
+                <div class="form-group">
+                    <label>选择形象</label>
+                    <div class="avatar-options" id="avatar-options">
+                        <span class="avatar-option selected" data-avatar="👨">👨</span>
+                        <span class="avatar-option" data-avatar="👩">👩</span>
+                        <span class="avatar-option" data-avatar="🧑">🧑</span>
+                        <span class="avatar-option" data-avatar="👦">👦</span>
+                        <span class="avatar-option" data-avatar="👧">👧</span>
+                        <span class="avatar-option" data-avatar="🧓">🧓</span>
+                        <span class="avatar-option" data-avatar="🦸">🦸</span>
+                        <span class="avatar-option" data-avatar="🧙">🧙</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>起始年龄</label>
+                    <input type="number" id="char-age-input" min="0" max="100" value="18">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="btn-cancel-char">取消</button>
+                <button class="btn-primary" id="btn-confirm-char">确认创建</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 自定义卡片弹窗 -->
+    <div class="modal" id="custom-card-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>自定义事件卡片</h3>
+                <button class="modal-close" id="custom-card-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>卡片名称</label>
+                    <input type="text" id="custom-card-name" placeholder="例如：学习日语">
+                </div>
+                <div class="form-group">
+                    <label>分类</label>
+                    <select id="custom-card-category">
+                        <option value="study">学习</option>
+                        <option value="work">工作</option>
+                        <option value="life">生活</option>
+                        <option value="entertainment">娱乐</option>
+                        <option value="health">健康</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>图标</label>
+                    <input type="text" id="custom-card-icon" placeholder="输入emoji，如 📚" maxlength="4">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="btn-cancel-custom">取消</button>
+                <button class="btn-primary" id="btn-save-custom">添加</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加习惯弹窗 -->
+    <div class="modal" id="habit-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>添加每日习惯</h3>
+                <button class="modal-close" id="habit-modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>习惯名称</label>
+                    <input type="text" id="habit-name-input" placeholder="例如：阅读30分钟">
+                </div>
+                <div class="form-group">
+                    <label>图标</label>
+                    <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;margin-bottom:0.5rem;">
+                        <span class="icon-quick-pick" style="font-size:1.3rem;cursor:pointer;">📚</span>
+                        <span class="icon-quick-pick" style="font-size:1.3rem;cursor:pointer;">🏃</span>
+                        <span class="icon-quick-pick" style="font-size:1.3rem;cursor:pointer;">🧘</span>
+                        <span class="icon-quick-pick" style="font-size:1.3rem;cursor:pointer;">💻</span>
+                        <span class="icon-quick-pick" style="font-size:1.3rem;cursor:pointer;">🎹</span>
+                        <span class="icon-quick-pick" style="font-size:1.3rem;cursor:pointer;">✍️</span>
+                        <span class="icon-quick-pick" style="font-size:1.3rem;cursor:pointer;">🧠</span>
+                        <span class="icon-quick-pick" style="font-size:1.3rem;cursor:pointer;">💪</span>
+                        <span class="icon-quick-pick" style="font-size:1.3rem;cursor:pointer;">🎸</span>
+                        <span class="icon-quick-pick" style="font-size:1.3rem;cursor:pointer;">😴</span>
+                    </div>
+                    <input type="text" id="habit-icon-input" placeholder="选择上方图标或输入emoji" maxlength="4">
+                </div>
+                <div class="form-group">
+                    <label>每日目标（小而具体）</label>
+                    <input type="text" id="habit-target-input" placeholder="例如：读10页书、跑步20分钟、练琴30分钟">
+                </div>
+                <div class="form-group">
+                    <label>频率</label>
+                    <div class="frequency-options">
+                        <span class="freq-option selected" data-freq="daily">每天</span>
+                        <span class="freq-option" data-freq="weekday">工作日</span>
+                        <span class="freq-option" data-freq="weekend">周末</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>关联目标（可选）</label>
+                    <select id="habit-link-goal">
+                        <option value="">不关联目标</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>提醒备注（可选）</label>
+                    <input type="text" id="habit-reminder-input" placeholder="例如：早上7点起床后做">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="btn-cancel-habit">取消</button>
+                <button class="btn-primary" id="btn-save-habit">保存习惯</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 习惯详情弹窗 -->
+    <div class="modal" id="habit-detail-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>习惯详情</h3>
+                <button class="modal-close" id="habit-detail-close">&times;</button>
+            </div>
+            <div class="modal-body" id="habit-detail-content"></div>
+        </div>
+    </div>
+
+    <!-- 添加/编辑成员弹窗 -->
+    <div class="modal" id="member-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="member-modal-title">添加家庭成员</h3>
+                <button class="modal-close" id="member-modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>成员名称</label>
+                    <input type="text" id="member-name-input" placeholder="例如：爸爸、妈妈、小明">
+                </div>
+                <div class="form-group">
+                    <label>出生年月日</label>
+                    <input type="date" id="member-birth-input">
+                    <span style="font-size:0.7rem;color:var(--text-muted);">用于生成专属的月度规划和年龄追踪</span>
+                </div>
+                <div class="form-group">
+                    <label>选择头像</label>
+                    <div class="member-avatar-options">
+                        <span class="member-avatar-option selected" data-avatar="😊">😊</span>
+                        <span class="member-avatar-option" data-avatar="👨">👨</span>
+                        <span class="member-avatar-option" data-avatar="👩">👩</span>
+                        <span class="member-avatar-option" data-avatar="👦">👦</span>
+                        <span class="member-avatar-option" data-avatar="👧">👧</span>
+                        <span class="member-avatar-option" data-avatar="🧒">🧒</span>
+                        <span class="member-avatar-option" data-avatar="👴">👴</span>
+                        <span class="member-avatar-option" data-avatar="👵">👵</span>
+                        <span class="member-avatar-option" data-avatar="🐱">🐱</span>
+                        <span class="member-avatar-option" data-avatar="🐶">🐶</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="btn-cancel-member">取消</button>
+                <button class="btn-primary" id="btn-save-member">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 管理成员弹窗 -->
+    <div class="modal" id="manage-members-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>管理家庭成员</h3>
+                <button class="modal-close" id="manage-modal-close">&times;</button>
+            </div>
+            <div class="modal-body" id="manage-members-content"></div>
+        </div>
+    </div>
+
+    <!-- 月份详情弹窗 -->
+    <div class="modal" id="month-detail-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="month-detail-title">月份详情</h3>
+                <button class="modal-close" id="month-detail-close">&times;</button>
+            </div>
+            <div class="modal-body" id="month-detail-content"></div>
+        </div>
+    </div>
+
+    <!-- Toast通知 -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+    <script src="js/data.js"></script>
+    <script src="js/family.js"></script>
+    <script src="js/cloud.js"></script>
+    <script src="js/timeline.js"></script>
+    <script src="js/goals.js"></script>
+    <script src="js/checkin.js"></script>
+    <script src="js/monthly.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/achievements.js"></script>
+    <script src="js/analytics.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

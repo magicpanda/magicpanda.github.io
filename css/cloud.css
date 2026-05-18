@@ -1,0 +1,150 @@
+/* ===== 云同步样式 ===== */
+
+.cloud-status-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.2rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 1rem;
+}
+
+.cloud-status-label {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+#cloud-sync-status {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.cloud-config-section {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.2rem;
+    margin-bottom: 1rem;
+}
+
+.cloud-config-section .form-group {
+    margin-bottom: 1rem;
+}
+
+.form-hint {
+    display: block;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-top: 0.3rem;
+    line-height: 1.5;
+}
+
+#cloud-config-input {
+    width: 100%;
+    padding: 0.7rem;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-family: 'SF Mono', Monaco, Consolas, monospace;
+    font-size: 0.75rem;
+    resize: vertical;
+}
+
+#cloud-config-input:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+#cloud-family-code-input {
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+}
+
+#family-code-display {
+    font-family: monospace;
+    font-weight: 700;
+    color: var(--secondary);
+    letter-spacing: 1px;
+}
+
+/* 帮助文档 */
+.cloud-help {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.2rem;
+    font-size: 0.85rem;
+    line-height: 1.6;
+}
+
+.cloud-help h4 {
+    font-size: 0.9rem;
+    margin: 0.8rem 0 0.5rem;
+    color: var(--primary-light);
+}
+
+.cloud-help h4:first-child {
+    margin-top: 0;
+}
+
+.cloud-help ol {
+    padding-left: 1.5rem;
+    color: var(--text-muted);
+}
+
+.cloud-help ol li {
+    margin-bottom: 0.4rem;
+    font-size: 0.8rem;
+}
+
+.cloud-help a {
+    color: var(--secondary);
+    text-decoration: none;
+}
+
+.cloud-help a:hover {
+    text-decoration: underline;
+}
+
+.cloud-help p {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    margin: 0.5rem 0;
+}
+
+.cloud-help pre {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 0.8rem;
+    font-size: 0.7rem;
+    color: var(--text);
+    overflow-x: auto;
+    font-family: 'SF Mono', Monaco, Consolas, monospace;
+    line-height: 1.4;
+}
+
+/* 同步指示器（导航栏角落） */
+.cloud-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    font-size: 0.7rem;
+    color: var(--success);
+    margin-left: 0.4rem;
+}
+
+.cloud-indicator.syncing {
+    color: var(--warning);
+    animation: pulse 1.5s infinite;
+}
+
+@media (max-width: 768px) {
+    #cloud-config-input {
+        font-size: 0.7rem;
+    }
+}

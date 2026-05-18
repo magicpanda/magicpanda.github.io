@@ -1,0 +1,386 @@
+/* ===== 月度规划样式 ===== */
+
+.monthly-section {
+    max-width: 1200px;
+}
+
+/* 头部信息 */
+.monthly-header-info {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem 1.2rem;
+    margin-bottom: 1rem;
+}
+
+.member-info-block {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.member-info-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+}
+
+.member-info-name {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.member-info-birth {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 0.2rem;
+}
+
+/* 空状态 */
+.monthly-empty {
+    text-align: center;
+    padding: 3rem 1rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+}
+
+.monthly-empty .empty-icon {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 1rem;
+}
+
+.monthly-empty p {
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.monthly-empty .empty-hint {
+    font-size: 0.8rem;
+    margin-bottom: 1.5rem;
+}
+
+/* 12个月网格 */
+.month-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+}
+
+/* 月份卡片 */
+.month-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem;
+    cursor: pointer;
+    transition: var(--transition);
+    position: relative;
+}
+
+.month-card:active {
+    transform: scale(0.98);
+}
+
+.month-card.current-month {
+    border-color: var(--primary);
+    background: linear-gradient(135deg, var(--bg-card), rgba(108, 92, 231, 0.05));
+}
+
+.month-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.6rem;
+}
+
+.month-card-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.month-num {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.month-year {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.month-badge-current {
+    background: var(--primary);
+    color: white;
+    font-size: 0.6rem;
+    padding: 0.1rem 0.5rem;
+    border-radius: 10px;
+    font-weight: 600;
+}
+
+.month-age {
+    font-size: 0.75rem;
+    color: var(--secondary);
+    background: rgba(0, 206, 201, 0.1);
+    padding: 0.2rem 0.5rem;
+    border-radius: 10px;
+}
+
+/* 月份进度条 */
+.month-progress-bar {
+    height: 4px;
+    background: var(--bg);
+    border-radius: 2px;
+    margin-bottom: 0.7rem;
+    overflow: hidden;
+}
+
+.month-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    border-radius: 2px;
+    transition: width 0.5s ease;
+}
+
+/* 月份卡片内容 */
+.month-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.month-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.month-section-label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-bottom: 0.2rem;
+}
+
+.month-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.6rem;
+    background: var(--bg);
+    border-radius: var(--radius-sm);
+    font-size: 0.8rem;
+}
+
+.month-item.done {
+    opacity: 0.6;
+}
+
+.month-item.done .month-item-name {
+    text-decoration: line-through;
+}
+
+.month-item-icon {
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.month-item-name {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+}
+
+.month-item-progress {
+    font-size: 0.7rem;
+    color: var(--primary-light);
+    flex-shrink: 0;
+}
+
+.month-more {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-align: center;
+    padding: 0.2rem;
+}
+
+/* 空槽位 */
+.month-empty-slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 1rem 0.5rem;
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    transition: var(--transition);
+}
+
+.month-card:active .month-empty-slot {
+    border-color: var(--primary);
+    color: var(--primary-light);
+}
+
+.empty-slot-icon {
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+.empty-slot-text {
+    font-size: 0.7rem;
+}
+
+/* ===== 月份详情弹窗 ===== */
+.month-detail-section {
+    margin-bottom: 1.2rem;
+}
+
+.month-detail-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.6rem;
+}
+
+.month-detail-section-header h4 {
+    font-size: 0.95rem;
+}
+
+.month-detail-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.month-detail-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.7rem 0.8rem;
+    background: var(--bg);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.month-detail-item:active {
+    transform: scale(0.98);
+}
+
+.month-detail-item.done {
+    opacity: 0.6;
+}
+
+.month-detail-item.done .month-item-name {
+    text-decoration: line-through;
+}
+
+.month-item-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.month-item-info .month-item-name {
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-bottom: 0.2rem;
+}
+
+.month-item-meta {
+    display: flex;
+    gap: 0.5rem;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
+
+.month-item-action {
+    flex-shrink: 0;
+    padding: 0.2rem 0.5rem;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    border-color: var(--border);
+}
+
+.month-item-action:active {
+    color: var(--danger);
+    border-color: var(--danger);
+}
+
+/* 月份详情打卡按钮 */
+.month-checkin-btn {
+    flex-shrink: 0;
+    padding: 0.4rem 0.8rem;
+    border-radius: 16px;
+    border: 1px solid var(--primary);
+    background: transparent;
+    color: var(--primary-light);
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.month-checkin-btn.checked {
+    background: var(--success);
+    border-color: var(--success);
+    color: white;
+}
+
+.month-checkin-btn:active {
+    transform: scale(0.95);
+}
+
+/* 提示语 */
+.month-detail-tip {
+    background: rgba(108, 92, 231, 0.08);
+    border: 1px solid rgba(108, 92, 231, 0.2);
+    border-radius: var(--radius-sm);
+    padding: 0.7rem 0.9rem;
+    display: flex;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin-top: 1rem;
+}
+
+.tip-icon {
+    flex-shrink: 0;
+    font-size: 1rem;
+}
+
+/* ===== 响应式 ===== */
+@media (min-width: 600px) {
+    .month-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .month-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (min-width: 1025px) {
+    .month-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .month-card:hover {
+        border-color: var(--primary);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow);
+    }
+}

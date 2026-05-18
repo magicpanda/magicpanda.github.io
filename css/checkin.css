@@ -1,0 +1,469 @@
+/* ===== 打卡模块样式 ===== */
+
+.checkin-section {
+    max-width: 600px;
+}
+
+/* 今日打卡概览 */
+.checkin-today {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.2rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.checkin-today-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.checkin-date {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.checkin-streak {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.8rem;
+    color: var(--warning);
+    background: rgba(253, 203, 110, 0.1);
+    padding: 0.3rem 0.6rem;
+    border-radius: 12px;
+}
+
+.checkin-summary {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 1rem;
+}
+
+.checkin-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.checkin-stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-light);
+}
+
+.checkin-stat-label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
+
+/* 打卡日历 */
+.checkin-calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    margin-top: 1rem;
+    padding: 0.5rem;
+}
+
+.calendar-day-label {
+    font-size: 0.6rem;
+    color: var(--text-muted);
+    text-align: center;
+    padding: 0.2rem;
+}
+
+.calendar-day {
+    aspect-ratio: 1;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    transition: var(--transition);
+}
+
+.calendar-day.today {
+    border: 2px solid var(--primary);
+    color: var(--text);
+    font-weight: 600;
+}
+
+.calendar-day.checked {
+    background: var(--primary);
+    color: white;
+}
+
+.calendar-day.checked.today {
+    background: var(--success);
+    border-color: var(--success);
+}
+
+.calendar-day.future {
+    opacity: 0.3;
+}
+
+/* 习惯/打卡列表 */
+.habits-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.habit-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    transition: var(--transition);
+}
+
+.habit-card:active {
+    transform: scale(0.98);
+}
+
+.habit-card.completed-today {
+    border-color: var(--success);
+    background: rgba(0, 184, 148, 0.05);
+}
+
+.habit-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.habit-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.habit-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 0.2rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.habit-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
+
+.habit-streak-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    background: rgba(253, 203, 110, 0.15);
+    color: var(--warning);
+    padding: 0.1rem 0.4rem;
+    border-radius: 8px;
+    font-size: 0.65rem;
+}
+
+.habit-frequency {
+    color: var(--secondary);
+}
+
+/* 打卡进度环 */
+.habit-progress-ring {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.habit-progress-ring svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.habit-progress-ring .ring-bg {
+    fill: none;
+    stroke: var(--border);
+    stroke-width: 3;
+}
+
+.habit-progress-ring .ring-fill {
+    fill: none;
+    stroke: var(--primary);
+    stroke-width: 3;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.5s ease;
+}
+
+.habit-progress-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 0.55rem;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+/* 打卡按钮 */
+.habit-checkin-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 2px solid var(--primary);
+    background: transparent;
+    color: var(--primary);
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.habit-checkin-btn:active {
+    transform: scale(0.9);
+}
+
+.habit-checkin-btn.checked {
+    background: var(--success);
+    border-color: var(--success);
+    color: white;
+    animation: checkinBounce 0.5s ease;
+}
+
+.habit-checkin-btn.checked::after {
+    content: '✓';
+    font-size: 1.2rem;
+}
+
+.habit-checkin-btn:not(.checked)::after {
+    content: '';
+}
+
+/* 添加习惯按钮 */
+.add-habit-btn {
+    background: var(--bg-card);
+    border: 2px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 1rem;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: var(--transition);
+    margin-top: 0.6rem;
+}
+
+.add-habit-btn:active {
+    border-color: var(--primary);
+    color: var(--primary-light);
+}
+
+/* 打卡详情/历史 */
+.habit-detail-header {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.habit-detail-icon {
+    font-size: 2.5rem;
+}
+
+.habit-detail-info h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.2rem;
+}
+
+.habit-detail-info p {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+/* 打卡统计 */
+.habit-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.8rem;
+    margin-bottom: 1.5rem;
+}
+
+.habit-stat-card {
+    background: var(--bg);
+    border-radius: var(--radius-sm);
+    padding: 0.8rem;
+    text-align: center;
+}
+
+.habit-stat-card .stat-num {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--primary-light);
+}
+
+.habit-stat-card .stat-text {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    margin-top: 0.2rem;
+}
+
+/* 周打卡视图 */
+.week-checkin-view {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.3rem;
+    margin: 1rem 0;
+    padding: 0.8rem;
+    background: var(--bg);
+    border-radius: var(--radius-sm);
+}
+
+.week-day {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.week-day-label {
+    font-size: 0.6rem;
+    color: var(--text-muted);
+}
+
+.week-day-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    transition: var(--transition);
+}
+
+.week-day-dot.checked {
+    background: var(--success);
+    border-color: var(--success);
+    color: white;
+}
+
+.week-day-dot.today {
+    border-color: var(--primary);
+}
+
+.week-day-dot.missed {
+    border-color: var(--danger);
+    opacity: 0.5;
+}
+
+/* 频率选择 */
+.frequency-options {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.freq-option {
+    padding: 0.4rem 0.8rem;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: var(--transition);
+    background: var(--bg);
+}
+
+.freq-option.selected {
+    border-color: var(--primary);
+    color: var(--primary-light);
+    background: rgba(108, 92, 231, 0.1);
+}
+
+/* 鼓励语 */
+.encouragement {
+    text-align: center;
+    padding: 1rem;
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+.encouragement .emoji {
+    font-size: 1.5rem;
+    display: block;
+    margin-bottom: 0.3rem;
+    font-style: normal;
+}
+
+/* ===== 响应式 ===== */
+@media (min-width: 769px) and (max-width: 1024px) {
+    /* iPad */
+    .checkin-section {
+        max-width: 750px;
+    }
+
+    .habits-list {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.8rem;
+    }
+
+    .habit-card {
+        padding: 1rem;
+    }
+
+    .checkin-summary {
+        gap: 3rem;
+    }
+
+    .checkin-calendar {
+        max-width: 300px;
+        margin: 1rem auto 0;
+    }
+}
+
+@media (min-width: 1025px) {
+    .checkin-section {
+        max-width: 700px;
+    }
+
+    .habits-list {
+        gap: 0.8rem;
+    }
+
+    .habit-card {
+        padding: 1.2rem;
+    }
+
+    .habit-card:hover {
+        border-color: var(--primary);
+        transform: translateX(4px);
+    }
+
+    .add-habit-btn:hover {
+        border-color: var(--primary);
+        color: var(--primary-light);
+    }
+
+    .checkin-summary {
+        gap: 3rem;
+    }
+}
